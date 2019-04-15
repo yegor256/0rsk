@@ -1,0 +1,53 @@
+assets:
+  config.yml: zerocracy/home#assets/0rsk/config.yml
+  id_rsa: zerocracy/home#assets/heroku-key
+  id_rsa.pub: zerocracy/home#assets/heroku-key.pub
+install: |-
+  export PATH=$PATH:/usr/lib/postgresql/10/bin
+  sudo apt-get -y update
+  sudo apt-get -y install libpq-dev
+  sudo rvm install ruby-2.6.0
+  rvm use 2.6.0
+  sudo gem install pdd
+  git config --global user.email "server@0rsk.com"
+  git config --global user.name "0rsk.com"
+release:
+  sensitive:
+    - config.yml
+  script: |-
+    pdd -f /dev/null
+    export GEM_HOME=~/.ruby
+    export GEM_PATH=$GEM_HOME:$GEM_PATH
+    bundle install --no-color
+    ruby -v
+    LC_ALL=en_US.UTF-8 rake
+    git remote add heroku git@heroku.com:0rsk.git
+    rm -rf ~/.ssh
+    mkdir ~/.ssh
+    mv ../id_rsa ../id_rsa.pub ~/.ssh
+    chmod -R 600 ~/.ssh/*
+    echo -e "Host *\n  StrictHostKeyChecking no\n  UserKnownHostsFile=/dev/null" > ~/.ssh/config
+    git fetch
+    sed -i "s/0\.0\.0/${tag}/g" ./version.rb
+    git add ./version.rb
+    git commit -m 'build number set'
+    cp ../config.yml config.yml
+    LC_ALL=en_US.UTF-8 rake config
+    git add config.yml
+    git commit -m 'config.yml'
+    git push -f heroku $(git symbolic-ref --short HEAD):master
+    git reset HEAD~1
+    LC_ALL=en_US.UTF-8 rake liquibase
+    rm -rf config.yml
+    curl -f --connect-timeout 15 --retry 5 --retry-delay 30 https://www.0rsk.com > /dev/null
+  commanders:
+  - yegor256
+architect:
+- yegor256
+merge:
+  commanders: []
+  script: |-
+    pdd -f /dev/null
+    bundle install
+    rake
+deploy: {}

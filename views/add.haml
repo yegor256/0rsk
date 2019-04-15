@@ -1,0 +1,18 @@
+%h2
+  Add
+
+%form{method: 'POST', action: '/do-add'}
+  %label Cause:
+  %input{type: 'text', name: 'cause', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1}
+  %label Risk:
+  %input{type: 'text', name: 'risk', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 2}
+  %label Effect:
+  %input{type: 'text', name: 'effect', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 3}
+  %input{type: 'submit', value: 'Add'}
+  %label Strategy:
+  %select{name: 'strategy'}
+    %option Mitigate
+    %option Accept
+  %label Plan:
+  %input{type: 'text', name: 'plan', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 2}
+  %input{type: 'submit', value: 'Add'}

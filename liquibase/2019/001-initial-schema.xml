@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<!--
+(The MIT License)
+
+Copyright (c) 2019 Yegor Bugayenko
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the 'Software'), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd" logicalFilePath="001-initial-schema.xml">
+  <changeSet id="001" author="yegor256">
+    <sql>
+      CREATE TABLE project (
+        id SERIAL PRIMARY KEY,
+        login VARCHAR(64) NOT NULL,
+        title VARCHAR(64) NOT NULL,
+        created TIMESTAMPTZ DEFAULT now() NOT NULL
+      )
+    </sql>
+    <sql>
+      CREATE TABLE cause (
+        id SERIAL PRIMARY KEY,
+        project INT NOT NULL REFERENCES project(id),
+        text VARCHAR(160) NOT NULL,
+        created TIMESTAMPTZ DEFAULT now() NOT NULL
+      )
+    </sql>
+    <sql>
+      CREATE TABLE risk (
+        id SERIAL PRIMARY KEY,
+        project INT NOT NULL REFERENCES project(id),
+        text VARCHAR(160) NOT NULL,
+        positive BOOLEAN NOT NULL DEFAULT false,
+        probability INT NOT NULL DEFAULT 3,
+        created TIMESTAMPTZ DEFAULT now() NOT NULL,
+        CHECK (probability &gt;= 1),
+        CHECK (probability &lt;= 9)
+      )
+    </sql>
+    <sql>
+      CREATE TABLE effect (
+        id SERIAL PRIMARY KEY,
+        project INT NOT NULL REFERENCES project(id),
+        text VARCHAR(160) NOT NULL,
+        impact INT NOT NULL DEFAULT 3,
+        created TIMESTAMPTZ DEFAULT now() NOT NULL,
+        CHECK (impact &gt;= 1),
+        CHECK (impact &lt;= 9)
+      )
+    </sql>
+    <sql>
+      CREATE TABLE plan (
+        id SERIAL PRIMARY KEY,
+        project INT NOT NULL REFERENCES project(id),
+        text VARCHAR(160) NOT NULL,
+        schedule VARCHAR(32) NOT NULL DEFAULT '',
+        created TIMESTAMPTZ DEFAULT now() NOT NULL
+      )
+    </sql>
+    <sql>
+      CREATE TABLE link (
+        id SERIAL PRIMARY KEY,
+        project INT NOT NULL REFERENCES project(id),
+        a VARCHAR(16) NOT NULL,
+        b VARCHAR(16) NOT NULL,
+        created TIMESTAMPTZ DEFAULT now() NOT NULL
+      )
+    </sql>
+    <sql>
+      CREATE TABLE ranked (
+        id SERIAL PRIMARY KEY,
+        project INT NOT NULL REFERENCES project(id),
+        rank INT NOT NULL,
+        mnemo VARCHAR(3) NOT NULL,
+        path VARCHAR(100) NOT NULL,
+        text VARCHAR(500) NOT NULL,
+        created TIMESTAMPTZ DEFAULT now() NOT NULL,
+        CHECK (rank &gt;= 1),
+        CHECK (rank &lt;= 81)
+      )
+    </sql>
+    <sql>
+      CREATE TABLE agenda (
+        id SERIAL PRIMARY KEY,
+        plan INT NOT NULL REFERENCES plan(id),
+        path VARCHAR(100) NOT NULL,
+        deadline TIMESTAMPTZ DEFAULT now() NOT NULL,
+        created TIMESTAMPTZ DEFAULT now() NOT NULL
+      )
+    </sql>
+  </changeSet>
+</databaseChangeLog>
