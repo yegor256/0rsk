@@ -20,8 +20,8 @@ release:
     export GEM_PATH=$GEM_HOME:$GEM_PATH
     bundle install --no-color
     ruby -v
-    LC_ALL=en_US.UTF-8 rake
-    git remote add heroku git@heroku.com:0rsk.git
+    LC_ALL=en_US.UTF-8 bundle exec rake
+    git remote add heroku git@heroku.com:zerorsk.git
     rm -rf ~/.ssh
     mkdir ~/.ssh
     mv ../id_rsa ../id_rsa.pub ~/.ssh
@@ -49,5 +49,5 @@ merge:
   script: |-
     pdd -f /dev/null
     bundle install
-    rake
+    bundle exec rake
 deploy: {}
