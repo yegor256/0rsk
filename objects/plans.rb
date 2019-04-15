@@ -14,14 +14,45 @@
 #
 # THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFINGEMENT. IN NO EVENT SHALL THE
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require_relative 'objects/rsk'
+require_relative 'rsk'
 
-module Rsk
-  VERSION = '0.0.0'
+# Plans.
+# Author:: Yegor Bugayenko (yegor256@gmail.com)
+# Copyright:: Copyright (c) 2019 Yegor Bugayenko
+# License:: MIT
+class Rsk::Plans
+  def initialize(pgsql, project)
+    @pgsql = pgsql
+    @project = project
+  end
+
+  def add(text)
+    @pgsql.exec(
+      'INSERT INTO plan (project, text) VALUES ($1, $2) RETURNING id',
+      [@project, text]
+    )[0]['id'].to_i
+  end
+
+  def exists?(id)
+    !@pgsql.exec(
+      'SELECT * FROM plan WHERE project = $1 AND id = $2',
+      [@project, id]
+    ).empty?
+  end
+
+  def fetch
+    @pgsql.exec('SELECT * FROM plan WHERE project = $1', [@project]).map do |r|
+      {
+        id: r['id'].to_i,
+        text: r['text'],
+        created: Time.parse(r['created'])
+      }
+    end
+  end
 end

@@ -22,17 +22,18 @@
 
 STDOUT.sync = true
 
-require 'time'
-require 'haml'
-require 'yaml'
-require 'json'
 require 'geocoder'
-require 'sinatra'
-require 'sinatra/cookies'
-require 'raven'
-require 'pgtk'
 require 'glogin'
 require 'glogin/codec'
+require 'haml'
+require 'json'
+require 'pgtk'
+require 'pgtk/pool'
+require 'raven'
+require 'sinatra'
+require 'sinatra/cookies'
+require 'time'
+require 'yaml'
 require_relative 'version'
 
 if ENV['RACK_ENV'] != 'test'
@@ -61,7 +62,7 @@ configure do
   if ENV['RACK_ENV'] != 'test'
     Raven.configure do |c|
       c.dsn = config['sentry']
-      c.release = VERSION
+      c.release = Rsk::VERSION
     end
   end
   set :dump_errors, false
@@ -74,19 +75,19 @@ configure do
     config['github']['client_secret'],
     'https://www.0rsk.com/github-callback'
   )
+  cfg = File.exist?('target/pgsql-config.yml') ? YAML.load_file('target/pgsql-config.yml') : config
   set :pgsql, Pgtk::Pool.new(
-    host: config['pgsql']['host'],
-    port: config['pgsql']['port'].to_i,
-    dbname: config['pgsql']['dbname'],
-    user: config['pgsql']['user'],
-    password: config['pgsql']['password']
-  )
-  settings.pgsql.start(10)
+    host: cfg['pgsql']['host'],
+    port: cfg['pgsql']['port'],
+    dbname: cfg['pgsql']['dbname'],
+    user: cfg['pgsql']['user'],
+    password: cfg['pgsql']['password']
+  ).start(4)
 end
 
 before '/*' do
   @locals = {
-    ver: VERSION,
+    ver: Rsk::VERSION,
     login_link: settings.glogin.login_uri,
     request_ip: request.ip
   }
@@ -143,7 +144,18 @@ get '/add' do
 end
 
 post '/do-add' do
-  error(404)
+  cid = params[:cid] || causes.add(params[:cause])
+  rid = params[:rid] || (risks.add(params[:risk]) if params[:risk])
+  eid = params[:eid] || (effects.add(params[:effect]) if params[:effect])
+  pid = params[:pid] || (plans.add(params[:plan]) if params[:plan])
+  links.add("C#{cid}", "R#{rid}") if cid && rid
+  links.add("R#{rid}", "E#{eid}") if rid && eid
+  links.add("C#{eid}", "P#{pid}") if pid && cid && !rid && !eid
+  links.add("R#{eid}", "P#{pid}") if pid && rid && !eid
+  links.add("E#{eid}", "P#{pid}") if pid && eid
+  risks.probability(rid, params[:probability].to_i) if rid && params[:probability]
+  effects.impact(eid, params[:impact].to_i) if eid && params[:impact]
+  flash('/', 'Thanks')
 end
 
 get '/robots.txt' do
@@ -183,7 +195,7 @@ error do
 end
 
 def context
-  "#{request.ip} #{request.user_agent} #{VERSION} #{Time.now.strftime('%Y/%m')}"
+  "#{request.ip} #{request.user_agent} #{Rsk::VERSION} #{Time.now.strftime('%Y/%m')}"
 end
 
 def merged(hash)
@@ -209,6 +221,31 @@ def current_user
   @locals[:user][:login].downcase
 end
 
-def ranked
-  Rsk::Ranked.new(pgsql: settings.pgsql)
+def current_project
+  @cookies['0rsk-project']
+end
+
+def ranked(project: current_project)
+  require_relative 'objects/ranked'
+  Rsk::Ranked.new(settings.pgsql, project)
+end
+
+def causes(project: current_project)
+  require_relative 'objects/causes'
+  Rsk::Causes.new(settings.pgsql, project)
+end
+
+def risks(project: current_project)
+  require_relative 'objects/risks'
+  Rsk::Risks.new(settings.pgsql, project)
+end
+
+def effects(project: current_project)
+  require_relative 'objects/effects'
+  Rsk::Effects.new(settings.pgsql, project)
+end
+
+def plans(project: current_project)
+  require_relative 'objects/plans'
+  Rsk::Plans.new(settings.pgsql, project)
 end

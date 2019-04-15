@@ -14,14 +14,30 @@
 #
 # THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFINGEMENT. IN NO EVENT SHALL THE
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require_relative 'objects/rsk'
+require 'minitest/autorun'
+require 'rack/test'
+require_relative 'test__helper'
+require_relative '../objects/rsk'
+require_relative '../objects/risks'
+require_relative '../objects/projects'
 
-module Rsk
-  VERSION = '0.0.0'
+# Test of Risks.
+# Author:: Yegor Bugayenko (yegor256@gmail.com)
+# Copyright:: Copyright (c) 2019 Yegor Bugayenko
+# License:: MIT
+class Rsk::RisksTest < Minitest::Test
+  def test_adds_and_fetches
+    pid = Rsk::Projects.new(test_pgsql, 'jeff19').add('test')
+    risks = Rsk::Risks.new(test_pgsql, pid)
+    text = 'we may lose data'
+    id = risks.add(text)
+    assert(id.positive?)
+    assert(risks.fetch.any? { |c| c[:text] == text })
+  end
 end

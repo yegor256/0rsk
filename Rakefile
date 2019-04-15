@@ -74,7 +74,7 @@ task(:config) do
   puts YAML.safe_load(File.open('config.yml')).to_yaml
 end
 
-task(run: :pgsql) do
+task(run: :liquibase) do
   `rerun -b "RACK_ENV=test rackup"`
 end
 

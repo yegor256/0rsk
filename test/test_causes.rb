@@ -22,7 +22,6 @@
 
 require 'minitest/autorun'
 require 'rack/test'
-require 'yaml'
 require_relative 'test__helper'
 require_relative '../objects/rsk'
 require_relative '../objects/causes'

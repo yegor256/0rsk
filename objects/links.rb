@@ -21,38 +21,45 @@
 # SOFTWARE.
 
 require_relative 'rsk'
+require_relative 'causes'
+require_relative 'risks'
+require_relative 'effects'
+require_relative 'plans'
 
-# Causes.
+# Links.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2019 Yegor Bugayenko
 # License:: MIT
-class Rsk::Causes
+class Rsk::Links
   def initialize(pgsql, project)
     @pgsql = pgsql
     @project = project
   end
 
-  def add(text)
+  def add(left, right)
     @pgsql.exec(
-      'INSERT INTO cause (project, text) VALUES ($1, $2) RETURNING id',
-      [@project, text]
+      'INSERT INTO link (project, a, b) VALUES ($1, $2, $3) RETURNING id',
+      [@project, real(left), real(right)]
     )[0]['id'].to_i
   end
 
-  def exists?(id)
-    !@pgsql.exec(
-      'SELECT * FROM cause WHERE project = $1 AND id = $2',
-      [@project, id]
-    ).empty?
-  end
+  private
 
-  def fetch
-    @pgsql.exec('SELECT * FROM cause WHERE project = $1', [@project]).map do |r|
-      {
-        id: r['id'].to_i,
-        text: r['text'],
-        created: Time.parse(r['created'])
-      }
+  def real(path)
+    raise "Invalid path #{path.inspect}" unless /^[CREP][0-9]+$/.match?(path)
+    id = path[1..-1].to_i
+    case path[0]
+    when 'C'
+      raise "Cause #{id} not found" unless Rsk::Causes.new(@pgsql, @project).exists?(id)
+    when 'R'
+      raise "Risk #{id} not found" unless Rsk::Risks.new(@pgsql, @project).exists?(id)
+    when 'E'
+      raise "Effect #{id} not found" unless Rsk::Effects.new(@pgsql, @project).exists?(id)
+    when 'P'
+      raise "Plan #{id} not found" unless Rsk::Plans.new(@pgsql, @project).exists?(id)
+    else
+      raise "Invalid prefix in #{path.inspect}"
     end
+    path
   end
 end
