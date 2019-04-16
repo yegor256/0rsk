@@ -234,7 +234,7 @@ post '/do-add' do
   links.add("C#{cid}", "R#{rid}") if cid && rid
   links.add("R#{rid}", "E#{eid}") if rid && eid
   links.add("C#{eid}", "P#{pid}") if pid && cid && !rid && !eid
-  links.add("R#{eid}", "P#{pid}") if pid && rid && !eid
+  links.add("R#{rid}", "P#{pid}") if pid && rid && !eid
   links.add("E#{eid}", "P#{pid}") if pid && eid
   risks.get(rid).probability = params[:probability].to_i if rid && params[:probability]
   effects.get(eid).impact = params[:impact].to_i if eid && params[:impact]
