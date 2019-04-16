@@ -303,7 +303,7 @@ def merged(hash)
   out
 end
 
-def flash(uri, msg, color: 'darkgreen')
+def flash(uri, msg = '', color: 'darkgreen')
   cookies[:flash_msg] = msg
   cookies[:flash_color] = color
   redirect uri

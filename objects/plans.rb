@@ -60,8 +60,12 @@ class Rsk::Plans
     )
     rows.map do |r|
       {
-        id: r['id'].to_i,
-        text: r['text']
+        label: "P#{r['id']}: #{r['text']}",
+        value: r['text'],
+        fields: {
+          pid: r['id'].to_i,
+          schedule: r['schedule']
+        }
       }
     end
   end

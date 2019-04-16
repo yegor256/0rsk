@@ -38,6 +38,6 @@ class Rsk::PlansTest < Minitest::Test
     text = 'we make backups'
     id = plans.add(text)
     assert(id.positive?)
-    assert(plans.fetch.any? { |c| c[:text] == text })
+    assert(plans.fetch.any? { |c| c[:value] == text })
   end
 end

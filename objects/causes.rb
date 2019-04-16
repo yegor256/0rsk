@@ -61,8 +61,11 @@ class Rsk::Causes
     )
     rows.map do |r|
       {
-        id: r['id'].to_i,
-        text: r['text']
+        label: "C#{r['id']}: #{r['text']}",
+        value: r['text'],
+        fields: {
+          cid: r['id'].to_i
+        }
       }
     end
   end

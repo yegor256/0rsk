@@ -1,6 +1,6 @@
 /*global $ */
 
-function auto(kind, prefix, field) {
+function auto(kind) {
   'use strict';
   $("#" + kind).autocomplete({
     source: function(request, response) {
@@ -10,26 +10,22 @@ function auto(kind, prefix, field) {
         dataType: "json",
         data: { query: request.term },
         success: function(data) {
-          response($.map(data, function(item) {
-            return {
-              label: prefix + item.id + ': ' + item.text,
-              value: item.text,
-              id: item.id
-            };
-          }));
+          response(data);
         }
       });
     },
     select: function(event, ui) {
-      $(field).val(ui.item.id);
+      $.each(ui.item.fields, function(field, v) {
+        $("#" + field).val(v);
+      });
     }
   });
 }
 
 $(function() {
   'use strict';
-  auto("cause", "C", "#cid");
-  auto("risk", "R", "#rid");
-  auto("effect", "E", "#eid");
-  auto("plan", "P", "#pid");
+  auto("cause");
+  auto("risk");
+  auto("effect");
+  auto("plan");
 });

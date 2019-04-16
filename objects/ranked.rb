@@ -97,9 +97,9 @@ class Rsk::Ranked
     if mnemo.end_with?('*')
       case mnemo
       when 'C*', '*'
-        %w[C CR CRE CREP]
+        %w[C CR CP CRE CREP]
       when 'CR*'
-        %w[CR CRE CREP]
+        %w[CR CRE CRP CREP]
       when 'CRE*'
         %w[CRE CREP]
       end

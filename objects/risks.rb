@@ -60,8 +60,12 @@ class Rsk::Risks
     )
     rows.map do |r|
       {
-        id: r['id'].to_i,
-        text: r['text']
+        label: "R#{r['id']}: #{r['text']}",
+        value: r['text'],
+        fields: {
+          rid: r['id'].to_i,
+          probability: r['probability'].to_i
+        }
       }
     end
   end

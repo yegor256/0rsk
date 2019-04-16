@@ -60,8 +60,12 @@ class Rsk::Effects
     )
     rows.map do |r|
       {
-        id: r['id'].to_i,
-        text: r['text']
+        label: "E#{r['id']}: #{r['text']}",
+        value: r['text'],
+        fields: {
+          eid: r['id'].to_i,
+          impact: r['impact'].to_i
+        }
       }
     end
   end

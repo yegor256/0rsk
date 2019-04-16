@@ -35,6 +35,6 @@
       %a.item.small{href: "/ranked/delete?id=#{r[:id]}"} Delete
 
 %p
-  - ['C', 'CR', 'CRE', 'CR*', 'CRE*', 'CREP', '*'].each do |m|
+  - ['C', 'CR', 'CP', 'CRE', 'CR*', 'CRE*', 'CRP', 'CREP', '*'].each do |m|
     %a.item{href: "?mnemo=#{m}&path=#{path.join(' ')}&q=#{CGI.escape(query)}"}<
       %code= m

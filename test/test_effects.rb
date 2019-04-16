@@ -39,6 +39,6 @@ class Rsk::EffectsTest < Minitest::Test
     eid = effects.add(text)
     assert(eid.positive?)
     assert(effects.exists?(eid))
-    assert(effects.fetch.any? { |c| c[:text] == text })
+    assert(effects.fetch.any? { |c| c[:value] == text })
   end
 end

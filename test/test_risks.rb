@@ -39,6 +39,6 @@ class Rsk::RisksTest < Minitest::Test
     rid = risks.add(text)
     assert(rid.positive?)
     assert(risks.exists?(rid))
-    assert(risks.fetch.any? { |c| c[:text] == text })
+    assert(risks.fetch.any? { |c| c[:value] == text })
   end
 end

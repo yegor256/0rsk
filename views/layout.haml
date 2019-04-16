@@ -50,7 +50,7 @@
               %li
                 %a{href: '/logout'}
                   Logout
-        - if defined? flash_msg
+        - if defined?(flash_msg) && !flash_msg.empty?
           %p{style: 'background-color:' + flash_color + ';color:white;padding:.1em .5em;border-radius:4px;width:100%;'}
             = flash_msg
       %article
