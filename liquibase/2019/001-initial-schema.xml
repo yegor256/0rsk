@@ -30,15 +30,18 @@ SOFTWARE.
         login VARCHAR(64) NOT NULL,
         title VARCHAR(64) NOT NULL,
         created TIMESTAMPTZ DEFAULT now() NOT NULL
-      )
+      );
+      CREATE INDEX idx_project1 ON project (login);
     </sql>
     <sql>
       CREATE TABLE cause (
         id SERIAL PRIMARY KEY,
         project INT NOT NULL REFERENCES project(id),
         text VARCHAR(160) NOT NULL,
-        created TIMESTAMPTZ DEFAULT now() NOT NULL
-      )
+        created TIMESTAMPTZ DEFAULT now() NOT NULL,
+        UNIQUE(project, text)
+      );
+      CREATE INDEX idx_cause1 ON cause (project);
     </sql>
     <sql>
       CREATE TABLE risk (
@@ -49,8 +52,10 @@ SOFTWARE.
         probability INT NOT NULL DEFAULT 3,
         created TIMESTAMPTZ DEFAULT now() NOT NULL,
         CHECK (probability &gt;= 1),
-        CHECK (probability &lt;= 9)
-      )
+        CHECK (probability &lt;= 9),
+        UNIQUE(project, text)
+      );
+      CREATE INDEX idx_risk1 ON risk (project);
     </sql>
     <sql>
       CREATE TABLE effect (
@@ -60,8 +65,10 @@ SOFTWARE.
         impact INT NOT NULL DEFAULT 3,
         created TIMESTAMPTZ DEFAULT now() NOT NULL,
         CHECK (impact &gt;= 1),
-        CHECK (impact &lt;= 9)
-      )
+        CHECK (impact &lt;= 9),
+        UNIQUE(project, text)
+      );
+      CREATE INDEX idx_effect1 ON effect (project);
     </sql>
     <sql>
       CREATE TABLE plan (
@@ -69,8 +76,10 @@ SOFTWARE.
         project INT NOT NULL REFERENCES project(id),
         text VARCHAR(160) NOT NULL,
         schedule VARCHAR(32) NOT NULL DEFAULT '',
-        created TIMESTAMPTZ DEFAULT now() NOT NULL
-      )
+        created TIMESTAMPTZ DEFAULT now() NOT NULL,
+        UNIQUE(project, text)
+      );
+      CREATE INDEX idx_plan1 ON plan (project);
     </sql>
     <sql>
       CREATE TABLE link (
@@ -78,30 +87,38 @@ SOFTWARE.
         project INT NOT NULL REFERENCES project(id),
         a VARCHAR(16) NOT NULL,
         b VARCHAR(16) NOT NULL,
-        created TIMESTAMPTZ DEFAULT now() NOT NULL
-      )
+        created TIMESTAMPTZ DEFAULT now() NOT NULL,
+        UNIQUE(project, a, b)
+      );
+      CREATE INDEX idx_link1 ON link (project, a);
     </sql>
     <sql>
       CREATE TABLE ranked (
         id SERIAL PRIMARY KEY,
         project INT NOT NULL REFERENCES project(id),
         rank INT NOT NULL,
-        mnemo VARCHAR(3) NOT NULL,
+        mnemo VARCHAR(4) NOT NULL,
         path VARCHAR(100) NOT NULL,
         text VARCHAR(500) NOT NULL,
         created TIMESTAMPTZ DEFAULT now() NOT NULL,
         CHECK (rank &gt;= 1),
-        CHECK (rank &lt;= 81)
-      )
+        CHECK (rank &lt;= 81),
+        UNIQUE(project, path)
+      );
+      CREATE INDEX idx_ranked1 ON ranked (project, rank, mnemo, path, text);
     </sql>
     <sql>
       CREATE TABLE agenda (
         id SERIAL PRIMARY KEY,
+        login VARCHAR(64) NOT NULL,
         plan INT NOT NULL REFERENCES plan(id),
         path VARCHAR(100) NOT NULL,
+        text TEXT NOT NULL,
         deadline TIMESTAMPTZ DEFAULT now() NOT NULL,
-        created TIMESTAMPTZ DEFAULT now() NOT NULL
-      )
+        created TIMESTAMPTZ DEFAULT now() NOT NULL,
+        UNIQUE(plan)
+      );
+      CREATE INDEX idx_agenda1 ON agenda (login, deadline, path, text);
     </sql>
   </changeSet>
 </databaseChangeLog>
