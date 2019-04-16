@@ -189,6 +189,26 @@ get '/projects/{id}' do
   )
 end
 
+get '/causes.json' do
+  content_type('application/json')
+  JSON.pretty_generate(causes.fetch(query: params[:query] || ''))
+end
+
+get '/risks.json' do
+  content_type('application/json')
+  JSON.pretty_generate(risks.fetch(query: params[:query] || ''))
+end
+
+get '/effects.json' do
+  content_type('application/json')
+  JSON.pretty_generate(effects.fetch(query: params[:query] || ''))
+end
+
+get '/plans.json' do
+  content_type('application/json')
+  JSON.pretty_generate(plans.fetch(query: params[:query] || ''))
+end
+
 get '/add' do
   chunks = (params[:path] || '').split(' ')
   vars = { title: '/add' }
@@ -225,6 +245,13 @@ post '/do-add' do
   ranked.analyze('CREP', "C#{cid} R#{rid} E#{eid} P#{pid}") if rid && eid && pid
   agenda.analyze(pid) if pid
   flash('/ranked', 'Thanks')
+end
+
+get '/js/*.js' do
+  file = File.join('js', params[:splat].first) + '.js'
+  error(404, "File not found: #{file}") unless File.exist?(file)
+  content_type 'application/javascript'
+  IO.read(file)
 end
 
 get '/robots.txt' do

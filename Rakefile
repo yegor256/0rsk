@@ -29,7 +29,7 @@ raise "Invalid encoding \"#{Encoding.default_external}\"" unless Encoding.defaul
 
 ENV['RACK_ENV'] = 'test'
 
-task default: %i[check_outdated_gems clean test rubocop xcop copyright]
+task default: %i[check_outdated_gems clean test eslint rubocop xcop copyright]
 
 require 'rake/testtask'
 Rake::TestTask.new(test: %i[pgsql liquibase]) do |test|
@@ -44,6 +44,12 @@ require 'rubocop/rake_task'
 RuboCop::RakeTask.new(:rubocop) do |task|
   task.fail_on_error = true
   task.requires << 'rubocop-rspec'
+end
+
+require 'eslintrb/eslinttask'
+Eslintrb::EslintTask.new(:eslint) do |t|
+  t.pattern = 'js/**/*.js'
+  t.options = :defaults
 end
 
 require 'pgtk/pgsql_task'

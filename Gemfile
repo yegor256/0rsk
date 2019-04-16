@@ -23,6 +23,7 @@ source 'https://rubygems.org'
 ruby '2.6.0'
 
 gem 'codecov', '0.1.14'
+gem 'eslintrb', '2.1.0'
 gem 'fakesmtpd', '0.3.1'
 gem 'geocoder', '1.5.0'
 gem 'glogin', '~> 0.4'
