@@ -39,27 +39,41 @@ class Rsk::Links
   def add(left, right)
     @pgsql.exec(
       'INSERT INTO link (project, a, b) VALUES ($1, $2, $3) RETURNING id',
-      [@project, real(left), real(right)]
+      [@project, item(left).chunk, item(right).chunk]
     )[0]['id'].to_i
+  end
+
+  def right_of(chunk)
+    @pgsql.exec(
+      'SELECT b FROM link WHERE project = $1 AND a = $2',
+      [@project, chunk]
+    ).map { |r| r['b'] }
+  end
+
+  def item(path)
+    raise "Invalid path #{path.inspect}" unless /^[CREP][0-9]+$/.match?(path)
+    id = path[1..-1].to_i
+    bag = bag(path[0])
+    unless bag.exists?(id)
+      raise "#{path.inspect}: #{bag.class.name.split('::').last}/#{id} not found in the project ##{@project}"
+    end
+    bag.get(id)
   end
 
   private
 
-  def real(path)
-    raise "Invalid path #{path.inspect}" unless /^[CREP][0-9]+$/.match?(path)
-    id = path[1..-1].to_i
-    case path[0]
+  def bag(prefix)
+    case prefix
     when 'C'
-      raise "Cause #{id} not found" unless Rsk::Causes.new(@pgsql, @project).exists?(id)
+      Rsk::Causes.new(@pgsql, @project)
     when 'R'
-      raise "Risk #{id} not found" unless Rsk::Risks.new(@pgsql, @project).exists?(id)
+      Rsk::Risks.new(@pgsql, @project)
     when 'E'
-      raise "Effect #{id} not found" unless Rsk::Effects.new(@pgsql, @project).exists?(id)
+      Rsk::Effects.new(@pgsql, @project)
     when 'P'
-      raise "Plan #{id} not found" unless Rsk::Plans.new(@pgsql, @project).exists?(id)
+      Rsk::Plans.new(@pgsql, @project)
     else
-      raise "Invalid prefix in #{path.inspect}"
+      raise "Invalid prefix #{prefix.inspect}"
     end
-    path
   end
 end

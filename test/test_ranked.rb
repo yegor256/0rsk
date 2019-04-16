@@ -24,23 +24,29 @@ require 'minitest/autorun'
 require 'rack/test'
 require_relative 'test__helper'
 require_relative '../objects/rsk'
-require_relative '../objects/links'
+require_relative '../objects/ranked'
 require_relative '../objects/causes'
 require_relative '../objects/risks'
+require_relative '../objects/effects'
 require_relative '../objects/projects'
 
-# Test of Links.
+# Test of Ranked.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2019 Yegor Bugayenko
 # License:: MIT
-class Rsk::LinksTest < Minitest::Test
+class Rsk::RankedTest < Minitest::Test
   def test_adds_and_fetches
-    pid = Rsk::Projects.new(test_pgsql, 'jeff13').add('test')
+    pid = Rsk::Projects.new(test_pgsql, 'jeff31').add('test')
     cid = Rsk::Causes.new(test_pgsql, pid).add('we have data')
-    rid = Rsk::Risks.new(test_pgsql, pid).add('we may lose data')
+    rid = Rsk::Risks.new(test_pgsql, pid).add('we may lose it')
+    eid = Rsk::Effects.new(test_pgsql, pid).add('business will stop')
     links = Rsk::Links.new(test_pgsql, pid)
-    id = links.add("C#{cid}", "R#{rid}")
-    assert(id.positive?)
-    assert_equal(["R#{rid}"], links.right_of("C#{cid}"))
+    links.add("C#{cid}", "R#{rid}")
+    links.add("R#{rid}", "E#{eid}")
+    ranked = Rsk::Ranked.new(test_pgsql, pid)
+    ranked.analyze('C', "C#{cid}")
+    i = ranked.fetch(chunks: ["C#{cid}"])[0]
+    assert_equal('CRE', i[:mnemo])
+    assert_equal(["C#{cid}", "R#{rid}", "E#{eid}"], i[:chunks])
   end
 end

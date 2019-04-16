@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 require_relative 'rsk'
+require_relative 'plan'
 
 # Plans.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -33,6 +34,7 @@ class Rsk::Plans
   end
 
   def add(text)
+    raise Rsk::Urror, 'Plan text can\'t be empty' if text.empty?
     @pgsql.exec(
       'INSERT INTO plan (project, text) VALUES ($1, $2) RETURNING id',
       [@project, text]
@@ -44,6 +46,11 @@ class Rsk::Plans
       'SELECT * FROM plan WHERE project = $1 AND id = $2',
       [@project, id]
     ).empty?
+  end
+
+  def get(id)
+    require_relative 'plan'
+    Rsk::Plan.new(@pgsql, id)
   end
 
   def fetch

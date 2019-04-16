@@ -32,8 +32,9 @@
           %ul
             %li
               - if defined? user
-                %a{href: '/'}
-                  = "@#{user[:login]}"
+                %a{href: '/'}= "@#{user[:login]}"
+                = '/'
+                %a{href: "/projects/#{current_project}"}= current_project
               - else
                 %a{href: login_link}
                   Login

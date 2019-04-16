@@ -36,8 +36,9 @@ class Rsk::RisksTest < Minitest::Test
     pid = Rsk::Projects.new(test_pgsql, 'jeff19').add('test')
     risks = Rsk::Risks.new(test_pgsql, pid)
     text = 'we may lose data'
-    id = risks.add(text)
-    assert(id.positive?)
+    rid = risks.add(text)
+    assert(rid.positive?)
+    assert(risks.exists?(rid))
     assert(risks.fetch.any? { |c| c[:text] == text })
   end
 end

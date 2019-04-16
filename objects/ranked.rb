@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 require_relative 'rsk'
+require_relative 'links'
 
 # Ranked.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -32,26 +33,98 @@ class Rsk::Ranked
     @project = project
   end
 
-  # For example: mnemo="CR", path="[C43] [R89]"
+  # For example: mnemo="CR", path="C43 R89"
   def analyze(mnemo, path)
-    rank = 1
-    text = 'hey'
-    @pgsql.exec(
-      'INSERT INTO ranked (project, rank, mnemo, path, text) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-      [@project, rank, mnemo, path, text]
-    )[0]['id'].to_i
+    chunks = path.split(' ')
+    insert(mnemo, chunks)
+    case mnemo
+    when 'C'
+      links = Rsk::Links.new(@pgsql, @project)
+      links.right_of(chunks[0]).each do |e|
+        analyze('CR', (chunks + [e]).join(' '))
+      end
+    when 'CR'
+      links = Rsk::Links.new(@pgsql, @project)
+      links.right_of(chunks[1]).each do |e|
+        analyze('CRE', (chunks + [e]).join(' '))
+      end
+    end
   end
 
-  def fetch(offset: 0, limit: 50)
-    @pgsql.exec('SELECT * FROM ranked WHERE project = $1 OFFSET $2 LIMIT $3', [@project, offset, limit]).map do |r|
+  def delete(_id)
+    raise 'not implemented'
+  end
+
+  def fetch(query: '', chunks: [], mnemo: '*', offset: 0, limit: 50)
+    rows = @pgsql.exec(
+      [
+        'SELECT * FROM ranked',
+        'WHERE project = $1',
+        'AND text LIKE $4',
+        'AND (' + mnemos(mnemo).map { |m| "mnemo = '#{m}'" }.join(' OR ') + ')',
+        chunks.empty? ? '' : 'AND (' + chunks.map { |c| "path LIKE '%[#{c}]%'" }.join(' OR ') + ')',
+        'ORDER BY rank DESC',
+        'OFFSET $2 LIMIT $3'
+      ].join(' '),
+      [@project, offset, limit, "%#{query}%"]
+    )
+    rows.map do |r|
+      c = r['path'].scan(/\[([A-Z][0-9]+)\]/).map { |x| x[0] }
       {
         id: r['id'].to_i,
         rank: r['rank'].to_i,
         mnemo: r['mnemo'],
-        path: r['path'],
+        path: c.join(' '),
+        chunks: c,
         text: r['text'],
         created: Time.parse(r['created'])
       }
     end
+  end
+
+  private
+
+  def insert(mnemo, chunks)
+    @pgsql.exec(
+      [
+        'INSERT INTO ranked (project, rank, mnemo, path, text)',
+        'VALUES ($1, $2, $3, $4, $5)',
+        'ON CONFLICT(project, path) DO UPDATE SET rank = $2, text = $5',
+        'RETURNING id'
+      ].join(' '),
+      [@project, rank(mnemo, chunks), mnemo, chunks.map { |c| "[#{c}]" }.join(' '), text(chunks)]
+    )[0]['id'].to_i
+  end
+
+  def mnemos(mnemo)
+    if mnemo.end_with?('*')
+      case mnemo
+      when 'C*', '*'
+        %w[C CR CRE]
+      when 'CR*'
+        %w[CR CRE]
+      end
+    else
+      [mnemo]
+    end
+  end
+
+  def rank(mnemo, chunks)
+    case mnemo
+    when 'C'
+      1
+    when 'CR'
+      1
+    when 'CRE'
+      links = Rsk::Links.new(@pgsql, @project)
+      risk = links.item(chunks[1])
+      effect = links.item(chunks[2])
+      risk.probability * effect.impact
+    end
+  end
+
+  def text(chunks)
+    links = Rsk::Links.new(@pgsql, @project)
+    chunks.map { |c| links.item(c).text }.join('; ')
   end
 end

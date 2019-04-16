@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 require_relative 'rsk'
+require_relative 'risk'
 
 # Risks.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -33,6 +34,7 @@ class Rsk::Risks
   end
 
   def add(text)
+    raise Rsk::Urror, 'Risk text can\'t be empty' if text.empty?
     @pgsql.exec(
       'INSERT INTO risk (project, text) VALUES ($1, $2) RETURNING id',
       [@project, text]
@@ -46,11 +48,9 @@ class Rsk::Risks
     ).empty?
   end
 
-  def probability(rid, value)
-    @pgsql.exec(
-      'UPDATE risk SET probability = $3 WHERE project = $1 and id = $2',
-      [@project, rid, value]
-    )
+  def get(id)
+    require_relative 'risk'
+    Rsk::Risk.new(@pgsql, id)
   end
 
   def fetch

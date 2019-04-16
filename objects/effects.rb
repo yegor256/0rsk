@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 require_relative 'rsk'
+require_relative 'effect'
 
 # Effects.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -33,6 +34,7 @@ class Rsk::Effects
   end
 
   def add(text)
+    raise Rsk::Urror, 'Effect text can\'t be empty' if text.empty?
     @pgsql.exec(
       'INSERT INTO effect (project, text) VALUES ($1, $2) RETURNING id',
       [@project, text]
@@ -46,11 +48,9 @@ class Rsk::Effects
     ).empty?
   end
 
-  def impact(eid, value)
-    @pgsql.exec(
-      'UPDATE effect SET impact = $3 WHERE project = $1 and id = $2',
-      [@project, eid, value]
-    )
+  def get(id)
+    require_relative 'effect'
+    Rsk::Effect.new(@pgsql, id)
   end
 
   def fetch

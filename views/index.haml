@@ -1,6 +1,31 @@
-%h2
-  Top Risks
+%form{method: 'GET', action: ''}
+  %input{type: 'text', name: 'q', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: query}
+  %input{type: 'submit', value: 'Search', tabindex: 2}
+
+%p
+  Mnemo:
+  %code= mnemo
+  = '/'
+  - ['C', 'CR', 'CRE', 'CR*', '*'].each do |m|
+    %a.item{href: "?mnemo=#{m}&path=#{path.join(' ')}&q=#{CGI.escape(query)}"}<
+      %code= m
+
+- unless path.empty?
+  %p
+    Path:
+    - path.each do |c|
+      %code=c
+      %a.item{href: "?path=#{(path - [c]).sort.uniq.join(' ')}&mnemo=#{mnemo}&q=#{query}"} x
 
 - ranked.each do |r|
   %p
-    = r[:html]
+    %span{style: 'color: ' + (r[:rank] < 32 ? 'gray' : (r[:rank] > 64 ? 'orangered' : 'seagreen'))}
+      = "#{r[:rank]}:"
+    - r[:chunks].each do |c|
+      %a{href: "?path=#{(path + [c]).sort.uniq.join(' ')}&mnemo=#{mnemo}&q=#{query}"}<
+        %code= c
+    = r[:text]
+    %br
+    %a.item.small{href: "/add?path=#{r[:path]}"} Edit
+    %a.item.small{href: "/delete?id=#{r[:id]}"} Delete
+

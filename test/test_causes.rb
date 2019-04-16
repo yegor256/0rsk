@@ -36,8 +36,9 @@ class Rsk::CausesTest < Minitest::Test
     pid = Rsk::Projects.new(test_pgsql, 'jeff11').add('test')
     causes = Rsk::Causes.new(test_pgsql, pid)
     text = 'we use Ruby'
-    id = causes.add(text)
-    assert(id.positive?)
+    cid = causes.add(text)
+    assert(cid.positive?)
+    assert(causes.exists?(cid))
     assert(causes.fetch.any? { |c| c[:text] == text })
   end
 end

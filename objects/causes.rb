@@ -21,6 +21,8 @@
 # SOFTWARE.
 
 require_relative 'rsk'
+require_relative 'cause'
+require_relative 'urror'
 
 # Causes.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -33,6 +35,7 @@ class Rsk::Causes
   end
 
   def add(text)
+    raise Rsk::Urror, 'Cause text can\'t be empty' if text.empty?
     @pgsql.exec(
       'INSERT INTO cause (project, text) VALUES ($1, $2) RETURNING id',
       [@project, text]
@@ -44,6 +47,11 @@ class Rsk::Causes
       'SELECT * FROM cause WHERE project = $1 AND id = $2',
       [@project, id]
     ).empty?
+  end
+
+  def get(id)
+    require_relative 'cause'
+    Rsk::Cause.new(@pgsql, id)
   end
 
   def fetch

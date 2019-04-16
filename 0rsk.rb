@@ -35,6 +35,7 @@ require 'sinatra/cookies'
 require 'time'
 require 'yaml'
 require_relative 'version'
+require_relative 'objects/urror'
 
 if ENV['RACK_ENV'] != 'test'
   require 'rack/ssl'
@@ -65,8 +66,9 @@ configure do
       c.release = Rsk::VERSION
     end
   end
-  set :dump_errors, false
   set :show_exceptions, false
+  set :raise_errors, false
+  set :dump_errors, false
   set :config, config
   set :logging, true
   set :server_settings, timeout: 25
@@ -103,11 +105,6 @@ before '/*' do
       cookies.delete(:glogin)
     end
   end
-  if params[:auth]
-    @locals[:user] = {
-      login: settings.codec.decrypt(Hex::ToText.new(params[:auth]).to_s)
-    }
-  end
 end
 
 get '/github-callback' do
@@ -131,30 +128,80 @@ get '/hello' do
 end
 
 get '/' do
+  query = params[:q] || ''
+  path = (params[:path] || '').split(' ')
+  mnemo = params[:mnemo] || 'CRE'
   haml :index, layout: :layout, locals: merged(
     title: '/',
-    ranked: ranked.fetch(offset: 0, limit: 10)
+    path: path,
+    mnemo: mnemo,
+    query: query,
+    ranked: ranked.fetch(query: query, chunks: path, mnemo: mnemo, offset: 0, limit: 10)
+  )
+end
+
+get '/delete' do
+  id = params[:id]
+  ranked.delete(id)
+  flash('/', "The item ##{id} deleted")
+end
+
+get '/projects' do
+  haml :projects, layout: :layout, locals: merged(
+    title: '/projects',
+    projects: projects.fetch
+  )
+end
+
+get '/projects/select' do
+  pid = params[:id]
+  cookies['0rsk-project'] = pid
+  flash('/', "Project ##{pid} selected")
+end
+
+post '/projects/create' do
+  title = params[:title]
+  pid = projects.add(title)
+  flash("/projects/select?id=#{pid}", "A new project ##{pid} selected")
+end
+
+get '/projects/{id}' do
+  pid = params[:id]
+  haml :project, layout: :layout, locals: merged(
+    title: "##{pid}",
+    pid: pid
   )
 end
 
 get '/add' do
-  haml :add, layout: :layout, locals: merged(
-    title: '/add'
-  )
+  chunks = (params[:path] || '').split(' ')
+  vars = { title: '/add' }
+  chunks.each do |c|
+    i = links.item(c)
+    vars[i.mnemo.downcase + '_item'] = i
+  end
+  haml :add, layout: :layout, locals: merged(vars)
 end
 
 post '/do-add' do
-  cid = params[:cid] || causes.add(params[:cause])
-  rid = params[:rid] || (risks.add(params[:risk]) if params[:risk])
-  eid = params[:eid] || (effects.add(params[:effect]) if params[:effect])
-  pid = params[:pid] || (plans.add(params[:plan]) if params[:plan])
+  cid = params[:cid].empty? ? causes.add(params[:cause].strip) : params[:cid]
+  rid = params[:rid].empty? ? (risks.add(params[:risk].strip) unless params[:risk].empty?) : params[:rid]
+  eid = params[:eid].empty? ? (effects.add(params[:effect].strip) unless params[:effect].empty?) : params[:eid]
+  pid = params[:pid].empty? ? (plans.add(params[:plan].strip) unless params[:plan].empty?) : params[:pid]
+  causes.get(cid).text = params[:cause].strip if params[:cause]
+  risks.get(rid).text = params[:risk].strip if params[:risk]
+  effects.get(eid).textt = params[:effect].strip if params[:effect]
+  plans.get(pid).text = params[:plan].strip if params[:plan]
   links.add("C#{cid}", "R#{rid}") if cid && rid
   links.add("R#{rid}", "E#{eid}") if rid && eid
   links.add("C#{eid}", "P#{pid}") if pid && cid && !rid && !eid
   links.add("R#{eid}", "P#{pid}") if pid && rid && !eid
   links.add("E#{eid}", "P#{pid}") if pid && eid
-  risks.probability(rid, params[:probability].to_i) if rid && params[:probability]
-  effects.impact(eid, params[:impact].to_i) if eid && params[:impact]
+  risks.get(rid).probability = params[:probability].to_i if rid && params[:probability]
+  effects.get(eid).impact = params[:impact].to_i if eid && params[:impact]
+  ranked.analyze('C', "C#{cid}")
+  ranked.analyze('CR', "C#{cid} R#{rid}") if rid
+  ranked.analyze('CRE', "C#{cid} R#{rid} E#{eid}") if rid && eid
   flash('/', 'Thanks')
 end
 
@@ -179,7 +226,7 @@ end
 error do
   status 503
   e = env['sinatra.error']
-  if e.is_a?(UserError)
+  if e.is_a?(Rsk::Urror)
     flash('/', e.message, color: 'darkred')
   else
     Raven.capture_exception(e)
@@ -222,7 +269,14 @@ def current_user
 end
 
 def current_project
-  @cookies['0rsk-project']
+  pid = @cookies['0rsk-project']
+  flash('/projects', 'Pick up a project to work with, or create a new one') unless pid
+  pid
+end
+
+def projects
+  require_relative 'objects/projects'
+  Rsk::Projects.new(settings.pgsql, current_user)
 end
 
 def ranked(project: current_project)
@@ -248,4 +302,9 @@ end
 def plans(project: current_project)
   require_relative 'objects/plans'
   Rsk::Plans.new(settings.pgsql, project)
+end
+
+def links(project: current_project)
+  require_relative 'objects/links'
+  Rsk::Links.new(settings.pgsql, project)
 end

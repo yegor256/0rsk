@@ -1,31 +1,39 @@
 %h2
-  Add
+  Add/Copy
 
 %form{method: 'POST', action: '/do-add'}
   %label Cause:
-  %input{type: 'text', name: 'cause', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1}
-  %input{type: 'text', name: 'cid', size: 4, autocomplete: 'off'}
+  %br
+  %input{type: 'text', name: 'cause', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: defined?(c_item) ? c_item.text : ''}
+  %input{id: 'cid', name: 'cid', size: 4, autocomplete: 'off', readonly: true, value: defined?(c_item) ? c_item.id : ''}
+  %a{href: '#', onclick: "$('#cid').val('');$(this).hide();return false;"} Detach
+  %br
   %label Risk:
-  %input{type: 'text', name: 'risk', size: 40, autocomplete: 'off', tabindex: 2}
+  %br
+  %input{type: 'text', name: 'risk', size: 40, autocomplete: 'off', tabindex: 2, value: defined?(r_item) ? r_item.text : ''}
   %select{name: 'probability', tabindex: 3}
     %option{value: 8} Extremely high
-    %option{value: 6} High
+    %option{value: 6, selected: true} High
     %option{value: 4} Low
     %option{value: 2} Very low
-  %input{type: 'text', name: 'rid', size: 4, autocomplete: 'off'}
+  %input{id: 'rid', name: 'rid', size: 4, autocomplete: 'off', readonly: true, value: defined?(r_item) ? r_item.id : ''}
+  %a{href: '#', onclick: "$('#rid').val('');$(this).hide();return false;"} Detach
+  %br
   %label Effect:
-  %input{type: 'text', name: 'effect', size: 40, autocomplete: 'off', tabindex: 4}
+  %br
+  %input{type: 'text', name: 'effect', size: 40, autocomplete: 'off', tabindex: 4, value: defined?(e_item) ? e_item.text : ''}
   %select{name: 'impact', tabindex: 5}
     %option{value: 8} Catastrophic
-    %option{value: 6} Serious
+    %option{value: 6, selected: true} Serious
     %option{value: 4} Moderate
     %option{value: 2} Unnoticable
-  %input{type: 'text', name: 'eid', size: 4, autocomplete: 'off'}
-  %label Strategy:
-  %select{name: 'strategy', tabindex: 6}
-    %option{value: 'mitigate'} Mitigate
-    %option{value: 'accept'} Accept
+  %input{id: 'eid', name: 'eid', size: 4, autocomplete: 'off', readonly: true, value: defined?(e_item) ? e_item.id : ''}
+  %a{href: '#', onclick: "$('#eid').val('');$(this).hide();return false;"} Detach
+  %br
   %label Plan:
-  %input{type: 'text', name: 'plan', size: 40, autocomplete: 'off', tabindex: 7}
-  %input{type: 'text', name: 'pid', size: 4, autocomplete: 'off'}
+  %br
+  %input{type: 'text', name: 'plan', size: 40, autocomplete: 'off', tabindex: 7, value: defined?(p_item) ? p_item.text : ''}
+  %input{id: 'pid', name: 'pid', size: 4, autocomplete: 'off', readonly: true, value: defined?(p_item) ? p_item.id : ''}
+  %a{href: '#', onclick: "$('#pid').val('');$(this).hide();return false;"} Detach
+  %br
   %input{type: 'submit', value: 'Add', tabindex: 8}

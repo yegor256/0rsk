@@ -20,27 +20,44 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require 'minitest/autorun'
-require 'rack/test'
-require_relative 'test__helper'
-require_relative '../objects/rsk'
-require_relative '../objects/links'
-require_relative '../objects/causes'
-require_relative '../objects/risks'
-require_relative '../objects/projects'
+require_relative 'rsk'
 
-# Test of Links.
+# Risk.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2019 Yegor Bugayenko
 # License:: MIT
-class Rsk::LinksTest < Minitest::Test
-  def test_adds_and_fetches
-    pid = Rsk::Projects.new(test_pgsql, 'jeff13').add('test')
-    cid = Rsk::Causes.new(test_pgsql, pid).add('we have data')
-    rid = Rsk::Risks.new(test_pgsql, pid).add('we may lose data')
-    links = Rsk::Links.new(test_pgsql, pid)
-    id = links.add("C#{cid}", "R#{rid}")
-    assert(id.positive?)
-    assert_equal(["R#{rid}"], links.right_of("C#{cid}"))
+class Rsk::Risk
+  attr_reader :id
+
+  def initialize(pgsql, id)
+    @pgsql = pgsql
+    @id = id
+  end
+
+  def mnemo
+    'R'
+  end
+
+  def chunk
+    "R#{@id}"
+  end
+
+  def text
+    @pgsql.exec('SELECT text FROM risk WHERE id = $1', [@id])[0]['text']
+  end
+
+  def text=(text)
+    @pgsql.exec('UPDATE risk SET text = $2 WHERE id = $1', [@id, text])
+  end
+
+  def probability
+    @pgsql.exec('SELECT probability FROM risk WHERE id = $1', [@id])[0]['probability'].to_i
+  end
+
+  def probability=(value)
+    @pgsql.exec(
+      'UPDATE risk SET probability = $2 WHERE id = $1',
+      [@id, value]
+    )
   end
 end

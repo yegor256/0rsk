@@ -36,8 +36,9 @@ class Rsk::EffectsTest < Minitest::Test
     pid = Rsk::Projects.new(test_pgsql, 'jeff98').add('test')
     effects = Rsk::Effects.new(test_pgsql, pid)
     text = 'the business will halt'
-    id = effects.add(text)
-    assert(id.positive?)
+    eid = effects.add(text)
+    assert(eid.positive?)
+    assert(effects.exists?(eid))
     assert(effects.fetch.any? { |c| c[:text] == text })
   end
 end
