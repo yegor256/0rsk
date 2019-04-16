@@ -122,6 +122,7 @@ get '/logout' do
 end
 
 get '/' do
+  flash('/ranked', 'Thanks for logging in') if @locals[:user]
   haml :index, layout: :layout, locals: merged(
     title: '/'
   )
@@ -143,7 +144,7 @@ end
 get '/ranked/delete' do
   path = params[:path]
   ranked.delete(path)
-  flash('/', "The item ##{id} deleted")
+  flash('/ranked', "The item ##{id} deleted")
 end
 
 get '/agenda' do
@@ -171,7 +172,7 @@ end
 get '/projects/select' do
   pid = params[:id]
   cookies['0rsk-project'] = pid
-  flash('/', "Project ##{pid} selected")
+  flash('/ranked', "Project ##{pid} selected")
 end
 
 post '/projects/create' do
@@ -223,7 +224,7 @@ post '/do-add' do
   ranked.analyze('CRE', "C#{cid} R#{rid} E#{eid}") if rid && eid
   ranked.analyze('CREP', "C#{cid} R#{rid} E#{eid} P#{pid}") if rid && eid && pid
   agenda.analyze(pid) if pid
-  flash('/', 'Thanks')
+  flash('/ranked', 'Thanks')
 end
 
 get '/robots.txt' do

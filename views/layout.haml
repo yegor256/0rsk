@@ -30,7 +30,7 @@
           %ul
             %li
               - if defined? user
-                %a{href: '/'}= "@#{user[:login]}"
+                %a{href: '/ranked'}= "@#{user[:login]}"
                 - if @cookies['0rsk-project']
                   = '/'
                   %a{href: "/projects/#{current_project}"}= current_project
@@ -38,6 +38,9 @@
                 %a{href: login_link}
                   Login
             - if defined? user
+              %li
+                %a{href: url('/projects')}
+                  Projects
               %li
                 %a{href: url('/add')}
                   Add
