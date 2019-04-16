@@ -6,7 +6,7 @@
     %p
       = succeed ':' do
         %a{href: "/?path=#{p[:plan].chunk}"}= p[:plan].chunk
-      %strong= p[:text]
+      = p[:text]
       %br
       = p[:deadline].utc.iso8601
       %br

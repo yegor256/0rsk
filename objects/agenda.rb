@@ -119,6 +119,6 @@ class Rsk::Agenda
   def parents(links, chunk)
     lefts = links.left_of(chunk)
     return lefts if lefts.empty?
-    (lefts + lefts.map { |c| parents(links, c) }).flatten.sort_by { |c| %w[C R E P].index(c[0]) }
+    (lefts + lefts.map { |c| parents(links, c) }).flatten.uniq.sort_by { |c| %w[C R E P].index(c[0]) }
   end
 end
