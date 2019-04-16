@@ -94,11 +94,10 @@ class Rsk::Ranked
       [
         'INSERT INTO ranked (project, rank, mnemo, path, text)',
         'VALUES ($1, $2, $3, $4, $5)',
-        'ON CONFLICT(project, path) DO UPDATE SET rank = $2, text = $5',
-        'RETURNING id'
+        'ON CONFLICT(project, path) DO UPDATE SET rank = $2, text = $5'
       ].join(' '),
       [@project, rank(mnemo, chunks), mnemo, chunks.map { |c| "[#{c}]" }.join(' '), text(chunks)]
-    )[0]['id'].to_i
+    )
   end
 
   def mnemos(mnemo)

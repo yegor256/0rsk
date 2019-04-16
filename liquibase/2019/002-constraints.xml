@@ -45,5 +45,10 @@ SOFTWARE.
     <sql>
       ALTER TABLE ranked ALTER COLUMN mnemo TYPE VARCHAR(4);
     </sql>
+    <sql>
+      ALTER TABLE agenda ADD UNIQUE(plan);
+      ALTER TABLE agenda ADD COLUMN text TEXT NOT NULL;
+      ALTER TABLE agenda ADD COLUMN login VARCHAR(64) NOT NULL;
+    </sql>
   </changeSet>
 </databaseChangeLog>

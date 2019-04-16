@@ -1,0 +1,17 @@
+- if agenda.empty?
+  %p
+    The agenda is empty.
+- else
+  - agenda.each do |p|
+    %p
+      = succeed ':' do
+        %a{href: "/?path=#{p[:plan].chunk}"}= p[:plan].chunk
+      = p[:text]
+      %br
+      = p[:deadline].utc.iso8601
+      %br
+      - p[:chunks].each do |c|
+        %a{href: "/?path=#{c}"}<
+          %code= c
+      %br
+      %a.item{href: "/agenda/done?pid=#{p[:plan].id}"} Done

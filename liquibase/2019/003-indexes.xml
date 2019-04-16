@@ -37,6 +37,9 @@ SOFTWARE.
       CREATE INDEX idx_link1 ON link (project, a);
     </sql>
     <sql>
+      CREATE INDEX idx_agenda1 ON agenda (login, deadline, path, text);
+    </sql>
+    <sql>
       CREATE INDEX idx_ranked1 ON ranked (project, rank, mnemo, path, text);
     </sql>
   </changeSet>

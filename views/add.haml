@@ -13,10 +13,8 @@
   %br
   %input{type: 'text', name: 'risk', size: 40, autocomplete: 'off', tabindex: 2, value: defined?(r_item) ? r_item.text : ''}
   %select{name: 'probability', tabindex: 3}
-    %option{value: 8} Extremely high
-    %option{value: 6, selected: true} High
-    %option{value: 4} Low
-    %option{value: 2} Very low
+    - {'Extremely high' => 8, 'High' => 6, 'Low' => 4, 'Very low' => 2}.each do |k, v|
+      %option{value: v, selected: defined?(probability) && probability == v}= k
   %input{id: 'rid', name: 'rid', size: 4, autocomplete: 'off', readonly: true, value: defined?(r_item) ? r_item.id : ''}
   - if defined?(r_item)
     %a{href: '#', onclick: "$('#rid').val('');$(this).hide();return false;"} Detach
@@ -25,10 +23,8 @@
   %br
   %input{type: 'text', name: 'effect', size: 40, autocomplete: 'off', tabindex: 4, value: defined?(e_item) ? e_item.text : ''}
   %select{name: 'impact', tabindex: 5}
-    %option{value: 8} Catastrophic
-    %option{value: 6, selected: true} Serious
-    %option{value: 4} Moderate
-    %option{value: 2} Unnoticable
+    - {'Catastrophic' => 8, 'Serious' => 6, 'Moderate' => 4, 'Unnoticable' => 2}.each do |k, v|
+      %option{value: v, selected: defined?(impact) && impact == v}= k
   %input{id: 'eid', name: 'eid', size: 4, autocomplete: 'off', readonly: true, value: defined?(e_item) ? e_item.id : ''}
   - if defined?(e_item)
     %a{href: '#', onclick: "$('#eid').val('');$(this).hide();return false;"} Detach
@@ -40,4 +36,8 @@
   - if defined?(p_item)
     %a{href: '#', onclick: "$('#pid').val('');$(this).hide();return false;"} Detach
   %br
-  %input{type: 'submit', value: 'Submit', tabindex: 8}
+  %label Schedule:
+  %br
+  %input{type: 'text', name: 'schedule', size: 30, autocomplete: 'off', tabindex: 8, value: defined?(schedule) ? schedule : ''}
+  %br
+  %input{type: 'submit', value: 'Submit', tabindex: 9}

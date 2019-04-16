@@ -17,13 +17,12 @@
       %code=c
       %a.item{href: "?path=#{(path - [c]).sort.uniq.join(' ')}&mnemo=#{mnemo}&q=#{query}"} x
 
-- found = ranked
-- if found.empty?
+- if ranked.empty?
   %p
     %span.red Nothing
     found, sorry.
 - else
-  - found.each do |r|
+  - ranked.each do |r|
     %p
       %span{style: 'color: ' + (r[:rank] < 32 ? 'gray' : (r[:rank] > 64 ? 'orangered' : 'seagreen'))}
         = "#{r[:rank]}:"

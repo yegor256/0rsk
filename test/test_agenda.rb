@@ -20,41 +20,36 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require_relative 'rsk'
+require 'minitest/autorun'
+require 'rack/test'
+require_relative 'test__helper'
+require_relative '../objects/rsk'
+require_relative '../objects/agenda'
+require_relative '../objects/causes'
+require_relative '../objects/risks'
+require_relative '../objects/effects'
+require_relative '../objects/plans'
+require_relative '../objects/projects'
 
-# Plan.
+# Test of Agenda.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2019 Yegor Bugayenko
 # License:: MIT
-class Rsk::Plan
-  attr_reader :id
-
-  def initialize(pgsql, id)
-    @pgsql = pgsql
-    @id = id
-  end
-
-  def mnemo
-    'P'
-  end
-
-  def chunk
-    "P#{@id}"
-  end
-
-  def text
-    @pgsql.exec('SELECT text FROM plan WHERE id = $1', [@id])[0]['text']
-  end
-
-  def text=(text)
-    @pgsql.exec('UPDATE plan SET text = $2 WHERE id = $1', [@id, text])
-  end
-
-  def schedule
-    @pgsql.exec('SELECT schedule FROM plan WHERE id = $1', [@id])[0]['schedule']
-  end
-
-  def schedule=(text)
-    @pgsql.exec('UPDATE plan SET schedule = $2 WHERE id = $1', [@id, text])
+class Rsk::AgendaTest < Minitest::Test
+  def test_adds_and_fetches
+    login = 'jeff309'
+    project = Rsk::Projects.new(test_pgsql, login).add('test')
+    cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
+    rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
+    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
+    pid = Rsk::Plans.new(test_pgsql, project).add('do it now!')
+    links = Rsk::Links.new(test_pgsql, project)
+    links.add("C#{cid}", "R#{rid}")
+    links.add("R#{rid}", "E#{eid}")
+    links.add("E#{eid}", "P#{pid}")
+    agenda = Rsk::Agenda.new(test_pgsql, login)
+    agenda.analyze(pid)
+    i = agenda.fetch[0]
+    assert_equal(["C#{cid}", "E#{eid}", "R#{rid}"], i[:chunks].sort)
   end
 end

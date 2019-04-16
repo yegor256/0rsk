@@ -132,7 +132,7 @@ get '/' do
   path = (params[:path] || '').split(' ')
   mnemo = params[:mnemo] || '*'
   haml :index, layout: :layout, locals: merged(
-    title: '/',
+    title: '/risks',
     path: path,
     mnemo: mnemo,
     query: query,
@@ -144,6 +144,21 @@ get '/delete' do
   path = params[:path]
   ranked.delete(path)
   flash('/', "The item ##{id} deleted")
+end
+
+get '/agenda' do
+  agenda.refresh
+  query = params[:q] || ''
+  haml :agenda, layout: :layout, locals: merged(
+    title: '/agenda',
+    query: query,
+    agenda: agenda.fetch(query: query, offset: 0, limit: 10)
+  )
+end
+
+get '/agenda/done' do
+  agenda.done(params[:pid].to_i)
+  flash('/agenda', 'Thanks!')
 end
 
 get '/projects' do
@@ -179,6 +194,9 @@ get '/add' do
   chunks.each do |c|
     i = links.item(c)
     vars[i.mnemo.downcase + '_item'] = i
+    vars['probability'] = i.probability if i.respond_to?(:probability)
+    vars['impact'] = i.impact if i.respond_to?(:impact)
+    vars['schedule'] = i.schedule if i.respond_to?(:schedule)
   end
   haml :add, layout: :layout, locals: merged(vars)
 end
@@ -199,10 +217,12 @@ post '/do-add' do
   links.add("E#{eid}", "P#{pid}") if pid && eid
   risks.get(rid).probability = params[:probability].to_i if rid && params[:probability]
   effects.get(eid).impact = params[:impact].to_i if eid && params[:impact]
+  plans.get(pid).schedule = params[:schedule].strip if pid && params[:schedule]
   ranked.analyze('C', "C#{cid}")
   ranked.analyze('CR', "C#{cid} R#{rid}") if rid
   ranked.analyze('CRE', "C#{cid} R#{rid} E#{eid}") if rid && eid
   ranked.analyze('CREP', "C#{cid} R#{rid} E#{eid} P#{pid}") if rid && eid && pid
+  agenda.analyze(pid) if pid
   flash('/', 'Thanks')
 end
 
@@ -283,6 +303,11 @@ end
 def ranked(project: current_project)
   require_relative 'objects/ranked'
   Rsk::Ranked.new(settings.pgsql, project)
+end
+
+def agenda
+  require_relative 'objects/agenda'
+  Rsk::Agenda.new(settings.pgsql, current_user)
 end
 
 def causes(project: current_project)

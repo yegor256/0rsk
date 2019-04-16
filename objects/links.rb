@@ -50,6 +50,13 @@ class Rsk::Links
     ).map { |r| r['b'] }
   end
 
+  def left_of(chunk)
+    @pgsql.exec(
+      'SELECT a FROM link WHERE project = $1 AND b = $2',
+      [@project, chunk]
+    ).map { |r| r['a'] }
+  end
+
   def item(path)
     raise "Invalid path #{path.inspect}" unless /^[CREP][0-9]+$/.match?(path)
     id = path[1..-1].to_i
