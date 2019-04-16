@@ -6,7 +6,8 @@
   %br
   %input{type: 'text', name: 'cause', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: defined?(c_item) ? c_item.text : ''}
   %input{id: 'cid', name: 'cid', size: 4, autocomplete: 'off', readonly: true, value: defined?(c_item) ? c_item.id : ''}
-  %a{href: '#', onclick: "$('#cid').val('');$(this).hide();return false;"} Detach
+  - if defined?(c_item)
+    %a{href: '#', onclick: "$('#cid').val('');$(this).hide();return false;"} Detach
   %br
   %label Risk:
   %br
@@ -17,7 +18,8 @@
     %option{value: 4} Low
     %option{value: 2} Very low
   %input{id: 'rid', name: 'rid', size: 4, autocomplete: 'off', readonly: true, value: defined?(r_item) ? r_item.id : ''}
-  %a{href: '#', onclick: "$('#rid').val('');$(this).hide();return false;"} Detach
+  - if defined?(r_item)
+    %a{href: '#', onclick: "$('#rid').val('');$(this).hide();return false;"} Detach
   %br
   %label Effect:
   %br
@@ -28,12 +30,14 @@
     %option{value: 4} Moderate
     %option{value: 2} Unnoticable
   %input{id: 'eid', name: 'eid', size: 4, autocomplete: 'off', readonly: true, value: defined?(e_item) ? e_item.id : ''}
-  %a{href: '#', onclick: "$('#eid').val('');$(this).hide();return false;"} Detach
+  - if defined?(e_item)
+    %a{href: '#', onclick: "$('#eid').val('');$(this).hide();return false;"} Detach
   %br
   %label Plan:
   %br
   %input{type: 'text', name: 'plan', size: 40, autocomplete: 'off', tabindex: 7, value: defined?(p_item) ? p_item.text : ''}
   %input{id: 'pid', name: 'pid', size: 4, autocomplete: 'off', readonly: true, value: defined?(p_item) ? p_item.id : ''}
-  %a{href: '#', onclick: "$('#pid').val('');$(this).hide();return false;"} Detach
+  - if defined?(p_item)
+    %a{href: '#', onclick: "$('#pid').val('');$(this).hide();return false;"} Detach
   %br
-  %input{type: 'submit', value: 'Add', tabindex: 8}
+  %input{type: 'submit', value: 'Submit', tabindex: 8}

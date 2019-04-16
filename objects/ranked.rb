@@ -48,6 +48,11 @@ class Rsk::Ranked
       links.right_of(chunks[1]).each do |e|
         analyze('CRE', (chunks + [e]).join(' '))
       end
+    when 'CRE'
+      links = Rsk::Links.new(@pgsql, @project)
+      links.right_of(chunks[2]).each do |e|
+        analyze('CREP', (chunks + [e]).join(' '))
+      end
     end
   end
 
@@ -60,13 +65,13 @@ class Rsk::Ranked
       [
         'SELECT * FROM ranked',
         'WHERE project = $1',
-        'AND text LIKE $4',
+        'AND LOWER(text) LIKE $4',
         'AND (' + mnemos(mnemo).map { |m| "mnemo = '#{m}'" }.join(' OR ') + ')',
         chunks.empty? ? '' : 'AND (' + chunks.map { |c| "path LIKE '%[#{c}]%'" }.join(' OR ') + ')',
         'ORDER BY rank DESC',
         'OFFSET $2 LIMIT $3'
       ].join(' '),
-      [@project, offset, limit, "%#{query}%"]
+      [@project, offset, limit, "%#{query.strip.downcase}%"]
     )
     rows.map do |r|
       c = r['path'].scan(/\[([A-Z][0-9]+)\]/).map { |x| x[0] }
@@ -100,9 +105,11 @@ class Rsk::Ranked
     if mnemo.end_with?('*')
       case mnemo
       when 'C*', '*'
-        %w[C CR CRE]
+        %w[C CR CRE CREP]
       when 'CR*'
-        %w[CR CRE]
+        %w[CR CRE CREP]
+      when 'CRE*'
+        %w[CRE CREP]
       end
     else
       [mnemo]
@@ -115,7 +122,7 @@ class Rsk::Ranked
       1
     when 'CR'
       1
-    when 'CRE'
+    when 'CRE', 'CREP'
       links = Rsk::Links.new(@pgsql, @project)
       risk = links.item(chunks[1])
       effect = links.item(chunks[2])
@@ -125,6 +132,16 @@ class Rsk::Ranked
 
   def text(chunks)
     links = Rsk::Links.new(@pgsql, @project)
-    chunks.map { |c| links.item(c).text }.join('; ')
+    risks = effects = plans = 0
+    links.right_of(chunks.last).each do |c|
+      risks += 1 if c.start_with?('R')
+      effects += 1 if c.start_with?('E')
+      plans += 1 if c.start_with?('P')
+    end
+    texts = chunks.map { |c| links.item(c).text }
+    texts << "#{risks} risks" if risks.positive?
+    texts << "#{effects} effects" if effects.positive?
+    texts << "#{plans} plans" if plans.positive?
+    texts.join('; ')
   end
 end

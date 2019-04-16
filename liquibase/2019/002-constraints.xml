@@ -25,19 +25,25 @@ SOFTWARE.
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd" logicalFilePath="001-initial-schema.xml">
   <changeSet id="002" author="yegor256">
     <sql>
-      ALTER TABLE ranked ADD UNIQUE(project, path)
+      ALTER TABLE ranked ADD UNIQUE(project, path);
     </sql>
     <sql>
-      ALTER TABLE cause ADD UNIQUE(project, text)
+      ALTER TABLE cause ADD UNIQUE(project, text);
     </sql>
     <sql>
-      ALTER TABLE risk ADD UNIQUE(project, text)
+      ALTER TABLE risk ADD UNIQUE(project, text);
     </sql>
     <sql>
-      ALTER TABLE effect ADD UNIQUE(project, text)
+      ALTER TABLE effect ADD UNIQUE(project, text);
     </sql>
     <sql>
-      ALTER TABLE plan ADD UNIQUE(project, text)
+      ALTER TABLE plan ADD UNIQUE(project, text);
+    </sql>
+    <sql>
+      ALTER TABLE link ADD UNIQUE(project, a, b);
+    </sql>
+    <sql>
+      ALTER TABLE ranked ALTER COLUMN mnemo TYPE VARCHAR(4);
     </sql>
   </changeSet>
 </databaseChangeLog>

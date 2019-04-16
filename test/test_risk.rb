@@ -40,6 +40,7 @@ class Rsk::RiskTest < Minitest::Test
     risk = risks.get(risks.add(before))
     assert_equal(before, risk.text)
     risk.text = after
+    risk.text = after
     assert_equal(after, risk.text)
   end
 end

@@ -39,8 +39,7 @@ class Rsk::LinksTest < Minitest::Test
     cid = Rsk::Causes.new(test_pgsql, pid).add('we have data')
     rid = Rsk::Risks.new(test_pgsql, pid).add('we may lose data')
     links = Rsk::Links.new(test_pgsql, pid)
-    id = links.add("C#{cid}", "R#{rid}")
-    assert(id.positive?)
+    links.add("C#{cid}", "R#{rid}")
     assert_equal(["R#{rid}"], links.right_of("C#{cid}"))
   end
 end

@@ -20,60 +20,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require_relative 'rsk'
-require_relative 'causes'
-require_relative 'risks'
-require_relative 'effects'
-require_relative 'plans'
+require 'minitest/autorun'
+require 'rack/test'
+require_relative 'test__helper'
+require_relative '../objects/rsk'
+require_relative '../objects/causes'
+require_relative '../objects/projects'
 
-# Links.
+# Test of Cause.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2019 Yegor Bugayenko
 # License:: MIT
-class Rsk::Links
-  def initialize(pgsql, project)
-    @pgsql = pgsql
-    @project = project
-  end
-
-  def add(left, right)
-    @pgsql.exec(
-      'INSERT INTO link (project, a, b) VALUES ($1, $2, $3) ON CONFLICT(project, a, b) DO NOTHING',
-      [@project, item(left).chunk, item(right).chunk]
-    )
-  end
-
-  def right_of(chunk)
-    @pgsql.exec(
-      'SELECT b FROM link WHERE project = $1 AND a = $2',
-      [@project, chunk]
-    ).map { |r| r['b'] }
-  end
-
-  def item(path)
-    raise "Invalid path #{path.inspect}" unless /^[CREP][0-9]+$/.match?(path)
-    id = path[1..-1].to_i
-    bag = bag(path[0])
-    unless bag.exists?(id)
-      raise "#{path.inspect}: #{bag.class.name.split('::').last}/#{id} not found in the project ##{@project}"
-    end
-    bag.get(id)
-  end
-
-  private
-
-  def bag(prefix)
-    case prefix
-    when 'C'
-      Rsk::Causes.new(@pgsql, @project)
-    when 'R'
-      Rsk::Risks.new(@pgsql, @project)
-    when 'E'
-      Rsk::Effects.new(@pgsql, @project)
-    when 'P'
-      Rsk::Plans.new(@pgsql, @project)
-    else
-      raise "Invalid prefix #{prefix.inspect}"
-    end
+class Rsk::CauseTest < Minitest::Test
+  def test_modifies_text
+    pid = Rsk::Projects.new(test_pgsql, 'jeff32').add('test')
+    before = 'text first'
+    after = 'another text to set'
+    causes = Rsk::Causes.new(test_pgsql, pid)
+    cause = causes.get(causes.add(before))
+    assert_equal(before, cause.text)
+    cause.text = after
+    assert_equal(after, cause.text)
   end
 end

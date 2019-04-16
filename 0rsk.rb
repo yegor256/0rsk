@@ -130,7 +130,7 @@ end
 get '/' do
   query = params[:q] || ''
   path = (params[:path] || '').split(' ')
-  mnemo = params[:mnemo] || 'CRE'
+  mnemo = params[:mnemo] || '*'
   haml :index, layout: :layout, locals: merged(
     title: '/',
     path: path,
@@ -141,8 +141,8 @@ get '/' do
 end
 
 get '/delete' do
-  id = params[:id]
-  ranked.delete(id)
+  path = params[:path]
+  ranked.delete(path)
   flash('/', "The item ##{id} deleted")
 end
 
@@ -190,7 +190,7 @@ post '/do-add' do
   pid = params[:pid].empty? ? (plans.add(params[:plan].strip) unless params[:plan].empty?) : params[:pid]
   causes.get(cid).text = params[:cause].strip if params[:cause]
   risks.get(rid).text = params[:risk].strip if params[:risk]
-  effects.get(eid).textt = params[:effect].strip if params[:effect]
+  effects.get(eid).text = params[:effect].strip if params[:effect]
   plans.get(pid).text = params[:plan].strip if params[:plan]
   links.add("C#{cid}", "R#{rid}") if cid && rid
   links.add("R#{rid}", "E#{eid}") if rid && eid
@@ -202,6 +202,7 @@ post '/do-add' do
   ranked.analyze('C', "C#{cid}")
   ranked.analyze('CR', "C#{cid} R#{rid}") if rid
   ranked.analyze('CRE', "C#{cid} R#{rid} E#{eid}") if rid && eid
+  ranked.analyze('CREP', "C#{cid} R#{rid} E#{eid} P#{pid}") if rid && eid && pid
   flash('/', 'Thanks')
 end
 
