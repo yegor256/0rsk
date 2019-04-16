@@ -17,8 +17,6 @@
       .gray { color: gray; }
       .red { background-color: #A22522; color: white; padding-left: .3em; padding-right: .3em; border-radius: 2px; }
       .green { color: green; }
-      .cross { text-decoration: line-through; color: gray; }
-      .hidden { display: none; }
       textarea { font-family: monospace; }
   %body
     %section
@@ -33,8 +31,9 @@
             %li
               - if defined? user
                 %a{href: '/'}= "@#{user[:login]}"
-                = '/'
-                %a{href: "/projects/#{current_project}"}= current_project
+                - if @cookies['0rsk-project']
+                  = '/'
+                  %a{href: "/projects/#{current_project}"}= current_project
               - else
                 %a{href: login_link}
                   Login

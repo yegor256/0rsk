@@ -121,17 +121,17 @@ get '/logout' do
   flash('/', 'You have been logged out')
 end
 
-get '/hello' do
-  haml :hello, layout: :layout, locals: merged(
+get '/' do
+  haml :index, layout: :layout, locals: merged(
     title: '/'
   )
 end
 
-get '/' do
+get '/ranked' do
   query = params[:q] || ''
   path = (params[:path] || '').split(' ')
   mnemo = params[:mnemo] || '*'
-  haml :index, layout: :layout, locals: merged(
+  haml :ranked, layout: :layout, locals: merged(
     title: '/risks',
     path: path,
     mnemo: mnemo,
@@ -140,7 +140,7 @@ get '/' do
   )
 end
 
-get '/delete' do
+get '/ranked/delete' do
   path = params[:path]
   ranked.delete(path)
   flash('/', "The item ##{id} deleted")
