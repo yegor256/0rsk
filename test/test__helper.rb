@@ -36,13 +36,15 @@ module Minitest
   class Test
     def test_pgsql
       config = YAML.load_file('target/pgsql-config.yml')
-      @test_pgsql ||= Pgtk::Pool.new(
+      # rubocop:disable Style/ClassVars
+      @@test_pgsql ||= Pgtk::Pool.new(
         host: config['pgsql']['host'],
         port: config['pgsql']['port'],
         dbname: config['pgsql']['dbname'],
         user: config['pgsql']['user'],
         password: config['pgsql']['password']
       ).start
+      # rubocop:enable Style/ClassVars
     end
   end
 end
