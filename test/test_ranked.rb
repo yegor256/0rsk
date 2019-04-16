@@ -35,7 +35,7 @@ require_relative '../objects/projects'
 # Copyright:: Copyright (c) 2019 Yegor Bugayenko
 # License:: MIT
 class Rsk::RankedTest < Minitest::Test
-  def test_adds_and_fetches
+  def test_adds_and_analyzes
     pid = Rsk::Projects.new(test_pgsql, 'jeff31').add('test')
     cid = Rsk::Causes.new(test_pgsql, pid).add('we have data')
     rid = Rsk::Risks.new(test_pgsql, pid).add('we may lose it')
@@ -44,9 +44,21 @@ class Rsk::RankedTest < Minitest::Test
     links.add("C#{cid}", "R#{rid}")
     links.add("R#{rid}", "E#{eid}")
     ranked = Rsk::Ranked.new(test_pgsql, pid)
-    ranked.analyze('C', "C#{cid}")
+    ranked.analyze("C#{cid}")
     i = ranked.fetch(chunks: ["C#{cid}"])[0]
     assert_equal('CRE', i[:mnemo])
     assert_equal(["C#{cid}", "R#{rid}", "E#{eid}"], i[:chunks])
+  end
+
+  def test_analyzes_non_standard_path
+    project = Rsk::Projects.new(test_pgsql, 'jeff377').add('test')
+    cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
+    rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
+    pid = Rsk::Plans.new(test_pgsql, project).add('fight!')
+    links = Rsk::Links.new(test_pgsql, project)
+    links.add("C#{cid}", "R#{rid}")
+    links.add("R#{rid}", "P#{pid}")
+    ranked = Rsk::Ranked.new(test_pgsql, project)
+    ranked.analyze("C#{cid}")
   end
 end

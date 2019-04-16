@@ -37,9 +37,14 @@ class Rsk::Links
   end
 
   def add(left, right)
+    a = item(left)
+    b = item(right)
+    order = %w[C R E P]
+    raise "#{a.chunk} can't link to #{b.chunk}" if a.mnemo == b.mnemo
+    raise "#{a.chunk} can't preceed #{b.chunk}" if order.index(a.mnemo) > order.index(b.mnemo)
     @pgsql.exec(
       'INSERT INTO link (project, a, b) VALUES ($1, $2, $3) ON CONFLICT(project, a, b) DO NOTHING',
-      [@project, item(left).chunk, item(right).chunk]
+      [@project, a.chunk, b.chunk]
     )
   end
 

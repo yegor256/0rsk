@@ -34,25 +34,12 @@ class Rsk::Ranked
   end
 
   # For example: mnemo="CR", path="C43 R89"
-  def analyze(mnemo, path)
+  def analyze(path)
     chunks = path.split(' ')
-    insert(mnemo, chunks)
-    case mnemo
-    when 'C'
-      links = Rsk::Links.new(@pgsql, @project)
-      links.right_of(chunks[0]).each do |e|
-        analyze('CR', (chunks + [e]).join(' '))
-      end
-    when 'CR'
-      links = Rsk::Links.new(@pgsql, @project)
-      links.right_of(chunks[1]).each do |e|
-        analyze('CRE', (chunks + [e]).join(' '))
-      end
-    when 'CRE'
-      links = Rsk::Links.new(@pgsql, @project)
-      links.right_of(chunks[2]).each do |e|
-        analyze('CREP', (chunks + [e]).join(' '))
-      end
+    insert(chunks)
+    links = Rsk::Links.new(@pgsql, @project)
+    links.right_of(chunks.last).each do |e|
+      analyze((chunks + [e]).join(' '))
     end
   end
 
@@ -89,7 +76,8 @@ class Rsk::Ranked
 
   private
 
-  def insert(mnemo, chunks)
+  def insert(chunks)
+    mnemo = mnemo(chunks)
     @pgsql.exec(
       [
         'INSERT INTO ranked (project, rank, mnemo, path, text)',
@@ -98,6 +86,11 @@ class Rsk::Ranked
       ].join(' '),
       [@project, rank(mnemo, chunks), mnemo, chunks.map { |c| "[#{c}]" }.join(' '), text(chunks)]
     )
+  end
+
+  def mnemo(chunks)
+    links = Rsk::Links.new(@pgsql, @project)
+    chunks.map { |c| links.item(c).mnemo }.join
   end
 
   def mnemos(mnemo)
@@ -117,15 +110,13 @@ class Rsk::Ranked
 
   def rank(mnemo, chunks)
     case mnemo
-    when 'C'
-      1
-    when 'CR'
-      1
     when 'CRE', 'CREP'
       links = Rsk::Links.new(@pgsql, @project)
       risk = links.item(chunks[1])
       effect = links.item(chunks[2])
       risk.probability * effect.impact
+    else
+      1
     end
   end
 

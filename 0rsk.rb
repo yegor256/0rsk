@@ -122,7 +122,7 @@ get '/logout' do
 end
 
 get '/' do
-  flash('/ranked', 'Thanks for logging in') if @locals[:user]
+  flash('/ranked') if @locals[:user]
   haml :index, layout: :layout, locals: merged(
     title: '/'
   )
@@ -239,10 +239,7 @@ post '/do-add' do
   risks.get(rid).probability = params[:probability].to_i if rid && params[:probability]
   effects.get(eid).impact = params[:impact].to_i if eid && params[:impact]
   plans.get(pid).schedule = params[:schedule].strip if pid && params[:schedule]
-  ranked.analyze('C', "C#{cid}")
-  ranked.analyze('CR', "C#{cid} R#{rid}") if rid
-  ranked.analyze('CRE', "C#{cid} R#{rid} E#{eid}") if rid && eid
-  ranked.analyze('CREP', "C#{cid} R#{rid} E#{eid} P#{pid}") if rid && eid && pid
+  ranked.analyze("C#{cid}")
   agenda.analyze(pid) if pid
   flash('/ranked', 'Thanks')
 end
