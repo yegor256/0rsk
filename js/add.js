@@ -24,7 +24,7 @@ function auto(kind) {
     select: function(event, ui) {
       $.each(ui.item.fields, function(field, v) {
         $("#" + field).val(v);
-        $("#" + kind + "_detach").show();
+        $("#" + kind + "_detach").show().removeClass("red");
       });
     },
     close: function() {
