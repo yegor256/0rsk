@@ -34,7 +34,7 @@
         %a{href: iri.over(path: (path + [c]).sort.uniq.join(' '))}<
           %code= c
       %br
-      = r[:text]
+      &= r[:text]
       %br
       - unless r[:plans].empty?
         %span.item.small

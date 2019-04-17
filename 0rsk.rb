@@ -221,13 +221,18 @@ end
 
 get '/add' do
   chunks = (params[:path] || '').split(' ')
-  vars = { title: '/add' }
+  vars = { title: '/add', plans: [] }
   chunks.each do |c|
     i = links.item(c)
     vars[i.mnemo.downcase + '_item'] = i
-    vars['probability'] = i.probability if i.respond_to?(:probability)
-    vars['impact'] = i.impact if i.respond_to?(:impact)
-    vars['schedule'] = i.schedule if i.respond_to?(:schedule)
+    vars[:probability] = i.probability if i.respond_to?(:probability)
+    vars[:impact] = i.impact if i.respond_to?(:impact)
+    links.right_of(i.chunk).select { |x| x.start_with?('P') }.each do |p|
+      vars[:plans] << {
+        chunk: p,
+        text: "#{p}: #{plans.get(p[1..-1].to_i).text}"
+      }
+    end
   end
   haml :add, layout: :layout, locals: merged(vars)
 end

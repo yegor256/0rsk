@@ -52,3 +52,9 @@
   %a.item.small{href: '#', id: 'schedule_later'} Later
   %br
   %input{type: 'submit', value: 'Submit', tabindex: 9}
+
+- plans.each do |p|
+  %p
+    %a{href: iri.cut('/agenda').over(q: p[:chunk])}<
+      %code= p[:chunk]
+    &= p[:text]

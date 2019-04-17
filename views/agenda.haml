@@ -11,7 +11,7 @@
       = succeed ':' do
         %a{href: iri.cut('/ranked').add(path: p[:plan].chunk, mnemo: '*')}<
           %code= p[:plan].chunk
-      = p[:text]
+      &= p[:text]
       %br
       = p[:deadline].utc.iso8601
       %br

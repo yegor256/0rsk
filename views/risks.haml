@@ -14,7 +14,8 @@
         %td
           %a{href: iri.cut('/ranked').add(path: chunk, mnemo: '*')}
             %code= chunk
-        %td= r[:value]
+        %td
+          &= r[:value]
         %td.right= r[:fields][:probability]
 
 %p
