@@ -12,7 +12,7 @@
       - chunk = "E#{r[:fields][:eid]}"
       %tr
         %td
-          %a{href: iri.cut('/ranked').add(path: chunk)}
+          %a{href: iri.cut('/ranked').add(path: chunk, mnemo: '*')}
             %code= chunk
         %td= r[:value]
         %td.right= r[:fields][:impact]

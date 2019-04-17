@@ -11,7 +11,7 @@
       - chunk = "C#{r[:fields][:cid]}"
       %tr
         %td
-          %a{href: iri.cut('/ranked').add(path: chunk)}
+          %a{href: iri.cut('/ranked').add(path: chunk, mnemo: '*')}
             %code= chunk
         %td= r[:value]
 
