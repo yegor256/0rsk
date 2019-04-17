@@ -33,7 +33,7 @@
       = r[:text]
       %br
       - unless r[:plans].empty?
-        %a.item.small
+        %span.item.small
           - r[:plans].each do |p|
             %a{href: iri.over(path: p, mnemo: '*')}<
               %code= p

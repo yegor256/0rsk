@@ -4,9 +4,6 @@ function auto(kind) {
   'use strict';
   var $input = $("#" + kind);
   var closing = false;
-  $input.on('input', function() {
-    $("#" + kind + '_detach').click();
-  });
   $input.autocomplete({
     minLength: 0,
     delay: 300,
@@ -39,10 +36,23 @@ function auto(kind) {
   });
 }
 
+function on_detach(button, id) {
+  'use strict';
+  $(button).on('click', function() {
+    $(id).val('');
+    $(this).hide();
+    return false;
+  });
+}
+
 $(function() {
   'use strict';
   auto("cause");
   auto("risk");
   auto("effect");
   auto("plan");
+  on_detach("#cause_detach", "#cid");
+  on_detach("#risk_detach", "#rid");
+  on_detach("#effect_detach", "#eid");
+  on_detach("#plan_detach", "#pid");
 });
