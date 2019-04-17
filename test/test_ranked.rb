@@ -44,10 +44,13 @@ class Rsk::RankedTest < Minitest::Test
     links.add("C#{cid}", "R#{rid}")
     links.add("R#{rid}", "E#{eid}")
     ranked = Rsk::Ranked.new(test_pgsql, pid)
+    ids = ranked.analyze("C#{cid}")
     ranked.analyze("C#{cid}")
+    assert(!ids.empty?)
     i = ranked.fetch(chunks: ["C#{cid}"])[0]
     assert_equal('CRE', i[:mnemo])
     assert_equal(["C#{cid}", "R#{rid}", "E#{eid}"], i[:chunks])
+    ids.each { |id| ranked.delete(id) }
   end
 
   def test_analyzes_non_standard_path

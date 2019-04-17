@@ -29,7 +29,7 @@
         %nav
           %ul
             %li
-              - if defined? user
+              - if defined?(user)
                 %a{href: '/ranked'}= "@#{user[:login]}"
                 - if @cookies['0rsk-project']
                   = '/'
@@ -37,7 +37,7 @@
               - else
                 %a{href: login_link}
                   Login
-            - if defined? user
+            - if defined?(user)
               %li
                 %a{href: iri.cut('/projects')}
                   Projects
@@ -56,6 +56,17 @@
       %article
         = yield
       %footer.small.gray
+        - if defined?(user) && @cookies['0rsk-project']
+          %nav
+            %ul
+              %li
+                %a{href: iri.cut('/causes')} Causes
+              %li
+                %a{href: iri.cut('/risks')} Risks
+              %li
+                %a{href: iri.cut('/effects')} Effects
+              %li
+                %a{href: iri.cut('/plans')} Plans
         %nav
           %ul
             %li

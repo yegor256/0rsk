@@ -148,9 +148,9 @@ get '/ranked' do
 end
 
 get '/ranked/delete' do
-  path = params[:path]
-  ranked.delete(path)
-  flash('/ranked', "The item ##{id} deleted")
+  id = params[:id]
+  ranked.delete(id)
+  flash('/ranked', "The ranked item ##{id} deleted")
 end
 
 get '/agenda' do
@@ -245,9 +245,53 @@ post '/do-add' do
   risks.get(rid).probability = params[:probability].to_i if rid && params[:probability]
   effects.get(eid).impact = params[:impact].to_i if eid && params[:impact]
   plans.get(pid).schedule = params[:schedule].strip if pid && params[:schedule]
-  ranked.analyze("C#{cid}")
+  ids = ranked.analyze("C#{cid}")
   agenda.analyze(pid) if pid
-  flash('/ranked', 'Thanks')
+  flash('/ranked', "Thanks, #{ids.count} ranked items updated")
+end
+
+get '/causes' do
+  offset = [(params[:offset] || '0').to_i, 0].max
+  limit = (params[:limit] || '25').to_i
+  haml :causes, layout: :layout, locals: merged(
+    title: '/causes',
+    offset: offset,
+    limit: limit,
+    causes: causes.fetch(offset: offset, limit: limit)
+  )
+end
+
+get '/risks' do
+  offset = [(params[:offset] || '0').to_i, 0].max
+  limit = (params[:limit] || '25').to_i
+  haml :risks, layout: :layout, locals: merged(
+    title: '/risks',
+    offset: offset,
+    limit: limit,
+    risks: risks.fetch(offset: offset, limit: limit)
+  )
+end
+
+get '/effects' do
+  offset = [(params[:offset] || '0').to_i, 0].max
+  limit = (params[:limit] || '25').to_i
+  haml :effects, layout: :layout, locals: merged(
+    title: '/effects',
+    offset: offset,
+    limit: limit,
+    effects: effects.fetch(offset: offset, limit: limit)
+  )
+end
+
+get '/plans' do
+  offset = [(params[:offset] || '0').to_i, 0].max
+  limit = (params[:limit] || '25').to_i
+  haml :plans, layout: :layout, locals: merged(
+    title: '/plans',
+    offset: offset,
+    limit: limit,
+    plans: plans.fetch(offset: offset, limit: limit)
+  )
 end
 
 get '/js/*.js' do

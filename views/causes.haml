@@ -1,0 +1,23 @@
+%h2
+  Causes
+
+%table
+  %thead
+    %tr
+      %th Id
+      %th Text
+  %tbody
+    - causes.each do |r|
+      - chunk = "C#{r[:fields][:cid]}"
+      %tr
+        %td
+          %a{href: iri.cut('/ranked').add(path: chunk)}
+            %code= chunk
+        %td= r[:value]
+
+%p
+  - if offset.positive?
+    %a.item{href: iri.over(offset: offset - 25)} Previous
+  - if causes.count >= limit
+    %a.item{href: iri.over(offset: offset + 25)} Next
+

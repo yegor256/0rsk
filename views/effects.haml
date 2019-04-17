@@ -1,0 +1,25 @@
+%h2
+  Effects
+
+%table
+  %thead
+    %tr
+      %th Id
+      %th Text
+      %th I
+  %tbody
+    - effects.each do |r|
+      - chunk = "E#{r[:fields][:eid]}"
+      %tr
+        %td
+          %a{href: iri.cut('/ranked').add(path: chunk)}
+            %code= chunk
+        %td= r[:value]
+        %td.right= r[:fields][:impact]
+
+%p
+  - if offset.positive?
+    %a.item{href: iri.over(offset: offset - 25)} Previous
+  - if effects.count >= limit
+    %a.item{href: iri.over(offset: offset + 25)} Next
+

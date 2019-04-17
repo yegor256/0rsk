@@ -53,10 +53,10 @@ class Rsk::Plans
     Rsk::Plan.new(@pgsql, id)
   end
 
-  def fetch(query: '', limit: 10)
+  def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
-      'SELECT * FROM plan WHERE project = $1 AND text LIKE $2 LIMIT $3',
-      [@project, "%#{query}%", limit]
+      'SELECT * FROM plan WHERE project = $1 AND text LIKE $2 OFFSET $3 LIMIT $4',
+      [@project, "%#{query}%", offset, limit]
     )
     rows.map do |r|
       {

@@ -36,15 +36,16 @@ class Rsk::Ranked
   # For example: mnemo="CR", path="C43 R89"
   def analyze(path)
     chunks = path.split(' ')
-    insert(chunks)
+    ids = [insert(chunks)]
     links = Rsk::Links.new(@pgsql, @project)
     links.right_of(chunks.last).each do |e|
-      analyze((chunks + [e]).join(' '))
+      ids += analyze((chunks + [e]).join(' '))
     end
+    ids
   end
 
-  def delete(_id)
-    raise 'not implemented'
+  def delete(id)
+    @pgsql.exec('DELETE FROM ranked WHERE id = $1 AND project = $2', [id, @project])
   end
 
   def fetch(query: '', chunks: [], mnemo: '*', offset: 0, limit: 50)
@@ -82,10 +83,11 @@ class Rsk::Ranked
       [
         'INSERT INTO ranked (project, rank, mnemo, path, text)',
         'VALUES ($1, $2, $3, $4, $5)',
-        'ON CONFLICT(project, path) DO UPDATE SET rank = $2, text = $5'
+        'ON CONFLICT(project, path) DO UPDATE SET rank = $2, text = $5',
+        'RETURNING id'
       ].join(' '),
       [@project, rank(mnemo, chunks), mnemo, chunks.map { |c| "[#{c}]" }.join(' '), text(chunks)]
-    )
+    )[0]['id'].to_i
   end
 
   def mnemo(chunks)

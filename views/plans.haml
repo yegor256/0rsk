@@ -1,0 +1,25 @@
+%h2
+  Plans
+
+%table
+  %thead
+    %tr
+      %th Id
+      %th Text
+      %th Schedule
+  %tbody
+    - plans.each do |r|
+      - chunk = "P#{r[:fields][:pid]}"
+      %tr
+        %td
+          %a{href: iri.cut('/ranked').add(path: chunk)}
+            %code= chunk
+        %td= r[:value]
+        %td= r[:fields][:schedule]
+
+%p
+  - if offset.positive?
+    %a.item{href: iri.over(offset: offset - 25)} Previous
+  - if plans.count >= limit
+    %a.item{href: iri.over(offset: offset + 25)} Next
+

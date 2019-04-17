@@ -1,0 +1,25 @@
+%h2
+  Risks
+
+%table
+  %thead
+    %tr
+      %th Id
+      %th Text
+      %th P
+  %tbody
+    - risks.each do |r|
+      - chunk = "R#{r[:fields][:rid]}"
+      %tr
+        %td
+          %a{href: iri.cut('/ranked').add(path: chunk)}
+            %code= chunk
+        %td= r[:value]
+        %td.right= r[:fields][:probability]
+
+%p
+  - if offset.positive?
+    %a.item{href: iri.over(offset: offset - 25)} Previous
+  - if risks.count >= limit
+    %a.item{href: iri.over(offset: offset + 25)} Next
+
