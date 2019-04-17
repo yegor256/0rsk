@@ -1,3 +1,7 @@
+%form{method: 'GET', action: ''}
+  %input{type: 'text', name: 'q', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: query}
+  %input{type: 'submit', value: 'Search', tabindex: 2}
+
 - if agenda.empty?
   %p
     The agenda is empty.
@@ -16,3 +20,10 @@
           %code= c
       %br
       %a.item.small{href: iri.cut('/agenda/done').add(pid: p[:plan].id)} Done
+
+%p
+  - if offset.positive?
+    %a.item{href: iri.over(offset: offset - 25)} Previous
+  - if agenda.count >= limit
+    %a.item{href: iri.over(offset: offset + 25)} Next
+

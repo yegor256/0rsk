@@ -154,12 +154,16 @@ get '/ranked/delete' do
 end
 
 get '/agenda' do
+  offset = [(params[:offset] || '0').to_i, 0].max
+  limit = (params[:limit] || '25').to_i
   agenda.refresh
   query = params[:q] || ''
   haml :agenda, layout: :layout, locals: merged(
     title: '/agenda',
+    offset: offset,
+    limit: limit,
     query: query,
-    agenda: agenda.fetch(query: query, offset: 0, limit: 10)
+    agenda: agenda.fetch(query: query, offset: offset, limit: limit)
   )
 end
 

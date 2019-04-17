@@ -52,18 +52,19 @@ class Rsk::Agenda
       [
         'SELECT * FROM agenda',
         'WHERE login = $1',
-        'AND LOWER(text) LIKE $2',
-        "AND deadline < NOW() + INTERVAL \'#{days} DAYS\'",
+        'AND (LOWER(text) LIKE $2',
+        "AND deadline < NOW() + INTERVAL \'#{days} DAYS\')",
+        'OR plan = $5',
         'ORDER BY deadline ASC',
         'OFFSET $3 LIMIT $4'
       ].join(' '),
-      [@login, "%#{query.strip.downcase}%", offset, limit]
+      [@login, "%#{query.strip.downcase}%", offset, limit, /^P[0-9]+$/.match?(query) ? query[1..-1].to_i : 0]
     )
     rows.map do |r|
       {
         id: r['id'].to_i,
         text: r['text'],
-        chunks: r['path'].split(' '),
+        chunks: path_to_chunks(r['path']),
         deadline: Time.parse(r['deadline']),
         plan: Rsk::Plan.new(@pgsql, r['plan'].to_i),
         created: Time.parse(r['created'])
@@ -83,6 +84,10 @@ class Rsk::Agenda
   end
 
   private
+
+  def path_to_chunks(path)
+    path.scan(/\[([A-Z][0-9]+)\]/).map { |x| x[0] }
+  end
 
   def deadline(plan)
     schedule = plan.schedule.strip.downcase
@@ -113,7 +118,7 @@ class Rsk::Agenda
 
   def path(plan)
     links = Rsk::Links.new(@pgsql, project_of(plan.id))
-    parents(links, plan.chunk).join(' ')
+    parents(links, plan.chunk).map { |c| "[#{c}]" }.join(' ')
   end
 
   def parents(links, chunk)
