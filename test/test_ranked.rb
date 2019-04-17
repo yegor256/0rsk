@@ -50,6 +50,7 @@ class Rsk::RankedTest < Minitest::Test
     i = ranked.fetch(chunks: ["C#{cid}"])[0]
     assert_equal('CRE', i[:mnemo])
     assert_equal(["C#{cid}", "R#{rid}", "E#{eid}"], i[:chunks])
+    assert_equal('we have data; we may lose it; business will stop', i[:text])
     ranked.delete(ids.first)
   end
 

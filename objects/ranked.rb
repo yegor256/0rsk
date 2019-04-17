@@ -137,7 +137,7 @@ class Rsk::Ranked
 
   def text(chunks)
     links = Rsk::Links.new(@pgsql, @project)
-    chunks.map { |c| links.item(c).text }
+    chunks.map { |c| links.item(c).text }.join('; ')
   end
 
   def plans(chunks)
