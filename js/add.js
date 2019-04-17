@@ -3,6 +3,9 @@
 function auto(kind) {
   "use strict";
   var $input = $("#" + kind);
+  $input.on("input", function() {
+    $("#" + kind + "_detach").addClass("red");
+  });
   var closing = false;
   $input.autocomplete({
     minLength: 0,
@@ -48,7 +51,7 @@ function on_detach(button, id) {
 function on_schedule(label, f) {
   "use strict";
   $("#schedule_" + label).on("click", function() {
-    $("#schedule").val(dateFns.format(f(new Date()), 'DD-MM-YYYY'));
+    $("#schedule").val(dateFns.format(f(new Date()), "DD-MM-YYYY"));
     return false;
   });
 }
