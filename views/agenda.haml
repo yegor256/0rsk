@@ -5,7 +5,8 @@
   - agenda.each do |p|
     %p
       = succeed ':' do
-        %a{href: iri.cut('/ranked').add(path: p[:plan].chunk, mnemo: '*')}= p[:plan].chunk
+        %a{href: iri.cut('/ranked').add(path: p[:plan].chunk, mnemo: '*')}
+          %code= p[:plan].chunk
       = p[:text]
       %br
       = p[:deadline].utc.iso8601
@@ -14,4 +15,4 @@
         %a{href: iri.cut('/ranked').add(path: c, mnemo: '*')}<
           %code= c
       %br
-      %a.item{href: iri.cut('/agenda/done').add(pid: p[:plan].id)} Done
+      %a.item.small{href: iri.cut('/agenda/done').add(pid: p[:plan].id)} Done

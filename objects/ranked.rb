@@ -82,6 +82,7 @@ class Rsk::Ranked
         path: c.join(' '),
         chunks: c,
         text: r['text'],
+        plans: path_to_chunks(r['plans']),
         created: Time.parse(r['created'])
       }
     end
@@ -97,12 +98,12 @@ class Rsk::Ranked
     mnemo = mnemo(chunks)
     @pgsql.exec(
       [
-        'INSERT INTO ranked (project, rank, mnemo, path, text)',
-        'VALUES ($1, $2, $3, $4, $5)',
-        'ON CONFLICT(project, path) DO UPDATE SET rank = $2, text = $5',
+        'INSERT INTO ranked (project, rank, mnemo, path, text, plans)',
+        'VALUES ($1, $2, $3, $4, $5, $6)',
+        'ON CONFLICT(project, path) DO UPDATE SET rank = $2, text = $5, plans = $6',
         'RETURNING id'
       ].join(' '),
-      [@project, rank(mnemo, chunks), mnemo, chunks.map { |c| "[#{c}]" }.join(' '), text(chunks)]
+      [@project, rank(mnemo, chunks), mnemo, chunks.map { |c| "[#{c}]" }.join(' '), text(chunks), plans(chunks)]
     )[0]['id'].to_i
   end
 
@@ -137,5 +138,10 @@ class Rsk::Ranked
   def text(chunks)
     links = Rsk::Links.new(@pgsql, @project)
     chunks.map { |c| links.item(c).text }
+  end
+
+  def plans(chunks)
+    links = Rsk::Links.new(@pgsql, @project)
+    links.right_of(chunks.last).select { |c| c.start_with?('P') }.map { |c| "[#{c}]" }
   end
 end
