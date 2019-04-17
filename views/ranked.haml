@@ -29,6 +29,7 @@
       - r[:chunks].each do |c|
         %a{href: iri.over(path: (path + [c]).sort.uniq.join(' '))}<
           %code= c
+      %br
       = r[:text]
       %br
       %a.item.small{href: iri.cut('/add').add(path: r[:path])} Edit

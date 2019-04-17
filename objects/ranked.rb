@@ -136,16 +136,6 @@ class Rsk::Ranked
 
   def text(chunks)
     links = Rsk::Links.new(@pgsql, @project)
-    risks = effects = plans = 0
-    links.right_of(chunks.last).each do |c|
-      risks += 1 if c.start_with?('R')
-      effects += 1 if c.start_with?('E')
-      plans += 1 if c.start_with?('P')
-    end
-    texts = chunks.map { |c| links.item(c).text }
-    texts << "#{risks} risks" if risks.positive?
-    texts << "#{effects} effects" if effects.positive?
-    texts << "#{plans} plans" if plans.positive?
-    texts.join('; ')
+    chunks.map { |c| links.item(c).text }
   end
 end
