@@ -36,9 +36,7 @@
       %option{value: v, selected: defined?(impact) && impact == v}= k
   %br
 
-  %label
-    %span{id: 'plan_type'}
-    Plan:
+  %label Avoidance/Mitigation Plan:
   %br
   %input{id: 'plan', type: 'text', name: 'plan', size: 45, maxlength: 160, autocomplete: 'off', tabindex: 7, value: defined?(p_item) ? p_item.text : ''}
   %input{id: 'pid', name: 'pid', size: 3, style: 'text-align:right', autocomplete: 'off', readonly: true, value: defined?(p_item) ? p_item.id : ''}

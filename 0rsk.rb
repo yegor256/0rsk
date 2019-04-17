@@ -238,10 +238,8 @@ post '/do-add' do
   effects.get(eid).text = params[:effect].strip if params[:effect]
   plans.get(pid).text = params[:plan].strip if params[:plan]
   links.add("C#{cid}", "R#{rid}") if cid && rid
-  links.add("R#{rid}", "E#{eid}") if rid && eid
-  links.add("C#{eid}", "P#{pid}") if pid && cid && !rid && !eid
-  links.add("R#{rid}", "P#{pid}") if pid && rid && !eid
-  links.add("E#{eid}", "P#{pid}") if pid && eid
+  links.add("R#{rid}", "E#{eid}") if cid && rid && eid
+  links.add("E#{eid}", "P#{pid}") if cid && rid && eid && pid
   risks.get(rid).probability = params[:probability].to_i if rid && params[:probability]
   effects.get(eid).impact = params[:impact].to_i if eid && params[:impact]
   plans.get(pid).schedule = params[:schedule].strip if pid && params[:schedule]

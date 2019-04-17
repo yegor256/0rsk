@@ -53,17 +53,6 @@ function on_schedule(label, f) {
   });
 }
 
-function update_plan_type() {
-  "use strict";
-  var effect = $("#effect").val();
-  var $type = $("#plan_type");
-  if (effect.length === 0) {
-    $type.text("Avoidance");
-  } else {
-    $type.text("Mitigation");
-  }
-}
-
 $(function() {
   "use strict";
   auto("cause");
@@ -78,6 +67,4 @@ $(function() {
   on_schedule("week", function(today) { return dateFns.addWeeks(today, 1); });
   on_schedule("month", function(today) { return dateFns.addMonths(today, 1); });
   on_schedule("later", function(today) { return dateFns.addMonths(today, 3); });
-  $("#risk").on("input", function() { update_plan_type(); });
-  $("#effect").on("input", function() { update_plan_type(); });
 });
