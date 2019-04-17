@@ -245,7 +245,7 @@ post '/do-add' do
   plans.get(pid).schedule = params[:schedule].strip if pid && params[:schedule]
   ids = ranked.analyze("C#{cid}")
   agenda.analyze(pid) if pid
-  flash('/ranked', "Thanks, #{ids.count} ranked items updated")
+  flash("/ranked?path=C#{cid}", "Thanks, #{ids.count} ranked items updated")
 end
 
 get '/causes' do
