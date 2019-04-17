@@ -39,7 +39,7 @@
       - unless r[:plans].empty?
         %span.item.small
           - r[:plans].each do |p|
-            %a{href: iri.cut('/agenda').over(query: p)}<
+            %a{href: iri.cut('/agenda').over(q: p)}<
               %code= p
       %a.item.small{href: iri.cut('/add').add(path: r[:path])} Edit
       %a.item.small{href: iri.cut('/ranked/delete').add(id: r[:id])} Delete
