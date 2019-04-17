@@ -5,7 +5,7 @@
   - agenda.each do |p|
     %p
       = succeed ':' do
-        %a{href: iri.cut('/ranked').add(path: p[:plan].chunk, mnemo: '*')}
+        %a{href: iri.cut('/ranked').add(path: p[:plan].chunk, mnemo: '*')}<
           %code= p[:plan].chunk
       = p[:text]
       %br
