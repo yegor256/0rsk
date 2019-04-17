@@ -8,40 +8,38 @@
 %form{method: 'POST', action: '/do-add'}
   %label Cause:
   %br
-  %input{id: 'cause', type: 'text', name: 'cause', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: defined?(c_item) ? c_item.text : ''}
+  %input{id: 'cause', type: 'text', name: 'cause', size: 35, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: defined?(c_item) ? c_item.text : ''}
   %input{id: 'cid', name: 'cid', size: 4, autocomplete: 'off', readonly: true, value: defined?(c_item) ? c_item.id : ''}
-  - if defined?(c_item)
-    %a{href: '#', onclick: "$('#cid').val('');$(this).hide();return false;"} Detach
+  %a{id: 'cause_detach', href: '#', onclick: "$('#cid').val('');$(this).hide();return false;", style: defined?(c_item) ? '' : 'display: none;'} Detach
   %br
 
   %label Risk:
   %br
-  %input{id: 'risk', type: 'text', name: 'risk', size: 40, maxlength: 160, tabindex: 2, value: defined?(r_item) ? r_item.text : ''}
+  %input{id: 'risk', type: 'text', name: 'risk', size: 50, maxlength: 160, tabindex: 2, value: defined?(r_item) ? r_item.text : ''}
+  %br
   %select{id: 'probability', name: 'probability', tabindex: 3}
     - {'Extremely high' => 8, 'High' => 6, 'Low' => 4, 'Very low' => 2}.each do |k, v|
       %option{value: v, selected: defined?(probability) && probability == v}= k
   %input{id: 'rid', name: 'rid', size: 4, autocomplete: 'off', readonly: true, value: defined?(r_item) ? r_item.id : ''}
-  - if defined?(r_item)
-    %a{href: '#', onclick: "$('#rid').val('');$(this).hide();return false;"} Detach
+  %a{id: 'risk_detach', href: '#', onclick: "$('#rid').val('');$(this).hide();return false;", style: defined?(r_item) ? '' : 'display: none;'} Detach
   %br
 
   %label Effect:
   %br
   %input{id: 'effect', type: 'text', name: 'effect', size: 40, maxlength: 160, autocomplete: 'off', tabindex: 4, value: defined?(e_item) ? e_item.text : ''}
+  %br
   %select{id: 'impact', name: 'impact', tabindex: 5}
     - {'Catastrophic' => 8, 'Serious' => 6, 'Moderate' => 4, 'Unnoticable' => 2}.each do |k, v|
       %option{value: v, selected: defined?(impact) && impact == v}= k
   %input{id: 'eid', name: 'eid', size: 4, autocomplete: 'off', readonly: true, value: defined?(e_item) ? e_item.id : ''}
-  - if defined?(e_item)
-    %a{href: '#', onclick: "$('#eid').val('');$(this).hide();return false;"} Detach
+  %a{id: 'effect_detach', href: '#', onclick: "$('#eid').val('');$(this).hide();return false;", style: defined?(e_item) ? '' : 'display: none;'} Detach
   %br
 
   %label Plan:
   %br
-  %input{id: 'plan', type: 'text', name: 'plan', size: 40, maxlength: 160, autocomplete: 'off', tabindex: 7, value: defined?(p_item) ? p_item.text : ''}
+  %input{id: 'plan', type: 'text', name: 'plan', size: 45, maxlength: 160, autocomplete: 'off', tabindex: 7, value: defined?(p_item) ? p_item.text : ''}
   %input{id: 'pid', name: 'pid', size: 4, autocomplete: 'off', readonly: true, value: defined?(p_item) ? p_item.id : ''}
-  - if defined?(p_item)
-    %a{href: '#', onclick: "$('#pid').val('');$(this).hide();return false;"} Detach
+  %a{id: 'plan_detach', href: '#', onclick: "$('#pid').val('');$(this).hide();return false;", style: defined?(p_item) ? '' : 'display: none;'} Detach
   %br
   %label Schedule:
   %br

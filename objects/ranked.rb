@@ -109,15 +109,11 @@ class Rsk::Ranked
   end
 
   def rank(mnemo, chunks)
-    case mnemo
-    when 'CRE', 'CREP'
-      links = Rsk::Links.new(@pgsql, @project)
-      risk = links.item(chunks[1])
-      effect = links.item(chunks[2])
-      risk.probability * effect.impact
-    else
-      1
-    end
+    return 1 unless mnemo == 'CRE'
+    links = Rsk::Links.new(@pgsql, @project)
+    risk = links.item(chunks[1])
+    effect = links.item(chunks[2])
+    risk.probability * effect.impact
   end
 
   def text(chunks)
