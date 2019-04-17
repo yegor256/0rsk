@@ -91,7 +91,21 @@ class Rsk::AppTest < Minitest::Test
   def test_add
     name = 'jeff09'
     login(name)
-    post('/do-add', 'cause=test&risk=test&effect=test&plan=test&cid=&rid=&eid=&pid=')
+    post(
+      '/do-add',
+      [
+        'cause=test',
+        'risk=test',
+        'probability=5',
+        'effect=test',
+        'impact=5',
+        'plan=test',
+        'cid=',
+        'rid=',
+        'eid=',
+        'pid='
+      ].join('&')
+    )
     assert_equal(302, last_response.status, last_response.body)
   end
 
