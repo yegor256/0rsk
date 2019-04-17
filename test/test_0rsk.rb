@@ -88,6 +88,13 @@ class Rsk::AppTest < Minitest::Test
     end
   end
 
+  def test_add
+    name = 'jeff09'
+    login(name)
+    post('/do-add', 'cause=test&risk=test&effect=test&plan=test&cid=&rid=&eid=&pid=')
+    assert_equal(302, last_response.status, last_response.body)
+  end
+
   private
 
   def login(name)
