@@ -5,7 +5,7 @@
 %h2
   Add/Copy
 
-%form{method: 'POST', action: '/do-add'}
+%form{method: 'POST', action: iri.cut('/do-add')}
   %label Cause:
   %br
   %input{id: 'cause', type: 'text', name: 'cause', size: 35, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: defined?(c_item) ? c_item.text : ''}

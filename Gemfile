@@ -29,7 +29,7 @@ gem 'geocoder', '1.5.0'
 gem 'glogin', '~> 0.4'
 gem 'gserver', '0.0.1'
 gem 'haml', '5.0.4'
-gem 'iri', '0.1.0'
+gem 'iri', '0.2.0'
 gem 'liquid', '4.0.1'
 gem 'mail', '2.7.1'
 gem 'minitest', '5.11.3', require: false

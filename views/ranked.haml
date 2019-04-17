@@ -31,8 +31,8 @@
           %code= c
       = r[:text]
       %br
-      %a.item.small{href: url("/add?path=#{CGI.escape(r[:path])}")} Edit
-      %a.item.small{href: url("/ranked/delete?id=#{r[:id]}")} Delete
+      %a.item.small{href: iri.cut('/add').add(path: r[:path])} Edit
+      %a.item.small{href: iri.cut('/ranked/delete').add(id: r[:id])} Delete
 
 %p
   - ['C', 'CR', 'CP', 'CRE', 'CR*', 'CRE*', 'CRP', 'CREP', '*'].each do |m|
