@@ -22,7 +22,11 @@
     %span.red Nothing
     found, sorry.
 - else
+  - rank = 0
   - ranked.each do |r|
+    - if r[:rank] == 1 && rank > 1
+      %hr
+    - rank = r[:rank]
     %p
       %span{style: 'color: ' + (r[:rank] < 32 ? 'gray' : (r[:rank] > 64 ? 'orangered' : 'seagreen'))}
         = "#{r[:rank]}:"
