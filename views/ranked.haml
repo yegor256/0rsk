@@ -35,7 +35,7 @@
       - unless r[:plans].empty?
         %a.item.small
           - r[:plans].each do |p|
-            %a{href: iri.over(path: p, mnemo: '*'}<
+            %a{href: iri.over(path: p, mnemo: '*')}<
               %code= p
       %a.item.small{href: iri.cut('/add').add(path: r[:path])} Edit
       %a.item.small{href: iri.cut('/ranked/delete').add(id: r[:id])} Delete
