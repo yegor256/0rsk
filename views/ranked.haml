@@ -45,7 +45,7 @@
       %a.item.small{href: iri.cut('/ranked/delete').add(id: r[:id])} Delete
 
 %p
-  - ['C', 'CR', 'CP', 'CRE', 'CR*', 'CRE*', 'CRP', 'CREP', '*'].each do |m|
+  - ['C', 'CR', 'CRE', 'CR*', 'CRE*', 'CREP', '*'].each do |m|
     %a.item{href: iri.over(mnemo: m)}<
       %code= m
 

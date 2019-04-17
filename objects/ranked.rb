@@ -40,6 +40,7 @@ class Rsk::Ranked
     ids = [insert(chunks)]
     links = Rsk::Links.new(@pgsql, @project)
     links.right_of(chunks.last).each do |e|
+      next if e.start_with?('P')
       ids += analyze((chunks + [e]).join(' '))
     end
     ids
@@ -116,9 +117,9 @@ class Rsk::Ranked
     if mnemo.end_with?('*')
       case mnemo
       when 'C*', '*'
-        %w[C CR CP CRP CRE CREP]
+        %w[C CR CRE CREP]
       when 'CR*'
-        %w[CR CRE CRP CREP]
+        %w[CR CRE CREP]
       when 'CRE*'
         %w[CRE CREP]
       end
