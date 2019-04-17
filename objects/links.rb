@@ -48,6 +48,15 @@ class Rsk::Links
     )
   end
 
+  def delete(left, right)
+    a = item(left)
+    b = item(right)
+    @pgsql.exec(
+      'DELETE FROM link WHERE project = $1 AND a = $2 AND b = $3',
+      [@project, a.chunk, b.chunk]
+    )
+  end
+
   def right_of(chunk)
     @pgsql.exec(
       'SELECT b FROM link WHERE project = $1 AND a = $2',

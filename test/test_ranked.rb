@@ -50,7 +50,7 @@ class Rsk::RankedTest < Minitest::Test
     i = ranked.fetch(chunks: ["C#{cid}"])[0]
     assert_equal('CRE', i[:mnemo])
     assert_equal(["C#{cid}", "R#{rid}", "E#{eid}"], i[:chunks])
-    ids.each { |id| ranked.delete(id) }
+    ranked.delete(ids.first)
   end
 
   def test_analyzes_non_standard_path

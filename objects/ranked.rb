@@ -22,6 +22,7 @@
 
 require_relative 'rsk'
 require_relative 'links'
+require_relative 'urror'
 
 # Ranked.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -45,7 +46,18 @@ class Rsk::Ranked
   end
 
   def delete(id)
+    row = @pgsql.exec('SELECT path FROM ranked WHERE id = $1 AND project = $2', [id, @project])[0]
+    raise Rsk::Urror, "Ranked item ##{id} not found in project ##{@project}" if row.nil?
+    path = row['path']
+    chunks = path_to_chunks(path)
+    return if chunks.count < 2
+    a, b = chunks.last(2)
+    links = Rsk::Links.new(@pgsql, @project)
+    links.delete(a, b)
     @pgsql.exec('DELETE FROM ranked WHERE id = $1 AND project = $2', [id, @project])
+    @pgsql.exec('SELECT id FROM ranked WHERE project = $1 AND path LIKE $2', [@project, path + ' %']).each do |r|
+      delete(r['id'].to_i)
+    end
   end
 
   def fetch(query: '', chunks: [], mnemo: '*', offset: 0, limit: 50)
@@ -62,7 +74,7 @@ class Rsk::Ranked
       [@project, offset, limit, "%#{query.strip.downcase}%"]
     )
     rows.map do |r|
-      c = r['path'].scan(/\[([A-Z][0-9]+)\]/).map { |x| x[0] }
+      c = path_to_chunks(r['path'])
       {
         id: r['id'].to_i,
         rank: r['rank'].to_i,
@@ -76,6 +88,10 @@ class Rsk::Ranked
   end
 
   private
+
+  def path_to_chunks(path)
+    path.scan(/\[([A-Z][0-9]+)\]/).map { |x| x[0] }
+  end
 
   def insert(chunks)
     mnemo = mnemo(chunks)
