@@ -33,7 +33,7 @@
                 %a{href: '/ranked'}= "@#{user[:login]}"
                 - if @cookies['0rsk-project']
                   = '/'
-                  %a{href: iri.cut("/projects/#{current_project}"}= current_project
+                  %a{href: iri.cut("/projects/#{current_project}")}= current_project
               - else
                 %a{href: login_link}
                   Login
