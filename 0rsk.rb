@@ -26,6 +26,7 @@ require 'geocoder'
 require 'glogin'
 require 'glogin/codec'
 require 'haml'
+require 'iri'
 require 'json'
 require 'pgtk'
 require 'pgtk/pool'
@@ -34,8 +35,8 @@ require 'sinatra'
 require 'sinatra/cookies'
 require 'time'
 require 'yaml'
-require_relative 'version'
 require_relative 'objects/urror'
+require_relative 'version'
 
 if ENV['RACK_ENV'] != 'test'
   require 'rack/ssl'
@@ -91,7 +92,8 @@ before '/*' do
   @locals = {
     ver: Rsk::VERSION,
     login_link: settings.glogin.login_uri,
-    request_ip: request.ip
+    request_ip: request.ip,
+    iri: Iri.new(request.url)
   }
   cookies[:glogin] = params[:glogin] if params[:glogin]
   if cookies[:glogin]
@@ -129,15 +131,19 @@ get '/' do
 end
 
 get '/ranked' do
+  offset = [(params[:offset] || '0').to_i, 0].max
+  limit = (params[:limit] || '25').to_i
   query = params[:q] || ''
   path = (params[:path] || '').split(' ')
-  mnemo = params[:mnemo] || '*'
+  mnemo = params[:mnemo] || 'CRE'
   haml :ranked, layout: :layout, locals: merged(
     title: '/risks',
     path: path,
     mnemo: mnemo,
     query: query,
-    ranked: ranked.fetch(query: query, chunks: path, mnemo: mnemo, offset: 0, limit: 10)
+    limit: limit,
+    offset: offset,
+    ranked: ranked.fetch(query: query, chunks: path, mnemo: mnemo, offset: offset, limit: limit)
   )
 end
 

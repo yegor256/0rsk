@@ -8,14 +8,14 @@
   %p
     Mnemo:
     %code= mnemo
-    %a.item{href: "?path=#{path.join(' ')}&mnemo=*&q=#{query}"} x
+    %a.item{href: iri.over(mnemo: '*')} x
 
 - unless path.empty?
   %p
     Path:
     - path.each do |c|
       %code=c
-      %a.item{href: "?path=#{(path - [c]).sort.uniq.join(' ')}&mnemo=#{mnemo}&q=#{query}"} x
+      %a.item{href: iri.over(path: (path - [c]).sort.uniq.join(' '))} x
 
 - if ranked.empty?
   %p
@@ -27,14 +27,21 @@
       %span{style: 'color: ' + (r[:rank] < 32 ? 'gray' : (r[:rank] > 64 ? 'orangered' : 'seagreen'))}
         = "#{r[:rank]}:"
       - r[:chunks].each do |c|
-        %a{href: "?path=#{(path + [c]).sort.uniq.join(' ')}&mnemo=#{mnemo}&q=#{query}"}<
+        %a{href: iri.over(path: (path + [c]).sort.uniq.join(' '))}<
           %code= c
       = r[:text]
       %br
-      %a.item.small{href: "/add?path=#{r[:path]}"} Edit
-      %a.item.small{href: "/ranked/delete?id=#{r[:id]}"} Delete
+      %a.item.small{href: url("/add?path=#{CGI.escape(r[:path])}")} Edit
+      %a.item.small{href: url("/ranked/delete?id=#{r[:id]}")} Delete
 
 %p
   - ['C', 'CR', 'CP', 'CRE', 'CR*', 'CRE*', 'CRP', 'CREP', '*'].each do |m|
-    %a.item{href: "?mnemo=#{m}&path=#{path.join(' ')}&q=#{CGI.escape(query)}"}<
+    %a.item{href: iri.over(mnemo: m)}<
       %code= m
+
+%p
+  - if offset.positive?
+    %a.item{href: iri.over(offset: offset - 25)} Previous
+  - if ranked.count >= limit
+    %a.item{href: iri.over(offset: offset + 25)} Next
+
