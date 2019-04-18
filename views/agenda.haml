@@ -16,8 +16,13 @@
       - if p[:deadline] < Time.now
         %strong.red Expired
       - else
-        = (Time.now - p[:deadline]) / (24 * 60 * 60)
-        days left
+        - days = ((p[:deadline] - Time.now) / (24 * 60 * 60)).round
+        - if days.zero?
+          Today!
+        - else
+          in
+          = days
+          days
       %br
       - p[:chunks].each do |c|
         %a{href: iri.cut('/ranked').add(path: c, mnemo: '*')}<
