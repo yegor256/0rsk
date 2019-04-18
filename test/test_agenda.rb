@@ -43,13 +43,16 @@ class Rsk::AgendaTest < Minitest::Test
     rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
     eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
     pid = Rsk::Plans.new(test_pgsql, project).add('do it now!')
+    Rsk::Plan.new(test_pgsql, pid).schedule = 'weekly'
     links = Rsk::Links.new(test_pgsql, project)
     links.add("C#{cid}", "R#{rid}")
     links.add("R#{rid}", "E#{eid}")
     links.add("E#{eid}", "P#{pid}")
     agenda = Rsk::Agenda.new(test_pgsql, login)
-    agenda.analyze(pid)
+    aid = agenda.analyze(pid)
+    assert(aid.positive?)
     i = agenda.fetch[0]
     assert_equal(["C#{cid}", "E#{eid}", "R#{rid}"], i[:chunks].sort)
+    agenda.done(pid)
   end
 end

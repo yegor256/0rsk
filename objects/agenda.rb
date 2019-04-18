@@ -40,10 +40,11 @@ class Rsk::Agenda
       [
         'INSERT INTO agenda (login, plan, deadline, text, path)',
         'VALUES ($1, $2, $3, $4, $5)',
-        'ON CONFLICT(plan) DO UPDATE SET deadline = $3, text = $4, path = $5'
+        'ON CONFLICT(plan) DO UPDATE SET deadline = $3, text = $4, path = $5',
+        'RETURNING id'
       ].join(' '),
       [@login, pid, deadline(plan), text(plan), path(plan)]
-    )
+    )[0]['id'].to_i
   end
 
   # Fetch it all.
@@ -80,7 +81,14 @@ class Rsk::Agenda
 
   def done(pid)
     plan = Rsk::Plan.new(@pgsql, pid)
-    @pgsql.exec('UPDATE agenda SET deadline = $1 WHERE id = $2', [deadline(plan), pid])
+    if /^[a-z]+$/.match?(plan.schedule)
+      project = plan.project
+      @pgsql.exec('DELETE FROM agenda WHERE plan = $1 AND login = $2', [pid, @login])
+      @pgsql.exec('DELETE FROM plan WHERE id = $1 and project = $2', [pid, project])
+      @pgsql.exec('DELETE FROM link WHERE b = $1 and project = $2', ["P#{pid}", project])
+    else
+      @pgsql.exec('UPDATE agenda SET deadline = $1 WHERE id = $2 AND login = $3', [deadline(plan), pid, @login])
+    end
   end
 
   private

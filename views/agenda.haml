@@ -13,7 +13,11 @@
           %code= p[:plan].chunk
       &= p[:text]
       %br
-      = p[:deadline].utc.iso8601
+      - if p[:deadline] < Time.now
+        %strong.red Expired
+      - else
+        = (Time.now - p[:deadline]) / (24 * 60 * 60)
+        days left
       %br
       - p[:chunks].each do |c|
         %a{href: iri.cut('/ranked').add(path: c, mnemo: '*')}<

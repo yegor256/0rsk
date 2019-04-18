@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 require_relative 'rsk'
+require_relative 'urror'
 
 # Plan.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -42,6 +43,10 @@ class Rsk::Plan
     "P#{@id}"
   end
 
+  def project
+    @pgsql.exec('SELECT project FROM plan WHERE id = $1', [@id])[0]['project'].to_i
+  end
+
   def text
     @pgsql.exec('SELECT text FROM plan WHERE id = $1', [@id])[0]['text']
   end
@@ -55,6 +60,9 @@ class Rsk::Plan
   end
 
   def schedule=(text)
+    unless /^([a-z]+|\d{2}-\d{2}-\d{4})$/.match?(text)
+      raise Rsk::Urror, "Schedule can either be a word or a date DD-MM-YYYY: #{text.inspect}"
+    end
     @pgsql.exec('UPDATE plan SET schedule = $2 WHERE id = $1', [@id, text])
   end
 end
