@@ -107,6 +107,7 @@ SOFTWARE.
       );
       CREATE INDEX idx_ranked1 ON ranked (project, rank, mnemo, path, text);
     </sql>
+    <!-- both Login and Deadline are removed in 003-agenda-refactor.xml -->
     <sql>
       CREATE TABLE agenda (
         id SERIAL PRIMARY KEY,

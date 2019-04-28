@@ -134,42 +134,38 @@ get '/ranked' do
   offset = [(params[:offset] || '0').to_i, 0].max
   limit = (params[:limit] || '25').to_i
   query = params[:q] || ''
-  path = (params[:path] || '').split(' ')
-  mnemo = params[:mnemo] || 'CRE'
   haml :ranked, layout: :layout, locals: merged(
-    title: '/risks',
-    path: path,
-    mnemo: mnemo,
+    title: '/ranked',
     query: query,
     limit: limit,
     offset: offset,
-    ranked: ranked.fetch(query: query, chunks: path, mnemo: mnemo, offset: offset, limit: limit)
+    triples: triples.fetch(query: query, offset: offset, limit: limit)
   )
 end
 
 get '/ranked/delete' do
   id = params[:id]
-  ranked.delete(id)
-  flash('/ranked', "The ranked item ##{id} deleted")
+  triples.delete(id)
+  flash('/ranked', "The ranked triple ##{id} deleted")
 end
 
-get '/agenda' do
+get '/tasks' do
   offset = [(params[:offset] || '0').to_i, 0].max
   limit = (params[:limit] || '25').to_i
-  agenda.refresh
   query = params[:q] || ''
-  haml :agenda, layout: :layout, locals: merged(
-    title: '/agenda',
+  haml :tasks, layout: :layout, locals: merged(
+    title: '/tasks',
     offset: offset,
     limit: limit,
     query: query,
-    agenda: agenda.fetch(query: query, offset: offset, limit: limit)
+    tasks: tasks.fetch(query: query, offset: offset, limit: limit)
   )
 end
 
-get '/agenda/done' do
-  agenda.done(params[:pid].to_i)
-  flash('/agenda', 'Thanks!')
+get '/tasks/done' do
+  id = params[:pid].to_i
+  tasks.done(id)
+  flash('/tasks', "Thanks, task ##{id} was removed")
 end
 
 get '/projects' do
@@ -219,42 +215,39 @@ get '/plans.json' do
   JSON.pretty_generate(plans.fetch(query: params[:query] || ''))
 end
 
-get '/add' do
-  chunks = (params[:path] || '').split(' ')
+get '/triple' do
   vars = { title: '/add', plans: [] }
-  chunks.each do |c|
-    i = links.item(c)
-    vars[i.mnemo.downcase + '_item'] = i
-    vars[:probability] = i.probability if i.respond_to?(:probability)
-    vars[:impact] = i.impact if i.respond_to?(:impact)
-    links.right_of(i.chunk).select { |x| x.start_with?('P') }.each do |p|
-      vars[:plans] << {
-        chunk: p,
-        text: "#{p}: #{plans.get(p[1..-1].to_i).text}"
-      }
-    end
+  id = params[:id].to_i
+  if id.positive?
+    triple = triples.fetch(id, limit: 1)[0]
+    raise Urror, "Triple ##{id} not found" if triple.nil?
+    vars[:triple] = triple
+    vars[:plans] = plans.fetch(query: id, limit: 100)
   end
   haml :add, layout: :layout, locals: merged(vars)
 end
 
-post '/do-add' do
-  cid = params[:cid].empty? ? causes.add(params[:cause].strip) : params[:cid]
-  rid = params[:rid].empty? ? (risks.add(params[:risk].strip) unless params[:risk].empty?) : params[:rid]
-  eid = params[:eid].empty? ? (effects.add(params[:effect].strip) unless params[:effect].empty?) : params[:eid]
-  pid = params[:pid].empty? ? (plans.add(params[:plan].strip) unless params[:plan].empty?) : params[:pid]
-  causes.get(cid).text = params[:cause].strip if params[:cause]
-  risks.get(rid).text = params[:risk].strip if params[:risk]
-  effects.get(eid).text = params[:effect].strip if params[:effect]
-  plans.get(pid).text = params[:plan].strip if params[:plan]
-  links.add("C#{cid}", "R#{rid}") if cid && rid
-  links.add("R#{rid}", "E#{eid}") if cid && rid && eid
-  links.add("E#{eid}", "P#{pid}") if cid && rid && eid && pid
-  risks.get(rid).probability = params[:probability].to_i if rid && params[:probability]
-  effects.get(eid).impact = params[:impact].to_i if eid && params[:impact]
-  plans.get(pid).schedule = params[:schedule].strip if pid && params[:schedule]
-  ids = ranked.analyze("C#{cid}")
-  agenda.analyze(pid) if pid
-  flash("/ranked?path=C#{cid}", "Thanks, #{ids.count} ranked items updated")
+post '/triple/save' do
+  ctext = params[:ctext].strip
+  rtext = params[:ctext].strip
+  etext = params[:ctext].strip
+  cid = params[:cid].empty? ? causes.add(ctext) : params[:cid]
+  rid = params[:rid].empty? ? risks.add(rtext) : params[:rid]
+  eid = params[:eid].empty? ? effects.add(etext) : params[:eid]
+  causes.get(cid).text = ctext
+  risks.get(rid).text = rtext
+  effects.get(eid).text = etext
+  risks.get(rid).probability = params[:probability].to_i
+  effects.get(eid).impact = params[:impact].to_i
+  id = triples.add(cid, rid, eid)
+  flash('/ranked', "Thanks, triple ##{id} created")
+end
+
+post '/triple/plans/add' do
+  id = params[:id].to_i
+  pid = params[:pid].to_i
+  plans.get().schedule = params[:schedule].strip if pid && params[:schedule]
+  flash("/triple?id=#{id}", "Thanks, plan ##{pid} added to the triple ##{id}")
 end
 
 get '/causes' do
@@ -382,14 +375,14 @@ def projects
   Rsk::Projects.new(settings.pgsql, current_user)
 end
 
-def ranked(project: current_project)
-  require_relative 'objects/ranked'
-  Rsk::Ranked.new(settings.pgsql, project)
+def triples(project: current_project)
+  require_relative 'objects/triples'
+  Rsk::Triples.new(settings.pgsql, project)
 end
 
-def agenda
-  require_relative 'objects/agenda'
-  Rsk::Agenda.new(settings.pgsql, current_user)
+def tasks
+  require_relative 'objects/tasks'
+  Rsk::Tasks.new(settings.pgsql, current_user)
 end
 
 def causes(project: current_project)
@@ -410,9 +403,4 @@ end
 def plans(project: current_project)
   require_relative 'objects/plans'
   Rsk::Plans.new(settings.pgsql, project)
-end
-
-def links(project: current_project)
-  require_relative 'objects/links'
-  Rsk::Links.new(settings.pgsql, project)
 end

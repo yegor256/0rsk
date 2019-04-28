@@ -16,7 +16,12 @@
             %code= chunk
         %td
           &= r[:value]
-        %td.right= r[:fields][:probability]
+        %td.right
+          - if r[:fields][:positive]
+            = '+'
+          - else
+            = '-'
+          = r[:fields][:probability]
 
 %p
   - if offset.positive?

@@ -21,52 +21,38 @@
 # SOFTWARE.
 
 require_relative 'rsk'
-require_relative 'urror'
 
-# Plan.
+# Tasks.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2019 Yegor Bugayenko
 # License:: MIT
-class Rsk::Plan
-  attr_reader :id
-
-  def initialize(pgsql, id)
+class Rsk::Tasks
+  def initialize(pgsql, login)
     @pgsql = pgsql
-    @id = id
+    @login = login
   end
 
-  def mnemo
-    'P'
+  def done(id)
+    @pgsql.exec('DELETE FROM task WHERE id = $1', [id, @project])
   end
 
-  def chunk
-    "P#{@id}"
-  end
-
-  def delete
-    @pgsql.exec('DELETE FROM plan WHERE id = $1', [@id])
-  end
-
-  def project
-    @pgsql.exec('SELECT project FROM plan WHERE id = $1', [@id])[0]['project'].to_i
-  end
-
-  def text
-    @pgsql.exec('SELECT text FROM plan WHERE id = $1', [@id])[0]['text']
-  end
-
-  def text=(text)
-    @pgsql.exec('UPDATE plan SET text = $2 WHERE id = $1', [@id, text])
-  end
-
-  def schedule
-    @pgsql.exec('SELECT schedule FROM plan WHERE id = $1', [@id])[0]['schedule']
-  end
-
-  def schedule=(text)
-    unless /^([a-z]+|\d{2}-\d{2}-\d{4})$/.match?(text)
-      raise Rsk::Urror, "Schedule can either be a word or a date DD-MM-YYYY: #{text.inspect}"
+  def fetch(query: '', limit: 10, offset: 0)
+    rows = @pgsql.exec(
+      [
+        'SELECT task.*, plan.text AS text FROM task',
+        'JOIN plan ON plan.id = task.plan',
+        'JOIN project ON plan.project = project.id',
+        'WHERE project.login = $1',
+        'AND plan.text LIKE $2',
+        'OFFSET $3 LIMIT $4'
+      ].join(' '),
+      [@login, "%#{query}%", offset, limit]
+    )
+    rows.map do |r|
+      {
+        id: r['id'].to_i,
+        text: r['text']
+      }
     end
-    @pgsql.exec('UPDATE plan SET schedule = $2 WHERE id = $1', [@id, text])
   end
 end

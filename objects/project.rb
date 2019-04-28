@@ -21,52 +21,18 @@
 # SOFTWARE.
 
 require_relative 'rsk'
-require_relative 'urror'
 
-# Plan.
+# Project.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2019 Yegor Bugayenko
 # License:: MIT
-class Rsk::Plan
-  attr_reader :id
-
+class Rsk::Project
   def initialize(pgsql, id)
     @pgsql = pgsql
     @id = id
   end
 
-  def mnemo
-    'P'
-  end
-
-  def chunk
-    "P#{@id}"
-  end
-
-  def delete
-    @pgsql.exec('DELETE FROM plan WHERE id = $1', [@id])
-  end
-
-  def project
-    @pgsql.exec('SELECT project FROM plan WHERE id = $1', [@id])[0]['project'].to_i
-  end
-
-  def text
-    @pgsql.exec('SELECT text FROM plan WHERE id = $1', [@id])[0]['text']
-  end
-
-  def text=(text)
-    @pgsql.exec('UPDATE plan SET text = $2 WHERE id = $1', [@id, text])
-  end
-
-  def schedule
-    @pgsql.exec('SELECT schedule FROM plan WHERE id = $1', [@id])[0]['schedule']
-  end
-
-  def schedule=(text)
-    unless /^([a-z]+|\d{2}-\d{2}-\d{4})$/.match?(text)
-      raise Rsk::Urror, "Schedule can either be a word or a date DD-MM-YYYY: #{text.inspect}"
-    end
-    @pgsql.exec('UPDATE plan SET schedule = $2 WHERE id = $1', [@id, text])
+  def login
+    @pgsql.exec('SELECT login FROM project WHERE id = $1', [@id])[0]['login']
   end
 end

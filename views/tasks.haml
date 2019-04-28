@@ -2,21 +2,18 @@
   %input{type: 'text', name: 'q', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: query}
   %input{type: 'submit', value: 'Search', tabindex: 2}
 
-- if triples.empty?
+- if tasks.empty?
   %p
-    %span.red Nothing
-    found, sorry.
+    The agenda is empty.
 - else
-  - triples.each do |r|
+  - tasks.each do |p|
     %p
-      &= r[:text]
-      %br
-      %a.item.small{href: iri.cut('/add').add(path: r[:path])} Edit
-      %a.item.small{href: iri.cut('/ranked/delete').add(id: r[:id])} Delete
+      &= p[:text]
+      %a.item.small{href: iri.cut('/tasks/done').add(pid: p[:id].id)} Done
 
 %p
   - if offset.positive?
     %a.item{href: iri.over(offset: offset - 25)} Previous
-  - if triples.count >= limit
+  - if tasks.count >= limit
     %a.item{href: iri.over(offset: offset + 25)} Next
 

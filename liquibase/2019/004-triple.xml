@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!--
+(The MIT License)
+
+Copyright (c) 2019 Yegor Bugayenko
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the 'Software'), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd" logicalFilePath="001-initial-schema.xml">
+  <changeSet id="004" author="yegor256">
+    <sql>
+      DROP TABLE link;
+      DROP TABLE ranked;
+      DROP TABLE agenda;
+    </sql>
+    <sql>
+      CREATE TYPE strategy AS ENUM ('Avoid', 'Mitigate');
+      ALTER TABLE plan ADD COLUMN strategy strategy NOT NULL DEFAULT 'Mitigate';
+    </sql>
+    <sql>
+      CREATE TABLE triple (
+        id SERIAL PRIMARY KEY,
+        cause INT NOT NULL REFERENCES cause(id),
+        risk INT NOT NULL REFERENCES risk(id),
+        effect INT NOT NULL REFERENCES effect(id),
+        created TIMESTAMPTZ DEFAULT now() NOT NULL,
+        UNIQUE(cause, risk, effect)
+      );
+      CREATE INDEX idx_triple1 ON triple(project, cause, risk, effect);
+    </sql>
+    <sql>
+      CREATE TABLE plans (
+        id SERIAL PRIMARY KEY,
+        triple INT NOT NULL REFERENCES plan(id),
+        plan INT NOT NULL REFERENCES plan(id),
+        created TIMESTAMPTZ DEFAULT now() NOT NULL,
+        UNIQUE(triple, plan)
+      );
+      CREATE INDEX idx_plans1 ON plans(triple, plan);
+    </sql>
+    <sql>
+      CREATE TABLE task (
+        id SERIAL PRIMARY KEY,
+        plan INT NOT NULL REFERENCES plan(id),
+        created TIMESTAMPTZ DEFAULT now() NOT NULL,
+        UNIQUE(plan)
+      );
+      CREATE INDEX idx_task1 ON task(plan);
+    </sql>
+  </changeSet>
+</databaseChangeLog>

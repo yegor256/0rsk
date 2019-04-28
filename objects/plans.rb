@@ -22,6 +22,8 @@
 
 require_relative 'rsk'
 require_relative 'plan'
+require_relative 'tasks'
+require_relative 'project'
 
 # Plans.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -31,6 +33,15 @@ class Rsk::Plans
   def initialize(pgsql, project)
     @pgsql = pgsql
     @project = project
+  end
+
+  # Promote plans into tasks, if their schedules requre.
+  def promote
+    tasks = Rsk::Tasks.new(@pgsql, Rsk::Project.new(@pgsql, @project).login)
+    @pgsql.exec('SELECT * FROM plan WHERE project = $1').each do |r|
+      # next unless expired?(r['promoted'] ? Time.parse(r['promoted']) : Time.now, r['schedule'])
+      tasks.add(r['id'].to_i)
+    end
   end
 
   def add(text)
@@ -55,7 +66,14 @@ class Rsk::Plans
 
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
-      'SELECT * FROM plan WHERE project = $1 AND text LIKE $2 OFFSET $3 LIMIT $4',
+      [
+        'SELECT * FROM plan',
+        'JOIN plans ON plans.plan = plan.id',
+        'WHERE project = $1',
+        'AND',
+        query.is_a?(Integer) ? "plans.triple = #{query}" : 'text LIKE $2',
+        'OFFSET $3 LIMIT $4'
+      ].join(' '),
       [@project, "%#{query}%", offset, limit]
     )
     rows.map do |r|
@@ -67,6 +85,24 @@ class Rsk::Plans
           schedule: r['schedule']
         }
       }
+    end
+  end
+
+  private
+
+  def deadline(plan)
+    schedule = plan.schedule.strip.downcase
+    if schedule == 'weekly'
+      Time.now + 3 * 24 * 60 * 60
+    elsif schedule == 'biweekly'
+      Time.now + 7 * 24 * 60 * 60
+    elsif schedule == 'monthly'
+      Time.now + 14 * 24 * 60 * 60
+    elsif /^[0-9]{2}-[0-9]{2}-[0-9]{4}$/.match?(schedule)
+      time = Time.parse(schedule)
+      time < Time.now ? Time.now + 60 * 60 : time
+    else
+      Time.now + 60 * 60
     end
   end
 end
