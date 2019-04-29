@@ -48,4 +48,8 @@ class Rsk::Projects
       }
     end
   end
+
+  def exists?(pid)
+    !@pgsql.exec('SELECT * FROM project WHERE login = $1 AND id = $2', [@login, pid]).empty?
+  end
 end
