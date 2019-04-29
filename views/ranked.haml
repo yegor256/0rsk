@@ -9,9 +9,17 @@
 - else
   - triples.each do |r|
     %p
-      &= r[:text]
+      %span{style: 'color:' + (r[:rank] >= 64 ? 'darkred' : (r[:rank] <= 32 ? 'darkgreen' : 'inherit'))}
+        = r[:rank]
+      %code= "C#{r[:cid]}"
+      %code= "R#{r[:rid]}"
+      %code= "E#{r[:eid]}"
       %br
-      %a.item.small{href: iri.cut('/add').add(path: r[:path])} Edit
+      &= "#{r[:ctext]};"
+      &= "#{r[:rtext]};"
+      &= "#{r[:etext]}."
+      %br
+      %a.item.small{href: iri.cut('/triple').add(id: r[:id])} Edit
       %a.item.small{href: iri.cut('/ranked/delete').add(id: r[:id])} Delete
 
 %p

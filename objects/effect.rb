@@ -35,11 +35,11 @@ class Rsk::Effect
   end
 
   def text
-    @pgsql.exec('SELECT text FROM effect WHERE id = $1', [@id])[0]['text']
+    @pgsql.exec('SELECT text FROM part WHERE id = $1', [@id])[0]['text']
   end
 
   def text=(text)
-    @pgsql.exec('UPDATE effect SET text = $2 WHERE id = $1', [@id, text])
+    @pgsql.exec('UPDATE part SET text = $2 WHERE id = $1', [@id, text])
   end
 
   def impact

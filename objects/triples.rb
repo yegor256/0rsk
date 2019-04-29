@@ -34,31 +34,46 @@ class Rsk::Triples
 
   def add(cid, rid, eid)
     @pgsql.exec(
-      'INSERT INTO triple (cause, risk, effect) VALUES ($1, $2, $3) RETURNING id',
+      [
+        'INSERT INTO triple (cause, risk, effect)',
+        'VALUES ($1, $2, $3)',
+        'ON CONFLICT(cause, risk, effect) DO NOTHING',
+        'RETURNING id'
+      ],
       [cid, rid, eid]
     )[0]['id'].to_i
   end
 
   def delete(id)
-    @pgsql.exec('DELETE FROM triple WHERE id = $1 AND project = $2', [id, @project])
+    @pgsql.exec(
+      [
+        'DELETE FROM triple WHERE id = $1',
+        'AND (SELECT project FROM part JOIN triple ON part.id = triple.cause WHERE triple.id = $1) = $2'
+      ],
+      [id, @project]
+    )
   end
 
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
       [
-        'SELECT cause.id AS cid, risk.id AS rid, effect.id AS eid,',
-        'risk.probability AS probability, effect.impact AS impact,',
-        'cause.text AS ctext, risk.text AS rtext, effect.text AS etext',
-        '(probability * impact) AS rank FROM triple',
+        'SELECT triple.id, cause.id AS cid, risk.id AS rid, effect.id AS eid,',
+        '  risk.probability AS probability, effect.impact AS impact,',
+        '  cpart.text AS ctext, rpart.text AS rtext, epart.text AS etext,',
+        '  (probability * impact) AS rank FROM triple',
         'JOIN cause ON cause.id = triple.cause',
-        'JOIN risk ON cause.id = triple.risk',
-        'JOIN effect ON cause.id = triple.effect',
-        'WHERE cause.project = $1 AND risk.project = $1 AND effect.project = $1',
+        'JOIN part AS cpart ON cause.id = cpart.id',
+        'JOIN risk ON risk.id = triple.risk',
+        'JOIN part AS rpart ON risk.id = rpart.id',
+        'JOIN effect ON effect.id = triple.effect',
+        'JOIN part AS epart ON effect.id = epart.id',
+        'WHERE cpart.project = $1 AND rpart.project = $1 AND epart.project = $1',
         'AND',
-        query.is_a?(Integer) ? "triple.id = #{query}" : '(ctext LIKE $2 OR rtext LIKE $2 OR etext LIKE $2)',
+        query.is_a?(Integer) ? "triple.id = #{query} AND (cpart.text = $2 OR cpart.text != $2)" :
+          '(cpart.text LIKE $2 OR rpart.text LIKE $2 OR epart.text LIKE $2)',
         'ORDER BY rank DESC',
         'OFFSET $3 LIMIT $4'
-      ].join(' '),
+      ]test_pgsql,
       [@project, "%#{query}%", offset, limit]
     )
     rows.map do |r|

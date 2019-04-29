@@ -53,17 +53,26 @@ class Rsk::Causes
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
       [
-        'SELECT cause.*, part.text FROM cause',
+        'SELECT cause.*, part.text, SUM(risk.probability * effect.impact) AS rank,',
+        '  COUNT(risk.id) AS risks',
+        'FROM cause',
         'JOIN part ON part.id = cause.id',
+        'LEFT JOIN triple ON triple.cause = cause.id',
+        'JOIN risk ON triple.risk = risk.id',
+        'JOIN effect ON triple.effect = effect.id',
         'WHERE project = $1 AND text LIKE $2',
+        'GROUP BY cause.id, part.id',
+        'ORDER BY rank DESC',
         'OFFSET $3 LIMIT $4'
-      ].join(' '),
+      ]test_pgsql,
       [@project, "%#{query}%", offset, limit]
     )
     rows.map do |r|
       {
         id: r['id'].to_i,
-        text: r['text']
+        text: r['text'],
+        rank: r['rank'].to_i,
+        risks: r['risks'].to_i
       }
     end
   end

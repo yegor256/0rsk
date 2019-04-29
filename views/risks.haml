@@ -6,22 +6,22 @@
     %tr
       %th Id
       %th Text
-      %th P
+      %th.right P
+      %th.right Rank
+      %th.right Effects
   %tbody
     - risks.each do |r|
-      - chunk = "R#{r[:fields][:rid]}"
       %tr
         %td
-          %a{href: iri.cut('/ranked').add(path: chunk, mnemo: '*')}
-            %code= chunk
+          %code= "R#{r[:id]}"
         %td
-          &= r[:value]
+          &= r[:text]
         %td.right
-          - if r[:fields][:positive]
-            = '+'
-          - else
-            = '-'
-          = r[:fields][:probability]
+          = r[:probability]
+        %td.right
+          = r[:rank]
+        %td.right
+          = r[:effects]
 
 %p
   - if offset.positive?

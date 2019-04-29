@@ -68,9 +68,9 @@ class Rsk::Plans
         query.is_a?(Integer) ? 'JOIN triple ON cause = part.id OR risk = part.id OR effect = part.id' : '',
         'WHERE project = $1',
         'AND',
-        query.is_a?(Integer) ? "triple.id = #{query}" : 'text LIKE $2',
+        query.is_a?(Integer) ? "triple.id = #{query} AND (text = $2 OR text != $2)" : 'text LIKE $2',
         'OFFSET $3 LIMIT $4'
-      ].join(' '),
+      ]test_pgsql,
       [@project, "%#{query}%", offset, limit]
     )
     rows.map do |r|

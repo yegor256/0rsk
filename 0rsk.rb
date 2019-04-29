@@ -204,7 +204,7 @@ get '/causes.json' do
         label: "C#{r[:id]}: #{r[:text]}",
         value: r[:text],
         fields: {
-          pid: r[:id]
+          cid: r[:id]
         }
       }
     end
@@ -219,7 +219,7 @@ get '/risks.json' do
         label: "R#{r[:id]}: #{r[:text]}",
         value: r[:text],
         fields: {
-          pid: r[:id],
+          rid: r[:id],
           probability: r[:probability]
         }
       }
@@ -235,7 +235,7 @@ get '/effects.json' do
         label: "E#{r[:id]}: #{r[:text]}",
         value: r[:text],
         fields: {
-          pid: r[:id],
+          eid: r[:id],
           impact: r[:impact]
         }
       }
@@ -263,18 +263,18 @@ get '/triple' do
   vars = { title: '/triple', plans: [] }
   id = params[:id].to_i
   if id.positive?
-    triple = triples.fetch(id, limit: 1)[0]
+    triple = triples.fetch(query: id, limit: 1)[0]
     raise Urror, "Triple ##{id} not found" if triple.nil?
     vars[:triple] = triple
     vars[:plans] = plans.fetch(query: id, limit: 100)
   end
-  haml :add, layout: :layout, locals: merged(vars)
+  haml :triple, layout: :layout, locals: merged(vars)
 end
 
 post '/triple/save' do
   ctext = params[:ctext].strip
-  rtext = params[:ctext].strip
-  etext = params[:ctext].strip
+  rtext = params[:rtext].strip
+  etext = params[:etext].strip
   cid = params[:cid].empty? ? causes.add(ctext) : params[:cid]
   rid = params[:rid].empty? ? risks.add(rtext) : params[:rid]
   eid = params[:eid].empty? ? effects.add(etext) : params[:eid]

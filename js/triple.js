@@ -1,6 +1,6 @@
 /*global $, dateFns */
 
-function auto(kind) {
+function auto(kind, uri) {
   "use strict";
   var $input = $("#" + kind);
   $input.on("input", function() {
@@ -12,7 +12,7 @@ function auto(kind) {
     delay: 300,
     source: function(request, response) {
       $.ajax({
-        url: "/" + kind + "s.json",
+        url: uri,
         method: "GET",
         dataType: "json",
         data: { query: request.term },
@@ -58,14 +58,12 @@ function on_schedule(label, f) {
 
 $(function() {
   "use strict";
-  auto("cause");
-  auto("risk");
-  auto("effect");
-  auto("plan");
-  on_detach("#cause_detach", "#cid");
-  on_detach("#risk_detach", "#rid");
-  on_detach("#effect_detach", "#eid");
-  on_detach("#plan_detach", "#pid");
+  auto("ctext", "/causes.json");
+  auto("rtext", "/risks.json");
+  auto("etext", "/effects.json");
+  on_detach("#ctext_detach", "#cid");
+  on_detach("#rtext_detach", "#rid");
+  on_detach("#etext_detach", "#eid");
   on_schedule("asap", function(today) { return dateFns.addDays(today, 3); });
   on_schedule("week", function(today) { return dateFns.addWeeks(today, 1); });
   on_schedule("month", function(today) { return dateFns.addMonths(today, 1); });

@@ -54,22 +54,26 @@ class Rsk::Risks
       [
         'SELECT risk.*, part.text AS text,',
         '  SUM(effect.impact) AS impact,',
-        '  risk.probability * SUM(effect.impact) AS rank FROM risk',
+        '  risk.probability * SUM(effect.impact) AS rank,',
+        '  COUNT(effect.id) AS effects',
+        'FROM risk',
         'JOIN part ON part.id = risk.id',
         'LEFT JOIN triple ON triple.risk = risk.id',
-        'LEFT JOIN effect ON triple.effect = effect.id',
+        'JOIN effect ON triple.effect = effect.id',
         'WHERE project = $1 AND text LIKE $2',
         'GROUP BY risk.id, part.id',
         'ORDER BY rank DESC',
         'OFFSET $3 LIMIT $4'
-      ].join(' '),
+      ]test_pgsql,
       [@project, "%#{query}%", offset, limit]
     )
     rows.map do |r|
       {
         id: r['id'].to_i,
         text: r['text'],
-        probability: r['probability'].to_i
+        probability: r['probability'].to_i,
+        rank: r['rank'].to_i,
+        effects: r['effects'].to_i
       }
     end
   end

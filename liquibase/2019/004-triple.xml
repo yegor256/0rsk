@@ -55,7 +55,7 @@ SOFTWARE.
     <sql>
       CREATE TABLE risk (
         id INT NOT NULL REFERENCES part(id),
-        probability INT NOT NULL DEFAULT 3,
+        probability INT NOT NULL DEFAULT 4,
         PRIMARY KEY(id),
         CHECK (probability &gt;= 1),
         CHECK (probability &lt;= 9)
@@ -65,7 +65,7 @@ SOFTWARE.
     <sql>
       CREATE TABLE effect (
         id INT NOT NULL REFERENCES part(id),
-        impact INT NOT NULL DEFAULT 3,
+        impact INT NOT NULL DEFAULT 4,
         PRIMARY KEY(id),
         CHECK (impact &gt;= 1),
         CHECK (impact &lt;= 9)

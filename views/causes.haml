@@ -6,15 +6,19 @@
     %tr
       %th Id
       %th Text
+      %th.right Rank
+      %th.right Risks
   %tbody
     - causes.each do |r|
-      - chunk = "C#{r[:fields][:cid]}"
       %tr
         %td
-          %a{href: iri.cut('/ranked').add(path: chunk, mnemo: '*')}
-            %code= chunk
+          %code= "C#{r[:id]}"
         %td
-          &= r[:value]
+          &= r[:text]
+        %td.right
+          = r[:rank]
+        %td.right
+          = r[:risks]
 
 %p
   - if offset.positive?

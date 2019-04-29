@@ -20,39 +20,32 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require_relative 'rsk'
+require 'minitest/autorun'
+require 'rack/test'
+require_relative 'test__helper'
+require_relative '../objects/rsk'
+require_relative '../objects/causes'
+require_relative '../objects/risks'
+require_relative '../objects/effects'
+require_relative '../objects/projects'
+require_relative '../objects/triples'
 
-# Tasks.
+# Test of Triples.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2019 Yegor Bugayenko
 # License:: MIT
-class Rsk::Tasks
-  def initialize(pgsql, login)
-    @pgsql = pgsql
-    @login = login
-  end
-
-  def done(id)
-    @pgsql.exec('DELETE FROM task WHERE id = $1', [id, @project])
-  end
-
-  def fetch(query: '', limit: 10, offset: 0)
-    rows = @pgsql.exec(
-      [
-        'SELECT task.*, plan.text AS text FROM task',
-        'JOIN plan ON plan.id = task.plan',
-        'JOIN project ON plan.project = project.id',
-        'WHERE project.login = $1',
-        'AND plan.text LIKE $2',
-        'OFFSET $3 LIMIT $4'
-      ]test_pgsql,
-      [@login, "%#{query}%", offset, limit]
-    )
-    rows.map do |r|
-      {
-        id: r['id'].to_i,
-        text: r['text']
-      }
-    end
+class Rsk::TriplesTest < Minitest::Test
+  def test_adds_and_fetches
+    login = 'jeff309'
+    project = Rsk::Projects.new(test_pgsql, login).add('test')
+    cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
+    rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
+    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
+    triples = Rsk::Triples.new(test_pgsql, project)
+    triples.add(cid, rid, eid)
+    tid = triples.add(cid, rid, eid)
+    assert(tid.positive?)
+    assert(triples.fetch.any? { |c| c[:id] == tid })
+    triples.delete(tid)
   end
 end
