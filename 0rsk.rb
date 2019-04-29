@@ -360,6 +360,13 @@ get '/plans' do
   )
 end
 
+get '/telegram' do
+  id = params[:id].to_i
+  telechats.add(id, current_user)
+  telepost("We identified you as [@#{current_user}](https://github.com/#{current_user}), thanks!")
+  flash('/', "Your account linked with Telegram chat ##{id}, thanks!")
+end
+
 get '/js/*.js' do
   file = File.join('js', params[:splat].first) + '.js'
   error(404, "File not found: #{file}") unless File.exist?(file)
@@ -442,7 +449,7 @@ end
 
 def users
   require_relative 'objects/users'
-  Rsk::Users.new(settings.pgsql)
+  @users ||= Rsk::Users.new(settings.pgsql)
 end
 
 def projects(login: current_user)
@@ -480,15 +487,36 @@ def plans(project: current_project)
   Rsk::Plans.new(settings.pgsql, project)
 end
 
+def telechats
+  require_relative 'objects/telechats'
+  @telechats ||= Rsk::Telechats.new(settings.pgsql)
+end
+
+def telebot
+  return nil unless settings.config['telegram']
+  @telebot ||= Telebot::Bot.new(settings.config['telegram']['token'])
+end
+
+def telepost(msg, chat = telechats.chat_of(current_user))
+  return unless settings.config['telegram']
+  telebot.send_message(
+    chat_id: chat,
+    parse_mode: 'Markdown',
+    disable_web_page_preview: true,
+    text: msg
+  )
+end
+
 if settings.config['telegram']
   Thread.start do
-    Telebot::Bot.new(settings.config['telegram']['token']).run do |client, message|
-      client.send_message(
-        chat_id: message.chat.id,
-        parse_mode: 'Markdown',
-        disable_web_page_preview: true,
-        text: "[Click here](https://www.0rsk.com/telegram?id=#{message.chat.id}) to identify yourself."
-      )
+    telebot.run do |_, message|
+      chat = message.chat.id
+      if telechats.exists?(chat)
+        login = telechats.login_of(chat)
+        telepost("Glad to see you, #{login}", chat)
+      else
+        telepost("[Click here](https://www.0rsk.com/telegram?id=#{chat}) to identify yourself.", chat)
+      end
     end
   end
 end
