@@ -82,11 +82,11 @@ class Rsk::Triples
         'WHERE cpart.project = $1 AND rpart.project = $1 AND epart.project = $1',
         'AND',
         query.is_a?(Integer) ? "t.id = #{query} AND (cpart.text = $2 OR cpart.text != $2)" :
-          '(cpart.text LIKE $2 OR rpart.text LIKE $2 OR epart.text LIKE $2)',
+          '(LOWER(cpart.text) LIKE $2 OR LOWER(rpart.text) LIKE $2 OR LOWER(epart.text) LIKE $2)',
         'ORDER BY rank DESC, t.created DESC',
         'OFFSET $3 LIMIT $4'
       ],
-      [@project, "%#{query}%", offset, limit]
+      [@project, "%#{query.to_s.strip.downcase}%", offset, limit]
     )
     rows.map do |r|
       {
