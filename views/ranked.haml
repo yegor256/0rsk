@@ -20,12 +20,13 @@
       &= "#{r[:etext]}."
       %br
       %a.item.small{href: iri.cut('/triple').add(id: r[:id])} Edit
-      %a.item.small{href: iri.cut('/responses').add(id: r[:id])} Plans
+      %a.item.small{href: iri.cut('/responses').add(id: r[:id]), class: r[:plans].zero? ? 'red' : ''}
+        = r[:plans]
+        plans
       %a.item.small{href: iri.cut('/ranked/delete').add(id: r[:id])} Delete
-
-%p
-  - if offset.positive?
-    %a.item{href: iri.over(offset: offset - 25)} Previous
-  - if triples.count >= limit
-    %a.item{href: iri.over(offset: offset + 25)} Next
+  %p
+    - if offset.positive?
+      %a.item{href: iri.over(offset: offset - 25)} Previous
+    - if triples.count >= limit
+      %a.item{href: iri.over(offset: offset + 25)} Next
 

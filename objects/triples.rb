@@ -67,21 +67,23 @@ class Rsk::Triples
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
       [
-        'SELECT triple.id, cause.id AS cid, risk.id AS rid, effect.id AS eid,',
+        'SELECT t.id, cause.id AS cid, risk.id AS rid, effect.id AS eid,',
         '  risk.probability AS probability, effect.impact AS impact,',
         '  cpart.text AS ctext, rpart.text AS rtext, epart.text AS etext,',
-        '  (probability * impact) AS rank FROM triple',
-        'JOIN cause ON cause.id = triple.cause',
+        '  (probability * impact) AS rank,',
+        '  (SELECT COUNT(*) FROM plan WHERE part = t.cause OR part = t.risk OR part = t.effect) AS plans',
+        'FROM triple t',
+        'JOIN cause ON cause.id = t.cause',
         'JOIN part AS cpart ON cause.id = cpart.id',
-        'JOIN risk ON risk.id = triple.risk',
+        'JOIN risk ON risk.id = t.risk',
         'JOIN part AS rpart ON risk.id = rpart.id',
-        'JOIN effect ON effect.id = triple.effect',
+        'JOIN effect ON effect.id = t.effect',
         'JOIN part AS epart ON effect.id = epart.id',
         'WHERE cpart.project = $1 AND rpart.project = $1 AND epart.project = $1',
         'AND',
-        query.is_a?(Integer) ? "triple.id = #{query} AND (cpart.text = $2 OR cpart.text != $2)" :
+        query.is_a?(Integer) ? "t.id = #{query} AND (cpart.text = $2 OR cpart.text != $2)" :
           '(cpart.text LIKE $2 OR rpart.text LIKE $2 OR epart.text LIKE $2)',
-        'ORDER BY rank DESC, triple.created DESC',
+        'ORDER BY rank DESC, t.created DESC',
         'OFFSET $3 LIMIT $4'
       ],
       [@project, "%#{query}%", offset, limit]
@@ -97,7 +99,8 @@ class Rsk::Triples
         etext: r['etext'],
         probability: r['probability'].to_i,
         impact: r['impact'].to_i,
-        rank: r['rank'].to_i
+        rank: r['rank'].to_i,
+        plans: r['plans'].to_i
       }
     end
   end
