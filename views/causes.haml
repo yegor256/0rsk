@@ -1,28 +1,31 @@
 %h2
   Causes
 
-%table
-  %thead
-    %tr
-      %th Id
-      %th Text
-      %th.right Rank
-      %th.right Risks
-  %tbody
-    - causes.each do |r|
+- if causes.empty?
+  %p
+    No causes as of yet.
+- else
+  %table
+    %thead
       %tr
-        %td
-          %code= "C#{r[:id]}"
-        %td
-          &= r[:text]
-        %td.right
-          = r[:rank]
-        %td.right
-          = r[:risks]
-
-%p
-  - if offset.positive?
-    %a.item{href: iri.over(offset: offset - 25)} Previous
-  - if causes.count >= limit
-    %a.item{href: iri.over(offset: offset + 25)} Next
+        %th Id
+        %th Text
+        %th.right Rank
+        %th.right Risks
+    %tbody
+      - causes.each do |r|
+        %tr
+          %td
+            %code= "C#{r[:id]}"
+          %td
+            &= r[:text]
+          %td.right
+            = r[:rank]
+          %td.right
+            = r[:risks]
+  %p
+    - if offset.positive?
+      %a.item{href: iri.over(offset: offset - 25)} Previous
+    - if causes.count >= limit
+      %a.item{href: iri.over(offset: offset + 25)} Next
 

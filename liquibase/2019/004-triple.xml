@@ -48,13 +48,13 @@ SOFTWARE.
     </sql>
     <sql>
       CREATE TABLE cause (
-        id INT NOT NULL REFERENCES part(id),
+        id INT NOT NULL REFERENCES part(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
       );
     </sql>
     <sql>
       CREATE TABLE risk (
-        id INT NOT NULL REFERENCES part(id),
+        id INT NOT NULL REFERENCES part(id) ON DELETE CASCADE,
         probability INT NOT NULL DEFAULT 4,
         PRIMARY KEY(id),
         CHECK (probability &gt;= 1),
@@ -64,7 +64,7 @@ SOFTWARE.
     </sql>
     <sql>
       CREATE TABLE effect (
-        id INT NOT NULL REFERENCES part(id),
+        id INT NOT NULL REFERENCES part(id) ON DELETE CASCADE,
         impact INT NOT NULL DEFAULT 4,
         PRIMARY KEY(id),
         CHECK (impact &gt;= 1),
@@ -74,9 +74,9 @@ SOFTWARE.
     </sql>
     <sql>
       CREATE TABLE plan (
-        id INT NOT NULL REFERENCES part(id),
-        part INT NOT NULL REFERENCES part(id),
-        schedule VARCHAR(32) NOT NULL DEFAULT '',
+        id INT NOT NULL REFERENCES part(id) ON DELETE CASCADE,
+        part INT NOT NULL REFERENCES part(id) ON DELETE CASCADE,
+        schedule VARCHAR(32) NOT NULL DEFAULT 'weekly',
         UNIQUE(id, part),
         CHECK (schedule &lt;&gt; '')
       );
@@ -96,7 +96,7 @@ SOFTWARE.
     <sql>
       CREATE TABLE task (
         id SERIAL PRIMARY KEY,
-        plan INT NOT NULL REFERENCES part(id),
+        plan INT NOT NULL REFERENCES part(id) ON DELETE CASCADE,
         created TIMESTAMPTZ DEFAULT now() NOT NULL,
         UNIQUE(plan)
       );

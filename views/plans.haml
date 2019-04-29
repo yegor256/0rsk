@@ -1,25 +1,28 @@
 %h2
   Plans
 
-%table
-  %thead
-    %tr
-      %th Id
-      %th Text
-      %th Schedule
-  %tbody
-    - plans.each do |r|
+- if plans.empty?
+  %p
+    No plans as of yet.
+- else
+  %table
+    %thead
       %tr
-        %td
-          %code= r[:id]
-        %td
-          &= r[:text]
-        %td
-          = r[:schedule]
-
-%p
-  - if offset.positive?
-    %a.item{href: iri.over(offset: offset - 25)} Previous
-  - if plans.count >= limit
-    %a.item{href: iri.over(offset: offset + 25)} Next
+        %th Id
+        %th Text
+        %th Schedule
+    %tbody
+      - plans.each do |r|
+        %tr
+          %td
+            %code= "P#{r[:id]}"
+          %td
+            &= r[:text]
+          %td
+            = r[:schedule]
+  %p
+    - if offset.positive?
+      %a.item{href: iri.over(offset: offset - 25)} Previous
+    - if plans.count >= limit
+      %a.item{href: iri.over(offset: offset + 25)} Next
 

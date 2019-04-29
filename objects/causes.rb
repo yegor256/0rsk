@@ -58,13 +58,13 @@ class Rsk::Causes
         'FROM cause',
         'JOIN part ON part.id = cause.id',
         'LEFT JOIN triple ON triple.cause = cause.id',
-        'JOIN risk ON triple.risk = risk.id',
-        'JOIN effect ON triple.effect = effect.id',
+        'LEFT JOIN risk ON triple.risk = risk.id',
+        'LEFT JOIN effect ON triple.effect = effect.id',
         'WHERE project = $1 AND text LIKE $2',
         'GROUP BY cause.id, part.id',
         'ORDER BY rank DESC',
         'OFFSET $3 LIMIT $4'
-      ]test_pgsql,
+      ],
       [@project, "%#{query}%", offset, limit]
     )
     rows.map do |r|

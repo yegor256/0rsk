@@ -1,0 +1,47 @@
+%script{src: 'https://cdnjs.cloudflare.com/ajax/libs/date-fns/1.30.1/date_fns.min.js'}
+%script{src: '/js/responses.js'}
+
+%h2
+  Responses to
+  = "##{triple[:id]}"
+
+%p
+  %span{style: 'color:' + (triple[:rank] >= 64 ? 'darkred' : (triple[:rank] <= 32 ? 'darkgreen' : 'inherit'))}
+    = triple[:rank]
+  %code= "C#{triple[:cid]}"
+  %code= "R#{triple[:rid]}"
+  %code= "E#{triple[:eid]}"
+  %br
+  &= "#{triple[:ctext]};"
+  &= "#{triple[:rtext]};"
+  &= "#{triple[:etext]}."
+
+%form{method: 'POST', action: iri.cut('/responses/add')}
+  %fieldset
+    %input{type: 'hidden', name: 'id', value: triple[:id]}
+    %label Strategy:
+    %select{id: 'strategy', name: 'strategy', tabindex: 1}
+      - {"Avoid C#{triple[:cid]}" => triple[:cid], "Avoid R#{triple[:rid]}" => triple[:rid], "Mitigate E#{triple[:eid]}" => triple[:eid]}.each do |k, v|
+        %option{value: v}= k
+    %label Plan:
+    %input{id: 'plan', type: 'text', name: 'plan', size: 60, maxlength: 160, autocomplete: 'off', tabindex: 2}
+    %label Schedule:
+    %input{id: 'schedule', type: 'text', name: 'schedule', size: 22, maxlength: 20, autocomplete: 'off', tabindex: 3}
+    %label
+      %a.item.small{href: '#', id: 'schedule_asap'} ASAP
+      %a.item.small{href: '#', id: 'schedule_week'} This week
+      %a.item.small{href: '#', id: 'schedule_month'} This month
+      %a.item.small{href: '#', id: 'schedule_later'} Later
+    %input{type: 'submit', value: 'Add', tabindex: 4}
+
+- plans.each do |p|
+  %p
+    %code= "P#{p[:id]}"
+    = '&rarr;'
+    %code= "#{p[:part]}"
+    %br
+    &= p[:text]
+    %br
+    %span.item.small
+      &= p[:schedule]
+    %a.item.small{href: iri.cut('/responses/detach').add(tid: triple[:id], id: p[:id], part: p[:part])} Detach

@@ -59,13 +59,13 @@ class Rsk::Effects
         'FROM effect',
         'JOIN part ON part.id = effect.id',
         'LEFT JOIN triple ON triple.effect = effect.id',
-        'JOIN risk ON triple.risk = risk.id',
+        'LEFT JOIN risk ON triple.risk = risk.id',
         'WHERE project = $1',
         'AND text LIKE $2',
         'GROUP BY effect.id, part.id',
         'ORDER BY rank DESC',
         'OFFSET $3 LIMIT $4'
-      ]test_pgsql,
+      ],
       [@project, "%#{query}%", offset, limit]
     )
     rows.map do |r|

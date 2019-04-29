@@ -1,31 +1,34 @@
 %h2
   Risks
 
-%table
-  %thead
-    %tr
-      %th Id
-      %th Text
-      %th.right P
-      %th.right Rank
-      %th.right Effects
-  %tbody
-    - risks.each do |r|
+- if risks.empty?
+  %p
+    No risks as of yet.
+- else
+  %table
+    %thead
       %tr
-        %td
-          %code= "R#{r[:id]}"
-        %td
-          &= r[:text]
-        %td.right
-          = r[:probability]
-        %td.right
-          = r[:rank]
-        %td.right
-          = r[:effects]
-
-%p
-  - if offset.positive?
-    %a.item{href: iri.over(offset: offset - 25)} Previous
-  - if risks.count >= limit
-    %a.item{href: iri.over(offset: offset + 25)} Next
+        %th Id
+        %th Text
+        %th.right P
+        %th.right Rank
+        %th.right Effects
+    %tbody
+      - risks.each do |r|
+        %tr
+          %td
+            %code= "R#{r[:id]}"
+          %td
+            &= r[:text]
+          %td.right
+            = r[:probability]
+          %td.right
+            = r[:rank]
+          %td.right
+            = r[:effects]
+  %p
+    - if offset.positive?
+      %a.item{href: iri.over(offset: offset - 25)} Previous
+    - if risks.count >= limit
+      %a.item{href: iri.over(offset: offset + 25)} Next
 

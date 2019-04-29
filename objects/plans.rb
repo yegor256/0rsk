@@ -47,11 +47,23 @@ class Rsk::Plans
   def add(part, text)
     @pgsql.transaction do |t|
       id = t.exec(
-        'INSERT INTO part (project, text, ptype) VALUES ($1, $2, $3) RETURNING id',
+        'INSERT INTO part (project, text, type) VALUES ($1, $2, $3) RETURNING id',
         [@project, text, 'Plan']
       )[0]['id'].to_i
       t.exec('INSERT INTO plan (id, part) VALUES ($1, $2)', [id, part])
       id
+    end
+  end
+
+  def detach(id, part)
+    @pgsql.transaction do |t|
+      if t.exec('SELECT * FROM part WHERE id = $1 AND project = $2', [id, @project]).empty?
+        raise Rsk::Urror, "##{id} is not in your project ##{@project}"
+      end
+      t.exec('DELETE FROM plan WHERE id = $1 AND part = $2', [id, part])
+      if t.exec('SELECT * FROM plan WHERE id = $1', [id]).empty?
+        t.exec('DELETE FROM part WHERE id = $1', [id])
+      end
     end
   end
 
@@ -63,20 +75,21 @@ class Rsk::Plans
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
       [
-        'SELECT * FROM plan',
-        'JOIN part ON plan.part = part.id',
-        query.is_a?(Integer) ? 'JOIN triple ON cause = part.id OR risk = part.id OR effect = part.id' : '',
+        'SELECT plan.*, part.text, plan.part AS pid FROM plan',
+        'JOIN part ON plan.id = part.id',
+        query.is_a?(Integer) ? 'LEFT JOIN triple ON cause = plan.part OR risk = plan.part OR effect = plan.part' : '',
         'WHERE project = $1',
         'AND',
         query.is_a?(Integer) ? "triple.id = #{query} AND (text = $2 OR text != $2)" : 'text LIKE $2',
         'OFFSET $3 LIMIT $4'
-      ]test_pgsql,
+      ],
       [@project, "%#{query}%", offset, limit]
     )
     rows.map do |r|
       {
         id: r['id'].to_i,
         text: r['text'],
+        part: r['pid'].to_i,
         schedule: r['schedule']
       }
     end

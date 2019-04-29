@@ -1,31 +1,34 @@
 %h2
   Effects
 
-%table
-  %thead
-    %tr
-      %th Id
-      %th Text
-      %th.right I
-      %th.right Rank
-      %th.right Risks
-  %tbody
-    - effects.each do |r|
+- if effects.empty?
+  %p
+    No effects as of yet.
+- else
+  %table
+    %thead
       %tr
-        %td
-          %code= "E#{r[:id]}"
-        %td
-          &= r[:text]
-        %td.right
-          = r[:impact]
-        %td.right
-          = r[:rank]
-        %td.right
-          = r[:risks]
-
-%p
-  - if offset.positive?
-    %a.item{href: iri.over(offset: offset - 25)} Previous
-  - if effects.count >= limit
-    %a.item{href: iri.over(offset: offset + 25)} Next
+        %th Id
+        %th Text
+        %th.right I
+        %th.right Rank
+        %th.right Risks
+    %tbody
+      - effects.each do |r|
+        %tr
+          %td
+            %code= "E#{r[:id]}"
+          %td
+            &= r[:text]
+          %td.right
+            = r[:impact]
+          %td.right
+            = r[:rank]
+          %td.right
+            = r[:risks]
+  %p
+    - if offset.positive?
+      %a.item{href: iri.over(offset: offset - 25)} Previous
+    - if effects.count >= limit
+      %a.item{href: iri.over(offset: offset + 25)} Next
 

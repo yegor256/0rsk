@@ -41,17 +41,27 @@ class Rsk::Triples
         'RETURNING id'
       ],
       [cid, rid, eid]
-    )[0]['id'].to_i
+    )
   end
 
   def delete(id)
-    @pgsql.exec(
-      [
-        'DELETE FROM triple WHERE id = $1',
-        'AND (SELECT project FROM part JOIN triple ON part.id = triple.cause WHERE triple.id = $1) = $2'
-      ],
-      [id, @project]
-    )
+    @pgsql.transaction do |t|
+      triple = fetch(query: id.to_i)[0]
+      raise Rsk::Urror, "Triple ##{id} not found in your project ##{@project}" if triple.nil?
+      if t.exec('SELECT * FROM part WHERE id = $1 AND project = $2', [triple[:cid], @project]).empty?
+        raise Rsk::Urror, "Triple ##{id} is not in your project ##{@project}"
+      end
+      t.exec('DELETE FROM triple WHERE id = $1', [id])
+      if t.exec('SELECT * FROM triple WHERE cause = $1', [triple[:cid]]).empty?
+        t.exec('DELETE FROM part WHERE id = $1', [triple[:cid]])
+      end
+      if t.exec('SELECT * FROM triple WHERE risk = $1', [triple[:rid]]).empty?
+        t.exec('DELETE FROM part WHERE id = $1', [triple[:rid]])
+      end
+      if t.exec('SELECT * FROM triple WHERE effect = $1', [triple[:eid]]).empty?
+        t.exec('DELETE FROM part WHERE id = $1', [triple[:eid]])
+      end
+    end
   end
 
   def fetch(query: '', limit: 10, offset: 0)
@@ -73,7 +83,7 @@ class Rsk::Triples
           '(cpart.text LIKE $2 OR rpart.text LIKE $2 OR epart.text LIKE $2)',
         'ORDER BY rank DESC',
         'OFFSET $3 LIMIT $4'
-      ]test_pgsql,
+      ],
       [@project, "%#{query}%", offset, limit]
     )
     rows.map do |r|

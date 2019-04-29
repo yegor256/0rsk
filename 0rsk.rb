@@ -260,13 +260,12 @@ get '/plans.json' do
 end
 
 get '/triple' do
-  vars = { title: '/triple', plans: [] }
+  vars = { title: '/triple' }
   id = params[:id].to_i
   if id.positive?
     triple = triples.fetch(query: id, limit: 1)[0]
-    raise Urror, "Triple ##{id} not found" if triple.nil?
+    raise Rsk::Urror, "Triple ##{id} not found" if triple.nil?
     vars[:triple] = triple
-    vars[:plans] = plans.fetch(query: id, limit: 100)
   end
   haml :triple, layout: :layout, locals: merged(vars)
 end
@@ -283,15 +282,35 @@ post '/triple/save' do
   effects.get(eid).text = etext
   risks.get(rid).probability = params[:probability].to_i
   effects.get(eid).impact = params[:impact].to_i
-  id = triples.add(cid, rid, eid)
-  flash('/ranked', "Thanks, triple ##{id} created")
+  triples.add(cid, rid, eid)
+  flash('/ranked', 'Thanks, saved')
 end
 
-post '/triple/plans/add' do
+get '/responses' do
   id = params[:id].to_i
-  pid = params[:pid].to_i
-  plans.get().schedule = params[:schedule].strip if pid && params[:schedule]
-  flash("/triple?id=#{id}", "Thanks, plan ##{pid} added to the triple ##{id}")
+  triple = triples.fetch(query: id, limit: 1)[0]
+  raise Rsk::Urror, "Triple ##{id} not found" if triple.nil?
+  haml :responses, layout: :layout, locals: merged(
+    title: '/triple',
+    triple: triple,
+    plans: plans.fetch(query: id, limit: 100)
+  )
+end
+
+post '/responses/add' do
+  id = params[:id].to_i
+  part = params[:strategy].to_i
+  pid = plans.add(part, params[:plan])
+  plans.get(pid).schedule = params[:schedule].strip
+  flash("/responses?id=#{id}", "Thanks, plan ##{pid} added to the triple ##{id}")
+end
+
+get '/responses/detach' do
+  tid = params[:tid].to_i
+  id = params[:id].to_i
+  part = params[:part].to_i
+  plans.detach(id, part)
+  flash("/responses?id=#{tid}", "Thanks, plan ##{id} detached from the triple ##{tid}")
 end
 
 get '/causes' do

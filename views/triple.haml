@@ -1,58 +1,35 @@
 %link{href: 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css', rel: 'stylesheet'}
 %script{src: 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js'}
-%script{src: 'https://cdnjs.cloudflare.com/ajax/libs/date-fns/1.30.1/date_fns.min.js'}
 %script{src: '/js/triple.js'}
 
 %h2
-  Add/Edit
+  - if defined?(triple)
+    Edit
+    = "##{triple[:id]}"
+  - else
+    Add
 
 %form{method: 'POST', action: iri.cut('/triple/save')}
-  %label Cause:
-  %br
-  %input{id: 'ctext', type: 'text', name: 'ctext', size: 35, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: defined?(triple) ? triple[:ctext] : ''}
-  %input{id: 'cid', name: 'cid', size: 3, style: 'text-align:right', autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:cid] : ''}
-  %a{id: 'ctext_detach', href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
-  %br
-  %label Risk:
-  %br
-  %input{id: 'rtext', type: 'text', name: 'rtext', size: 50, maxlength: 160, tabindex: 2, value: defined?(triple) ? triple[:rtext] : ''}
-  %input{id: 'rid', name: 'rid', size: 3, style: 'text-align:right', autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:rid] : ''}
-  %a{id: 'rtext_detach', href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
-  %br
-  %select{id: 'probability', name: 'probability', tabindex: 3}
-    - {'Extremely high' => 8, 'High' => 6, 'Low' => 4, 'Very low' => 2}.each do |k, v|
-      %option{value: v, selected: defined?(triple) && triple[:probability] == v}= k
-  %br
-  %label Effect:
-  %br
-  %input{id: 'etext', type: 'text', name: 'etext', size: 40, maxlength: 160, autocomplete: 'off', tabindex: 4, value: defined?(triple) ? triple[:etext] : ''}
-  %input{id: 'eid', name: 'eid', size: 3, style: 'text-align:right', autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:eid] : ''}
-  %a{id: 'etext_detach', href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
-  %br
-  %select{id: 'impact', name: 'impact', tabindex: 5}
-    - {'Catastrophic' => 8, 'Serious' => 6, 'Moderate' => 4, 'Unnoticable' => 2}.each do |k, v|
-      %option{value: v, selected: defined?(triple) && triple[:impact] == v}= k
-  %br
-  %input{type: 'submit', value: 'Submit', tabindex: 9}
-
-- if defined?(triple)
-  %form{method: 'POST', action: iri.cut('/triple/plans/add')}
-    %input{type: 'hidden', name: 'id', value: triple[:id]}
-    %label Avoidance/Mitigation Plan:
-    %br
-    %input{id: 'plan', type: 'text', name: 'plan', size: 45, maxlength: 160, autocomplete: 'off', tabindex: 7}
-    %input{id: 'pid', name: 'pid', size: 3, style: 'text-align:right', autocomplete: 'off', readonly: true}
-    %br
-    %label Schedule:
-    %br
-    %input{id: 'schedule', type: 'text', name: 'schedule', size: 22, maxlength: 20, autocomplete: 'off', tabindex: 8, value: defined?(schedule) ? schedule : ''}
-    %br
-    %a.item.small{href: '#', id: 'schedule_asap'} ASAP
-    %a.item.small{href: '#', id: 'schedule_week'} This week
-    %a.item.small{href: '#', id: 'schedule_month'} This month
-    %a.item.small{href: '#', id: 'schedule_later'} Later
-    %br
-    %input{type: 'submit', value: 'Add', tabindex: 9}
-  - plans.each do |p|
-    %p
-      &= p[:text]
+  %fieldset
+    %label
+      Cause:
+      %a.small.item{id: 'ctext_detach', href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
+    %input{id: 'ctext', type: 'text', name: 'ctext', size: 35, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: defined?(triple) ? triple[:ctext] : ''}
+    %input{id: 'cid', type: 'text', name: 'cid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:cid] : ''}
+    %label
+      Risk:
+      %a.small.item{id: 'rtext_detach', href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
+    %input{id: 'rtext', type: 'text', name: 'rtext', size: 50, maxlength: 160, tabindex: 2, value: defined?(triple) ? triple[:rtext] : ''}
+    %input{id: 'rid', type: 'text', name: 'rid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:rid] : ''}
+    %select{id: 'probability', name: 'probability', tabindex: 3}
+      - {'Extremely high' => 8, 'High' => 6, 'Low' => 4, 'Very low' => 2}.each do |k, v|
+        %option{value: v, selected: defined?(triple) && triple[:probability] == v}= k
+    %label
+      Effect:
+      %a.small.item{id: 'etext_detach', href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
+    %input{id: 'etext', type: 'text', name: 'etext', size: 40, maxlength: 160, autocomplete: 'off', tabindex: 4, value: defined?(triple) ? triple[:etext] : ''}
+    %input{id: 'eid', type: 'text', name: 'eid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:eid] : ''}
+    %select{id: 'impact', name: 'impact', tabindex: 5}
+      - {'Catastrophic' => 8, 'Serious' => 6, 'Moderate' => 4, 'Unnoticable' => 2}.each do |k, v|
+        %option{value: v, selected: defined?(triple) && triple[:impact] == v}= k
+    %input{type: 'submit', value: 'Submit', tabindex: 9}

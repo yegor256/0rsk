@@ -45,7 +45,7 @@ class Rsk::Tasks
         'WHERE project.login = $1',
         'AND plan.text LIKE $2',
         'OFFSET $3 LIMIT $4'
-      ]test_pgsql,
+      ],
       [@login, "%#{query}%", offset, limit]
     )
     rows.map do |r|
