@@ -49,7 +49,8 @@ class Rsk::AppTest < Minitest::Test
       '/version',
       '/robots.txt',
       '/',
-      '/js/add.js'
+      '/js/triple.js',
+      '/js/responses.js'
     ]
     pages.each do |p|
       get(p)
@@ -71,8 +72,8 @@ class Rsk::AppTest < Minitest::Test
     pages = [
       '/projects',
       '/ranked',
-      '/agenda',
-      '/add',
+      '/tasks',
+      '/triple',
       '/risks',
       '/causes',
       '/effects',
@@ -92,18 +93,16 @@ class Rsk::AppTest < Minitest::Test
     name = 'jeff09'
     login(name)
     post(
-      '/do-add',
+      '/triple/save',
       [
-        'cause=test',
-        'risk=test',
+        'ctext=test+cause',
+        'rtext=test+risk',
         'probability=5',
-        'effect=test',
+        'etext=test+effect',
         'impact=5',
-        'plan=test',
         'cid=',
         'rid=',
-        'eid=',
-        'pid='
+        'eid='
       ].join('&')
     )
     assert_equal(302, last_response.status, last_response.body)

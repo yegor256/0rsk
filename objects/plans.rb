@@ -52,9 +52,7 @@ class Rsk::Plans
         raise Rsk::Urror, "##{id} is not in your project ##{@project}"
       end
       t.exec('DELETE FROM plan WHERE id = $1 AND part = $2', [id, part])
-      if t.exec('SELECT * FROM plan WHERE id = $1', [id]).empty?
-        t.exec('DELETE FROM part WHERE id = $1', [id])
-      end
+      t.exec('DELETE FROM part WHERE id = $1', [id]) if t.exec('SELECT * FROM plan WHERE id = $1', [id]).empty?
     end
   end
 

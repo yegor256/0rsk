@@ -48,9 +48,7 @@ class Rsk::Tasks
     plans.each do |p|
       completed = Time.parse(p['completed'])
       deadline = deadline(completed, p['schedule'].strip.downcase)
-      if deadline < Time.now
-        @pgsql.exec('INSERT INTO task (plan) VALUES ($1)', [p['id'].to_i])
-      end
+      @pgsql.exec('INSERT INTO task (plan) VALUES ($1)', [p['id'].to_i]) if deadline < Time.now
     end
   end
 

@@ -44,7 +44,7 @@ class Rsk::TriplesTest < Minitest::Test
     triples = Rsk::Triples.new(test_pgsql, project)
     triples.add(cid, rid, eid)
     triples.add(cid, rid, eid)
-    assert(triples.fetch.any? { |t| t[:id] == tid })
+    assert(triples.fetch.any? { |t| t[:id].positive? })
     triples.fetch.each { |t| triples.delete(t[:id]) }
   end
 end

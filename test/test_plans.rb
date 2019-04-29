@@ -26,6 +26,7 @@ require_relative 'test__helper'
 require_relative '../objects/rsk'
 require_relative '../objects/plans'
 require_relative '../objects/projects'
+require_relative '../objects/risks'
 
 # Test of Plans.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -34,10 +35,12 @@ require_relative '../objects/projects'
 class Rsk::PlansTest < Minitest::Test
   def test_adds_and_fetches
     pid = Rsk::Projects.new(test_pgsql, 'jeff23').add('test')
+    risks = Rsk::Risks.new(test_pgsql, pid)
+    rid = risks.add('we may lose data')
     plans = Rsk::Plans.new(test_pgsql, pid)
     text = 'we make backups'
-    id = plans.add(text)
+    id = plans.add(rid, text)
     assert(id.positive?)
-    assert(plans.fetch.any? { |c| c[:value] == text })
+    assert(plans.fetch.any? { |p| p[:text] == text })
   end
 end
