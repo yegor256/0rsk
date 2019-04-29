@@ -426,7 +426,7 @@ def flash(uri, msg = '', color: 'darkgreen')
 end
 
 def current_user
-  redirect '/hello' unless @locals[:user]
+  redirect '/' unless @locals[:user]
   @locals[:user][:login].downcase
 end
 
