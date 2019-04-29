@@ -21,6 +21,8 @@
       %a.small.item{id: 'rtext_detach', href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
     %input{id: 'rtext', type: 'text', name: 'rtext', size: 50, maxlength: 160, tabindex: 2, value: defined?(triple) ? triple[:rtext] : ''}
     %input{id: 'rid', type: 'text', name: 'rid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:rid] : ''}
+    %label
+      Probability:
     %select{id: 'probability', name: 'probability', tabindex: 3}
       - {'Definitely' => 9, 'Extremely high' => 8, 'High' => 6, 'Average' => 5, 'Low' => 4, 'Very low' => 2, 'Unlikely' => 1}.each do |k, v|
         %option{value: v, selected: defined?(triple) && triple[:probability] == v}= "#{k} (#{v})"
@@ -29,6 +31,8 @@
       %a.small.item{id: 'etext_detach', href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
     %input{id: 'etext', type: 'text', name: 'etext', size: 40, maxlength: 160, autocomplete: 'off', tabindex: 4, value: defined?(triple) ? triple[:etext] : ''}
     %input{id: 'eid', type: 'text', name: 'eid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:eid] : ''}
+    %label
+      Impact:
     %select{id: 'impact', name: 'impact', tabindex: 5}
       - {'Fatal' => 9, 'Catastrophic' => 8, 'Serious' => 6, 'Average' => 5, 'Moderate' => 4, 'Minor' => 2, 'Unnoticable' => 1}.each do |k, v|
         %option{value: v, selected: defined?(triple) && triple[:impact] == v}= "#{k} (#{v})"

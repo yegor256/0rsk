@@ -81,7 +81,7 @@ class Rsk::Triples
         'AND',
         query.is_a?(Integer) ? "triple.id = #{query} AND (cpart.text = $2 OR cpart.text != $2)" :
           '(cpart.text LIKE $2 OR rpart.text LIKE $2 OR epart.text LIKE $2)',
-        'ORDER BY rank DESC',
+        'ORDER BY rank DESC, triple.created DESC',
         'OFFSET $3 LIMIT $4'
       ],
       [@project, "%#{query}%", offset, limit]
