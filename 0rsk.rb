@@ -87,6 +87,12 @@ configure do
     password: cfg['pgsql']['password'],
     log: nil
   ).start(4)
+  Thread.start do
+    sleep(10 * 60)
+    users.fetch.each do |login|
+      tasks(login).create
+    end
+  end
 end
 
 before '/*' do
@@ -440,9 +446,14 @@ def current_project
   pid
 end
 
-def projects
+def users
+  require_relative 'objects/users'
+  Rsk::Users.new(settings.pgsql)
+end
+
+def projects(login: current_user)
   require_relative 'objects/projects'
-  Rsk::Projects.new(settings.pgsql, current_user)
+  Rsk::Projects.new(settings.pgsql, login)
 end
 
 def triples(project: current_project)
@@ -450,9 +461,9 @@ def triples(project: current_project)
   Rsk::Triples.new(settings.pgsql, project)
 end
 
-def tasks
+def tasks(login: current_user)
   require_relative 'objects/tasks'
-  Rsk::Tasks.new(settings.pgsql, current_user)
+  Rsk::Tasks.new(settings.pgsql, login)
 end
 
 def causes(project: current_project)
