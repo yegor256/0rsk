@@ -22,7 +22,6 @@
 
 STDOUT.sync = true
 
-require 'geocoder'
 require 'glogin'
 require 'glogin/codec'
 require 'haml'
@@ -33,6 +32,7 @@ require 'pgtk/pool'
 require 'raven'
 require 'sinatra'
 require 'sinatra/cookies'
+require 'telebot'
 require 'time'
 require 'yaml'
 require_relative 'objects/urror'
@@ -87,12 +87,6 @@ configure do
     password: cfg['pgsql']['password'],
     log: nil
   ).start(4)
-  Thread.start do
-    sleep(10 * 60)
-    users.fetch.each do |login|
-      tasks(login).create
-    end
-  end
 end
 
 before '/*' do
@@ -484,4 +478,24 @@ end
 def plans(project: current_project)
   require_relative 'objects/plans'
   Rsk::Plans.new(settings.pgsql, project)
+end
+
+if settings.config['telegram']
+  Thread.start do
+    Telebot::Bot.new(settings.config['telegram']['token']).run do |client, message|
+      client.send_message(
+        chat_id: message.chat.id,
+        parse_mode: 'Markdown',
+        disable_web_page_preview: true,
+        text: "[Click here](https://www.0rsk.com/telegram?id=#{message.chat.id}) to identify yourself."
+      )
+    end
+  end
+end
+
+Thread.start do
+  sleep(10 * 60)
+  users.fetch.each do |login|
+    tasks(login).create
+  end
 end
