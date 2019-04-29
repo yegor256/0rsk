@@ -20,9 +20,11 @@
       &= "#{r[:etext]}."
       %br
       %a.item.small{href: iri.cut('/triple').add(id: r[:id])} Edit
-      %a.item.small{href: iri.cut('/responses').add(id: r[:id]), class: r[:plans].zero? ? 'red' : ''}
-        = r[:plans]
-        plans
+      %a.item.small{href: iri.cut('/responses').add(id: r[:id])}
+        - if r[:plans].zero?
+          %span.red No plans
+        - else
+          = "#{r[:plans]} plan#{r[:plans] == 1 ? '' : 's'}"
       %a.item.small{href: iri.cut('/ranked/delete').add(id: r[:id])} Delete
   %p
     - if offset.positive?
