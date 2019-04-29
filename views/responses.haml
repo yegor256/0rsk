@@ -21,13 +21,14 @@
     %input{type: 'hidden', name: 'id', value: triple[:id]}
     %label Strategy:
     %select{id: 'strategy', name: 'strategy', tabindex: 1}
-      - {"Avoid C#{triple[:cid]}" => triple[:cid], "Avoid R#{triple[:rid]}" => triple[:rid], "Mitigate E#{triple[:eid]}" => triple[:eid]}.each do |k, v|
+      - {"Eliminate C#{triple[:cid]}" => triple[:cid], "Avoid R#{triple[:rid]}" => triple[:rid], "Mitigate E#{triple[:eid]}" => triple[:eid]}.each do |k, v|
         %option{value: v}= k
     %label Plan:
     %input{id: 'plan', type: 'text', name: 'plan', size: 60, maxlength: 160, autocomplete: 'off', tabindex: 2}
-    %label Schedule:
+    %label Schedule (daily, weekly, biweekly, or monthly):
     %input{id: 'schedule', type: 'text', name: 'schedule', size: 22, maxlength: 20, autocomplete: 'off', tabindex: 3}
     %label
+      Only once:
       %a.item.small{href: '#', id: 'schedule_asap'} ASAP
       %a.item.small{href: '#', id: 'schedule_week'} This week
       %a.item.small{href: '#', id: 'schedule_month'} This month
