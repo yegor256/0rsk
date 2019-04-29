@@ -20,7 +20,7 @@
       &= "#{r[:etext]}."
       %br
       %a.item.small{href: iri.cut('/triple').add(id: r[:id])} Edit
-      %a.item.small{href: iri.cut('/responses').add(id: r[:id])}
+      %a.item.small{href: iri.cut('/responses').add(id: r[:id])}<
         - if r[:plans].zero?
           %span.red No plans
         - else
