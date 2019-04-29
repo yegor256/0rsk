@@ -110,6 +110,10 @@ class Rsk::Tasks
       completed + 14 * 24 * 60 * 60
     elsif schedule == 'monthly'
       completed + 30 * 24 * 60 * 60
+    elsif schedule == 'quarterly'
+      completed + 3 * 30 * 24 * 60 * 60
+    elsif schedule == 'annually'
+      completed + 12 * 30 * 24 * 60 * 60
     elsif /^[0-9]{2}-[0-9]{2}-[0-9]{4}$/.match?(schedule)
       Time.parse(schedule)
     else
