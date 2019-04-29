@@ -9,6 +9,7 @@
 [![PDD status](http://www.0pdd.com/svg?name=yegor256/0rsk)](http://www.0pdd.com/p?name=yegor256/0rsk)
 [![Test Coverage](https://img.shields.io/codecov/c/github/yegor256/0rsk.svg)](https://codecov.io/github/yegor256/0rsk?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/51006993d98c150f21fc/maintainability)](https://codeclimate.com/github/yegor256/0rsk/maintainability)
+[![Hits-of-Code](https://hitsofcode.com/github/yegor256/0rsk)](https://hitsofcode.com/view/github/yegor256/0rsk)
 
 It's an online risk manager.
 

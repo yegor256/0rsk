@@ -33,7 +33,7 @@ gem 'iri', '0.2.0'
 gem 'liquid', '4.0.1'
 gem 'mail', '2.7.1'
 gem 'minitest', '5.11.3', require: false
-gem 'pgtk', '0.2.2'
+gem 'pgtk', '0.4.0'
 gem 'rack', '2.0.6'
 gem 'rack-ssl', '1.4.1'
 gem 'rack-test', '1.1.0'

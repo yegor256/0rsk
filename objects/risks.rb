@@ -34,18 +34,14 @@ class Rsk::Risks
   end
 
   def add(text)
-    raise Rsk::Urror, 'Risk text can\'t be empty' if text.empty?
-    @pgsql.exec(
-      'INSERT INTO risk (project, text) VALUES ($1, $2) RETURNING id',
-      [@project, text]
-    )[0]['id'].to_i
-  end
-
-  def exists?(id)
-    !@pgsql.exec(
-      'SELECT * FROM risk WHERE project = $1 AND id = $2',
-      [@project, id]
-    ).empty?
+    @pgsql.transaction do |t|
+      id = t.exec(
+        'INSERT INTO part (project, text, type) VALUES ($1, $2, $3) RETURNING id',
+        [@project, text, 'Risk']
+      )[0]['id'].to_i
+      t.exec('INSERT INTO risk (id) VALUES ($1)', [id])
+      id
+    end
   end
 
   def get(id)
@@ -56,10 +52,14 @@ class Rsk::Risks
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
       [
-        'SELECT risk.*, SUM(effect.impact) AS impact, risk.probability * impact AS rank FROM risk',
+        'SELECT risk.*, part.text AS text,',
+        '  SUM(effect.impact) AS impact,',
+        '  risk.probability * SUM(effect.impact) AS rank FROM risk',
+        'JOIN part ON part.id = risk.id',
         'LEFT JOIN triple ON triple.risk = risk.id',
-        'JOIN effect ON triple.effect = effect.id',
+        'LEFT JOIN effect ON triple.effect = effect.id',
         'WHERE project = $1 AND text LIKE $2',
+        'GROUP BY risk.id, part.id',
         'ORDER BY rank DESC',
         'OFFSET $3 LIMIT $4'
       ].join(' '),
@@ -67,13 +67,9 @@ class Rsk::Risks
     )
     rows.map do |r|
       {
-        label: "R#{r['id']}: #{r['text']}",
-        value: r['text'],
-        fields: {
-          rid: r['id'].to_i,
-          probability: r['probability'].to_i,
-          positive: r['positive'] == 'true'
-        }
+        id: r['id'].to_i,
+        text: r['text'],
+        probability: r['probability'].to_i
       }
     end
   end

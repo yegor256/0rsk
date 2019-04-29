@@ -36,27 +36,23 @@ class Rsk::Plans
   end
 
   # Promote plans into tasks, if their schedules requre.
-  def promote
-    tasks = Rsk::Tasks.new(@pgsql, Rsk::Project.new(@pgsql, @project).login)
-    @pgsql.exec('SELECT * FROM plan WHERE project = $1').each do |r|
-      # next unless expired?(r['promoted'] ? Time.parse(r['promoted']) : Time.now, r['schedule'])
-      tasks.add(r['id'].to_i)
+  # def promote
+  #   tasks = Rsk::Tasks.new(@pgsql, Rsk::Project.new(@pgsql, @project).login)
+  #   @pgsql.exec('SELECT * FROM plan WHERE project = $1').each do |r|
+  #     # next unless expired?(r['promoted'] ? Time.parse(r['promoted']) : Time.now, r['schedule'])
+  #     tasks.add(r['id'].to_i)
+  #   end
+  # end
+
+  def add(part, text)
+    @pgsql.transaction do |t|
+      id = t.exec(
+        'INSERT INTO part (project, text, ptype) VALUES ($1, $2, $3) RETURNING id',
+        [@project, text, 'Plan']
+      )[0]['id'].to_i
+      t.exec('INSERT INTO plan (id, part) VALUES ($1, $2)', [id, part])
+      id
     end
-  end
-
-  def add(text)
-    raise Rsk::Urror, 'Plan text can\'t be empty' if text.empty?
-    @pgsql.exec(
-      'INSERT INTO plan (project, text) VALUES ($1, $2) RETURNING id',
-      [@project, text]
-    )[0]['id'].to_i
-  end
-
-  def exists?(id)
-    !@pgsql.exec(
-      'SELECT * FROM plan WHERE project = $1 AND id = $2',
-      [@project, id]
-    ).empty?
   end
 
   def get(id)
@@ -68,22 +64,20 @@ class Rsk::Plans
     rows = @pgsql.exec(
       [
         'SELECT * FROM plan',
-        'JOIN plans ON plans.plan = plan.id',
+        'JOIN part ON plan.part = part.id',
+        query.is_a?(Integer) ? 'JOIN triple ON cause = part.id OR risk = part.id OR effect = part.id' : '',
         'WHERE project = $1',
         'AND',
-        query.is_a?(Integer) ? "plans.triple = #{query}" : 'text LIKE $2',
+        query.is_a?(Integer) ? "triple.id = #{query}" : 'text LIKE $2',
         'OFFSET $3 LIMIT $4'
       ].join(' '),
       [@project, "%#{query}%", offset, limit]
     )
     rows.map do |r|
       {
-        label: "P#{r['id']}: #{r['text']}",
-        value: r['text'],
-        fields: {
-          pid: r['id'].to_i,
-          schedule: r['schedule']
-        }
+        id: r['id'].to_i,
+        text: r['text'],
+        schedule: r['schedule']
       }
     end
   end

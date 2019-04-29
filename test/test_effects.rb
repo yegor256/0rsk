@@ -38,7 +38,6 @@ class Rsk::EffectsTest < Minitest::Test
     text = 'the business will halt'
     eid = effects.add(text)
     assert(eid.positive?)
-    assert(effects.exists?(eid))
-    assert(effects.fetch.any? { |c| c[:value] == text })
+    assert(effects.fetch.any? { |c| c[:text] == text })
   end
 end

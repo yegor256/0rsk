@@ -34,19 +34,11 @@ class Rsk::Cause
     @id = id
   end
 
-  def mnemo
-    'C'
-  end
-
-  def chunk
-    "C#{@id}"
-  end
-
   def text
-    @pgsql.exec('SELECT text FROM cause WHERE id = $1', [@id])[0]['text']
+    @pgsql.exec('SELECT text FROM part WHERE id = $1', [@id])[0]['text']
   end
 
   def text=(text)
-    @pgsql.exec('UPDATE cause SET text = $2 WHERE id = $1', [@id, text])
+    @pgsql.exec('UPDATE part SET text = $2 WHERE id = $1', [@id, text])
   end
 end

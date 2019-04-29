@@ -34,14 +34,6 @@ class Rsk::Effect
     @id = id
   end
 
-  def mnemo
-    'E'
-  end
-
-  def chunk
-    "E#{@id}"
-  end
-
   def text
     @pgsql.exec('SELECT text FROM effect WHERE id = $1', [@id])[0]['text']
   end

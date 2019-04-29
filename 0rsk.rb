@@ -84,7 +84,8 @@ configure do
     port: cfg['pgsql']['port'],
     dbname: cfg['pgsql']['dbname'],
     user: cfg['pgsql']['user'],
-    password: cfg['pgsql']['password']
+    password: cfg['pgsql']['password'],
+    log: nil
   ).start(4)
 end
 
@@ -197,26 +198,69 @@ end
 
 get '/causes.json' do
   content_type('application/json')
-  JSON.pretty_generate(causes.fetch(query: params[:query] || ''))
+  JSON.pretty_generate(
+    causes.fetch(query: params[:query] || '').map do |r|
+      {
+        label: "C#{r[:id]}: #{r[:text]}",
+        value: r[:text],
+        fields: {
+          pid: r[:id]
+        }
+      }
+    end
+  )
 end
 
 get '/risks.json' do
   content_type('application/json')
-  JSON.pretty_generate(risks.fetch(query: params[:query] || ''))
+  JSON.pretty_generate(
+    risks.fetch(query: params[:query] || '').map do |r|
+      {
+        label: "R#{r[:id]}: #{r[:text]}",
+        value: r[:text],
+        fields: {
+          pid: r[:id],
+          probability: r[:probability]
+        }
+      }
+    end
+  )
 end
 
 get '/effects.json' do
   content_type('application/json')
-  JSON.pretty_generate(effects.fetch(query: params[:query] || ''))
+  JSON.pretty_generate(
+    effects.fetch(query: params[:query] || '').map do |r|
+      {
+        label: "E#{r[:id]}: #{r[:text]}",
+        value: r[:text],
+        fields: {
+          pid: r[:id],
+          impact: r[:impact]
+        }
+      }
+    end
+  )
 end
 
 get '/plans.json' do
   content_type('application/json')
-  JSON.pretty_generate(plans.fetch(query: params[:query] || ''))
+  JSON.pretty_generate(
+    plans.fetch(query: params[:query] || '').map do |r|
+      {
+        label: "P#{r[:id]}: #{r[:text]}",
+        value: r[:text],
+        fields: {
+          pid: r[:id],
+          schedule: r[:schedule]
+        }
+      }
+    end
+  )
 end
 
 get '/triple' do
-  vars = { title: '/add', plans: [] }
+  vars = { title: '/triple', plans: [] }
   id = params[:id].to_i
   if id.positive?
     triple = triples.fetch(id, limit: 1)[0]

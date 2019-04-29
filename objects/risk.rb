@@ -34,20 +34,12 @@ class Rsk::Risk
     @id = id
   end
 
-  def mnemo
-    'R'
-  end
-
-  def chunk
-    "R#{@id}"
-  end
-
   def text
-    @pgsql.exec('SELECT text FROM risk WHERE id = $1', [@id])[0]['text']
+    @pgsql.exec('SELECT text FROM part WHERE id = $1', [@id])[0]['text']
   end
 
   def text=(text)
-    @pgsql.exec('UPDATE risk SET text = $2 WHERE id = $1', [@id, text])
+    @pgsql.exec('UPDATE part SET text = $2 WHERE id = $1', [@id, text])
   end
 
   def probability

@@ -35,18 +35,14 @@ class Rsk::Causes
   end
 
   def add(text)
-    raise Rsk::Urror, 'Cause text can\'t be empty' if text.empty?
-    @pgsql.exec(
-      'INSERT INTO cause (project, text) VALUES ($1, $2) RETURNING id',
-      [@project, text]
-    )[0]['id'].to_i
-  end
-
-  def exists?(id)
-    !@pgsql.exec(
-      'SELECT * FROM cause WHERE project = $1 AND id = $2',
-      [@project, id]
-    ).empty?
+    @pgsql.transaction do |t|
+      id = t.exec(
+        'INSERT INTO part (project, text, type) VALUES ($1, $2, $3) RETURNING id',
+        [@project, text, 'Cause']
+      )[0]['id'].to_i
+      t.exec('INSERT INTO cause (id) VALUES ($1)', [id])
+      id
+    end
   end
 
   def get(id)
@@ -56,16 +52,18 @@ class Rsk::Causes
 
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
-      'SELECT * FROM cause WHERE project = $1 AND text LIKE $2 OFFSET $3 LIMIT $4',
+      [
+        'SELECT cause.*, part.text FROM cause',
+        'JOIN part ON part.id = cause.id',
+        'WHERE project = $1 AND text LIKE $2',
+        'OFFSET $3 LIMIT $4'
+      ].join(' '),
       [@project, "%#{query}%", offset, limit]
     )
     rows.map do |r|
       {
-        label: "C#{r['id']}: #{r['text']}",
-        value: r['text'],
-        fields: {
-          cid: r['id'].to_i
-        }
+        id: r['id'].to_i,
+        text: r['text']
       }
     end
   end

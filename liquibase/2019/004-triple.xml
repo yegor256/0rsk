@@ -28,10 +28,59 @@ SOFTWARE.
       DROP TABLE link;
       DROP TABLE ranked;
       DROP TABLE agenda;
+      DROP TABLE cause;
+      DROP TABLE risk;
+      DROP TABLE effect;
+      DROP TABLE plan;
     </sql>
     <sql>
-      CREATE TYPE strategy AS ENUM ('Avoid', 'Mitigate');
-      ALTER TABLE plan ADD COLUMN strategy strategy NOT NULL DEFAULT 'Mitigate';
+      CREATE TYPE ptype AS ENUM ('Cause', 'Risk', 'Effect', 'Plan');
+      CREATE TABLE part (
+        id SERIAL PRIMARY KEY,
+        project INT NOT NULL REFERENCES project(id),
+        type ptype NOT NULL,
+        text VARCHAR(160) NOT NULL,
+        created TIMESTAMPTZ DEFAULT now() NOT NULL,
+        UNIQUE(project, text),
+        CHECK (text &lt;&gt; '')
+      );
+      CREATE INDEX idx_part1 ON part(project, created);
+    </sql>
+    <sql>
+      CREATE TABLE cause (
+        id INT NOT NULL REFERENCES part(id),
+        PRIMARY KEY(id)
+      );
+    </sql>
+    <sql>
+      CREATE TABLE risk (
+        id INT NOT NULL REFERENCES part(id),
+        probability INT NOT NULL DEFAULT 3,
+        PRIMARY KEY(id),
+        CHECK (probability &gt;= 1),
+        CHECK (probability &lt;= 9)
+      );
+      CREATE INDEX idx_risk1 ON risk(probability);
+    </sql>
+    <sql>
+      CREATE TABLE effect (
+        id INT NOT NULL REFERENCES part(id),
+        impact INT NOT NULL DEFAULT 3,
+        PRIMARY KEY(id),
+        CHECK (impact &gt;= 1),
+        CHECK (impact &lt;= 9)
+      );
+      CREATE INDEX idx_effect1 ON effect(impact);
+    </sql>
+    <sql>
+      CREATE TABLE plan (
+        id INT NOT NULL REFERENCES part(id),
+        part INT NOT NULL REFERENCES part(id),
+        schedule VARCHAR(32) NOT NULL DEFAULT '',
+        UNIQUE(id, part),
+        CHECK (schedule &lt;&gt; '')
+      );
+      CREATE INDEX idx_plan1 ON plan(part);
     </sql>
     <sql>
       CREATE TABLE triple (
@@ -42,22 +91,12 @@ SOFTWARE.
         created TIMESTAMPTZ DEFAULT now() NOT NULL,
         UNIQUE(cause, risk, effect)
       );
-      CREATE INDEX idx_triple1 ON triple(project, cause, risk, effect);
-    </sql>
-    <sql>
-      CREATE TABLE plans (
-        id SERIAL PRIMARY KEY,
-        triple INT NOT NULL REFERENCES plan(id),
-        plan INT NOT NULL REFERENCES plan(id),
-        created TIMESTAMPTZ DEFAULT now() NOT NULL,
-        UNIQUE(triple, plan)
-      );
-      CREATE INDEX idx_plans1 ON plans(triple, plan);
+      CREATE INDEX idx_triple1 ON triple(cause, risk, effect);
     </sql>
     <sql>
       CREATE TABLE task (
         id SERIAL PRIMARY KEY,
-        plan INT NOT NULL REFERENCES plan(id),
+        plan INT NOT NULL REFERENCES part(id),
         created TIMESTAMPTZ DEFAULT now() NOT NULL,
         UNIQUE(plan)
       );

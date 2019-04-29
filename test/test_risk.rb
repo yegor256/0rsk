@@ -43,4 +43,14 @@ class Rsk::RiskTest < Minitest::Test
     risk.text = after
     assert_equal(after, risk.text)
   end
+
+  def test_modifies_probability
+    pid = Rsk::Projects.new(test_pgsql, 'jeff94').add('test')
+    after = 9
+    risks = Rsk::Risks.new(test_pgsql, pid)
+    risk = risks.get(risks.add('some risk'))
+    risk.probability = after
+    risk.probability = after
+    assert_equal(after, risk.probability)
+  end
 end

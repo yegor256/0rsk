@@ -38,7 +38,7 @@ class Rsk::CausesTest < Minitest::Test
     text = 'we use Ruby'
     cid = causes.add(text)
     assert(cid.positive?)
-    assert(causes.exists?(cid))
-    assert(causes.fetch.any? { |c| c[:value] == text })
+    assert(causes.fetch.any? { |c| c[:id] == cid })
+    assert(causes.fetch.any? { |c| c[:text] == text })
   end
 end
