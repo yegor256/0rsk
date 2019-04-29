@@ -151,6 +151,7 @@ get '/ranked/delete' do
 end
 
 get '/tasks' do
+  tasks.create
   offset = [(params[:offset] || '0').to_i, 0].max
   limit = (params[:limit] || '25').to_i
   query = params[:q] || ''
@@ -164,9 +165,11 @@ get '/tasks' do
 end
 
 get '/tasks/done' do
-  id = params[:pid].to_i
-  tasks.done(id)
-  flash('/tasks', "Thanks, task ##{id} was removed")
+  id = params[:id].to_i
+  plan = params[:plan].to_i
+  part = params[:part].to_i
+  tasks.done(id, plan, part)
+  flash('/tasks', "Thanks, task ##{id} was completed!")
 end
 
 get '/projects' do
@@ -419,7 +422,7 @@ end
 def flash(uri, msg = '', color: 'darkgreen')
   cookies[:flash_msg] = msg
   cookies[:flash_color] = color
-  redirect uri
+  redirect(uri)
 end
 
 def current_user

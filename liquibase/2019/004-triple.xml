@@ -77,6 +77,7 @@ SOFTWARE.
         id INT NOT NULL REFERENCES part(id) ON DELETE CASCADE,
         part INT NOT NULL REFERENCES part(id) ON DELETE CASCADE,
         schedule VARCHAR(32) NOT NULL DEFAULT 'weekly',
+        completed TIMESTAMPTZ DEFAULT now() NOT NULL,
         UNIQUE(id, part),
         CHECK (schedule &lt;&gt; '')
       );

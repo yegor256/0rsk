@@ -6,14 +6,24 @@
   %p
     The agenda is empty.
 - else
-  - tasks.each do |p|
+  - tasks.each do |t|
     %p
-      &= p[:text]
-      %a.item.small{href: iri.cut('/tasks/done').add(pid: p[:id].id)} Done
-
-%p
-  - if offset.positive?
-    %a.item{href: iri.over(offset: offset - 25)} Previous
-  - if tasks.count >= limit
-    %a.item{href: iri.over(offset: offset + 25)} Next
+      %code= "T#{t[:id]}"
+      = '&rarr;'
+      %code= "P#{t[:plan]}"
+      = '&rarr;'
+      %code= "#{t[:part]}"
+      %br
+      &= t[:ptext]
+      %br
+      &= t[:text]
+      %br
+      %span.item.small<
+        &= t[:schedule]
+      %a.item.small{href: iri.cut('/tasks/done').add(id: t[:id], plan: t[:plan], part: t[:part])} Done
+  %p
+    - if offset.positive?
+      %a.item{href: iri.over(offset: offset - 25)} Previous
+    - if tasks.count >= limit
+      %a.item{href: iri.over(offset: offset + 25)} Next
 

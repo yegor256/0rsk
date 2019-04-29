@@ -35,15 +35,6 @@ class Rsk::Plans
     @project = project
   end
 
-  # Promote plans into tasks, if their schedules requre.
-  # def promote
-  #   tasks = Rsk::Tasks.new(@pgsql, Rsk::Project.new(@pgsql, @project).login)
-  #   @pgsql.exec('SELECT * FROM plan WHERE project = $1').each do |r|
-  #     # next unless expired?(r['promoted'] ? Time.parse(r['promoted']) : Time.now, r['schedule'])
-  #     tasks.add(r['id'].to_i)
-  #   end
-  # end
-
   def add(part, text)
     @pgsql.transaction do |t|
       id = t.exec(
@@ -64,6 +55,15 @@ class Rsk::Plans
       if t.exec('SELECT * FROM plan WHERE id = $1', [id]).empty?
         t.exec('DELETE FROM part WHERE id = $1', [id])
       end
+    end
+  end
+
+  def complete(id, part)
+    p = get(id)
+    if /^[a-z]+$/.match?(p.schedule)
+      @pgsql.exec('UPDATE plan SET completed = NOW() WHERE id = $1 AND part = $2', [id, part])
+    else
+      detach(id, part)
     end
   end
 
@@ -90,26 +90,9 @@ class Rsk::Plans
         id: r['id'].to_i,
         text: r['text'],
         part: r['pid'].to_i,
+        completed: Time.parse(r['completed']),
         schedule: r['schedule']
       }
-    end
-  end
-
-  private
-
-  def deadline(plan)
-    schedule = plan.schedule.strip.downcase
-    if schedule == 'weekly'
-      Time.now + 3 * 24 * 60 * 60
-    elsif schedule == 'biweekly'
-      Time.now + 7 * 24 * 60 * 60
-    elsif schedule == 'monthly'
-      Time.now + 14 * 24 * 60 * 60
-    elsif /^[0-9]{2}-[0-9]{2}-[0-9]{4}$/.match?(schedule)
-      time = Time.parse(schedule)
-      time < Time.now ? Time.now + 60 * 60 : time
-    else
-      Time.now + 60 * 60
     end
   end
 end

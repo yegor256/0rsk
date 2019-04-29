@@ -35,30 +35,6 @@ class Rsk::Plan
     @id = id
   end
 
-  def mnemo
-    'P'
-  end
-
-  def chunk
-    "P#{@id}"
-  end
-
-  def delete
-    @pgsql.exec('DELETE FROM plan WHERE id = $1', [@id])
-  end
-
-  def project
-    @pgsql.exec('SELECT project FROM plan WHERE id = $1', [@id])[0]['project'].to_i
-  end
-
-  def text
-    @pgsql.exec('SELECT text FROM plan WHERE id = $1', [@id])[0]['text']
-  end
-
-  def text=(text)
-    @pgsql.exec('UPDATE plan SET text = $2 WHERE id = $1', [@id, text])
-  end
-
   def schedule
     @pgsql.exec('SELECT schedule FROM plan WHERE id = $1', [@id])[0]['schedule']
   end

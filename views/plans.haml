@@ -11,6 +11,7 @@
         %th Id
         %th Text
         %th Schedule
+        %th Completed
     %tbody
       - plans.each do |r|
         %tr
@@ -20,6 +21,8 @@
             &= r[:text]
           %td
             = r[:schedule]
+          %td
+            = r[:completed].utc.iso8601
   %p
     - if offset.positive?
       %a.item{href: iri.over(offset: offset - 25)} Previous

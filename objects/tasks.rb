@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 require_relative 'rsk'
+require_relative 'plans'
 
 # Tasks.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -32,18 +33,58 @@ class Rsk::Tasks
     @login = login
   end
 
-  def done(id)
-    @pgsql.exec('DELETE FROM task WHERE id = $1', [id, @project])
+  # Promote plans into tasks, if their schedules requre.
+  def create
+    plans = @pgsql.exec(
+      [
+        'SELECT plan.* FROM plan',
+        'JOIN part ON part.id = plan.part',
+        'JOIN project ON part.project = project.id',
+        'LEFT JOIN task ON task.plan = plan.id',
+        'WHERE project.login = $1 AND task.id IS NULL'
+      ],
+      [@login]
+    )
+    plans.each do |p|
+      completed = Time.parse(p['completed'])
+      deadline = deadline(completed, p['schedule'].strip.downcase)
+      if deadline < Time.now
+        @pgsql.exec('INSERT INTO task (plan) VALUES ($1)', [p['id'].to_i])
+      end
+    end
+  end
+
+  def done(id, plan, part)
+    project = @pgsql.exec(
+      [
+        'SELECT project.* FROM project',
+        'JOIN part ON part.project = project.id',
+        'JOIN plan ON plan.id = part.id',
+        'JOIN task ON task.plan = plan.id',
+        'WHERE task.id = $1'
+      ],
+      [id]
+    )[0]
+    raise Rsk::Urror, "Task ##{id} not found in projects of #{@login}" if project.nil?
+    raise Rsk::Urror, "Task ##{id} doesn't belong to #{@login}" if project['login'] != @login
+    @pgsql.transaction do |t|
+      t.exec('DELETE FROM task WHERE id = $1', [id])
+      Rsk::Plans.new(@pgsql, project['id'].to_i).complete(plan, part)
+    end
   end
 
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
       [
-        'SELECT task.*, plan.text AS text FROM task',
+        'SELECT task.*, plan.schedule AS schedule, plan.part AS part,',
+        '  part.text AS text, target.text AS ptext',
+        'FROM task',
         'JOIN plan ON plan.id = task.plan',
-        'JOIN project ON plan.project = project.id',
+        'JOIN part ON plan.id = part.id',
+        'JOIN project ON part.project = project.id',
+        'JOIN part AS target ON plan.part = target.id',
         'WHERE project.login = $1',
-        'AND plan.text LIKE $2',
+        'AND part.text LIKE $2',
         'OFFSET $3 LIMIT $4'
       ],
       [@login, "%#{query}%", offset, limit]
@@ -51,8 +92,30 @@ class Rsk::Tasks
     rows.map do |r|
       {
         id: r['id'].to_i,
-        text: r['text']
+        plan: r['plan'].to_i,
+        part: r['part'].to_i,
+        text: r['text'],
+        ptext: r['ptext'],
+        schedule: r['schedule']
       }
+    end
+  end
+
+  private
+
+  def deadline(completed, schedule)
+    if schedule == 'daily'
+      completed + 24 * 60 * 60
+    elsif schedule == 'weekly'
+      completed + 7 * 24 * 60 * 60
+    elsif schedule == 'biweekly'
+      completed + 14 * 24 * 60 * 60
+    elsif schedule == 'monthly'
+      completed + 30 * 24 * 60 * 60
+    elsif /^[0-9]{2}-[0-9]{2}-[0-9]{4}$/.match?(schedule)
+      Time.parse(schedule)
+    else
+      completed
     end
   end
 end
