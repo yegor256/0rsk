@@ -33,7 +33,7 @@
     %input{id: 'eid', type: 'text', name: 'eid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:eid] : ''}
     %label
       Consequences are positive?
-    %input{id: 'positive', type: 'checkbox', name: 'positive', tabindex: 5, value: 'positive'}
+    %input{id: 'positive', type: 'checkbox', name: 'positive', tabindex: 5, value: 'positive', checked: defined?(triple) && triple[:positive] ? 'true' : nil}
     %label
       Impact:
     %select{id: 'impact', name: 'impact', tabindex: 6}
