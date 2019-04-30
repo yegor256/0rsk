@@ -75,10 +75,10 @@ class Rsk::Plans
     rows = @pgsql.exec(
       [
         'SELECT plan.*, part.text, plan.part AS pid,',
-        'triple.id AS tid,',
-        'effect.positive AS positive,',
-        'CASE WHEN p.type = \'Cause\' THEN \'C\' WHEN p.type = \'Risk\' THEN \'R\' ELSE \'E\' END AS prefix,',
-        '(risk.probability * effect.impact) AS rank',
+        '  triple.id AS tid,',
+        '  effect.positive AS positive,',
+        '  CASE WHEN p.type = \'Cause\' THEN \'C\' WHEN p.type = \'Risk\' THEN \'R\' ELSE \'E\' END AS prefix,',
+        '  (risk.probability * effect.impact) AS rank',
         'FROM plan',
         'JOIN part ON plan.id = part.id',
         'JOIN part AS p ON plan.part = p.id',
