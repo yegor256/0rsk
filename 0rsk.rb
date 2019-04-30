@@ -160,7 +160,8 @@ get '/tasks' do
     offset: offset,
     limit: limit,
     query: query,
-    tasks: tasks.fetch(query: query, offset: offset, limit: limit)
+    tasks: tasks.fetch(query: query, offset: offset, limit: limit),
+    wired: telechats.wired?(current_user)
   )
 end
 
@@ -396,7 +397,7 @@ error do
   status 503
   e = env['sinatra.error']
   if e.is_a?(Rsk::Urror)
-    flash('/', e.message, color: 'darkred')
+    flash(@locals[:user] ? '/ranked' : '/', e.message, color: 'darkred')
   else
     Raven.capture_exception(e)
     haml(

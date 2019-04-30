@@ -1,7 +1,8 @@
-%p
-  Talk to our Telegram bot:
-  %a{href: 'https://t.me/zerorsk_bot'}<
-    %code @zerorsk_bot
+- unless wired
+  %p
+    Talk to our Telegram bot:
+    %a{href: 'https://t.me/zerorsk_bot'}<
+      %code @zerorsk_bot
 
 %form{method: 'GET', action: ''}
   %input{type: 'text', name: 'q', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: query}
