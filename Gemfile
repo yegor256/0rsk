@@ -28,7 +28,7 @@ gem 'glogin', '~> 0.4'
 gem 'haml', '5.0.4'
 gem 'iri', '0.2.0'
 gem 'minitest', '5.11.3', require: false
-gem 'pgtk', '0.5.0'
+gem 'pgtk', '0.5.1'
 gem 'rack', '2.0.6'
 gem 'rack-ssl', '1.4.1'
 gem 'rack-test', '1.1.0'
