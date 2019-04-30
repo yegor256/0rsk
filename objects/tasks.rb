@@ -78,10 +78,12 @@ class Rsk::Tasks
       [
         'SELECT task.*, plan.schedule AS schedule, plan.part AS part,',
         '  part.text AS text, target.text AS ptext,',
-        '  project.id AS pid, project.title AS title',
+        '  project.id AS pid, project.title AS title,',
+        '  triple.id AS tid',
         'FROM task',
         'JOIN plan ON plan.id = task.plan',
         'JOIN part ON plan.id = part.id',
+        'JOIN triple ON risk = plan.part OR cause = plan.part OR effect = plan.part',
         'JOIN project ON part.project = project.id',
         'JOIN part AS target ON plan.part = target.id',
         'WHERE project.login = $1',
@@ -95,6 +97,7 @@ class Rsk::Tasks
       {
         id: r['id'].to_i,
         pid: r['pid'].to_i,
+        triple: r['tid'].to_i,
         title: r['title'],
         plan: r['plan'].to_i,
         part: r['part'].to_i,

@@ -19,7 +19,8 @@
     %p
       %code= "T#{t[:id]}"
       = '&rarr;'
-      %code= "P#{t[:plan]}"
+      %a{href: iri.cut('/responses').add(id: t[:triple])}<
+        %code= "P#{t[:plan]}"
       = '&rarr;'
       %code= "#{t[:part]}"
       %br
