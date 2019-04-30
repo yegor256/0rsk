@@ -529,6 +529,7 @@ if settings.config['telegram']
         ]
         begin
           if %r{^/done [0-9]+$}.match?(msg)
+            id = msg.split(' ')[1].to_i
             tasks(login: login).done(id)
             response = ["Task `T#{id}` was marked as completed, thanks!"]
           end
