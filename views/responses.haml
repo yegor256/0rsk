@@ -6,6 +6,10 @@
   = "##{triple[:id]}"
 
 %p
+  - if r[:positive]
+    = '&#x1F44D;'
+  - else
+    = '&#x1F44E;'
   %span{style: 'color:' + (triple[:rank] >= 64 ? 'darkred' : (triple[:rank] <= 32 ? 'darkgreen' : 'inherit'))}
     = triple[:rank]
   %code= "C#{triple[:cid]}"
@@ -21,9 +25,14 @@
     %input{type: 'hidden', name: 'id', value: triple[:id]}
     %label Strategy:
     %select{id: 'strategy', name: 'strategy', tabindex: 1}
-      %option{value: triple[:cid]}= "Eliminate C#{triple[:cid]}"
-      %option{value: triple[:rid], selected: true}= "Avoid R#{triple[:rid]}"
-      %option{value: triple[:eid]}= "Mitigate E#{triple[:eid]}"
+      - if r[:positive]
+        %option{value: triple[:cid]}= "Promote C#{triple[:cid]}"
+        %option{value: triple[:rid], selected: true}= "Exploit R#{triple[:rid]}"
+        %option{value: triple[:eid]}= "Enhance E#{triple[:eid]}"
+      - else
+        %option{value: triple[:cid]}= "Eliminate C#{triple[:cid]}"
+        %option{value: triple[:rid], selected: true}= "Avoid R#{triple[:rid]}"
+        %option{value: triple[:eid]}= "Mitigate E#{triple[:eid]}"
     %label Plan:
     %input{id: 'plan', type: 'text', name: 'plan', size: 60, maxlength: 160, autocomplete: 'off', tabindex: 2}
     %label Schedule (daily, weekly, biweekly, monthly, quarterly, or annually):
