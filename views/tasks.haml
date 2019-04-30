@@ -31,10 +31,12 @@
         &= t[:title]
       %span.item.small<
         &= t[:schedule]
-      %a.item.small{href: iri.cut('/tasks/done').add(id: t[:id], plan: t[:plan], part: t[:part])} Done
+      %a.item.small{href: iri.cut('/tasks/done').add(id: t[:id])} Done
   %p
     - if offset.positive?
       %a.item{href: iri.over(offset: offset - 25)} Previous
     - if tasks.count >= limit
       %a.item{href: iri.over(offset: offset + 25)} Next
 
+%p
+  %a{href: iri.cut('/tasks/create')} Create now

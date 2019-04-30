@@ -52,7 +52,7 @@ class Rsk::Tasks
     end
   end
 
-  def done(id, plan, part)
+  def done(id)
     project = @pgsql.exec(
       [
         'SELECT project.* FROM project',
@@ -65,9 +65,11 @@ class Rsk::Tasks
     )[0]
     raise Rsk::Urror, "Task ##{id} not found in projects of #{@login}" if project.nil?
     raise Rsk::Urror, "Task ##{id} doesn't belong to #{@login}" if project['login'] != @login
+    row = @pgsql.exec('SELECT plan.* FROM plan JOIN task ON task.plan = plan.id WHERE task.id = $1', [id])[0]
+    raise Rsk::Urror, "Plan for task ##{id} not found" if row.nil?
     @pgsql.transaction do |t|
       t.exec('DELETE FROM task WHERE id = $1', [id])
-      Rsk::Plans.new(@pgsql, project['id'].to_i).complete(plan, part)
+      Rsk::Plans.new(@pgsql, project['id'].to_i).complete(row['id'].to_i, row['part'].to_i)
     end
   end
 

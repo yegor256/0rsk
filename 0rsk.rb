@@ -166,10 +166,13 @@ end
 
 get '/tasks/done' do
   id = params[:id].to_i
-  plan = params[:plan].to_i
-  part = params[:part].to_i
-  tasks.done(id, plan, part)
+  tasks.done(id)
   flash('/tasks', "Thanks, task ##{id} was completed!")
+end
+
+get '/tasks/create' do
+  tasks.create
+  flash('/tasks', 'All necessary tasks were created, thanks!')
 end
 
 get '/projects' do
@@ -518,14 +521,21 @@ if settings.config['telegram']
       chat = message.chat.id
       if telechats.exists?(chat)
         login = telechats.login_of(chat)
-        telepost(
-          [
-            "I'm still with you, [#{login}](https://github.com/#{login})!",
-            'In this chat I inform you about the most important tasks you have in your agenda',
-            'in [0rsk.com](https://www.0rsk.com).'
-          ].join(' '),
-          chat
-        )
+        msg = message.text
+        response = [
+          "I'm still with you, [#{login}](https://github.com/#{login})!",
+          'In this chat I inform you about the most important tasks you have in your agenda',
+          'in [0rsk.com](https://www.0rsk.com).'
+        ]
+        begin
+          if %r{^/done [0-9]+$}.match?(msg)
+            tasks(login).done(id)
+            response = ["Task `T#{id}` was marked as completed, thanks!"]
+          end
+        rescue StandardError => e
+          response = ["Oops... #{e.message}"]
+        end
+        telepost(response.join(' '), chat)
       else
         telepost("[Click here](https://www.0rsk.com/telegram?id=#{chat}) to identify yourself.", chat)
       end
