@@ -597,6 +597,6 @@ end
 Thread.start do
   sleep(10 * 60)
   users.fetch.each do |login|
-    tasks(login).create
+    tasks(login: login).create
   end
 end

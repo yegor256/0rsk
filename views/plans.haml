@@ -9,6 +9,7 @@
     %thead
       %tr
         %th Id
+        %th Target
         %th Text
         %th Schedule
         %th Completed
@@ -17,6 +18,8 @@
         %tr
           %td
             %code= "P#{r[:id]}"
+          %td
+            %code= "#{r[:prefix]}#{r[:part]}"
           %td
             &= r[:text]
           %td

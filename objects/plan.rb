@@ -40,7 +40,7 @@ class Rsk::Plan
   end
 
   def schedule=(text)
-    unless /^([a-z]+|\d{2}-\d{2}-\d{4})$/.match?(text)
+    unless /^(daily|weekly|biweekly|monthly|quarterly|annually|\d{2}-\d{2}-\d{4})$/.match?(text)
       raise Rsk::Urror, "Schedule can either be a word or a date DD-MM-YYYY: #{text.inspect}"
     end
     @pgsql.exec('UPDATE plan SET schedule = $2 WHERE id = $1', [@id, text])
