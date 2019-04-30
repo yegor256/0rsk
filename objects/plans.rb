@@ -74,7 +74,7 @@ class Rsk::Plans
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
       [
-        'SELECT plan.*, part.text, plan.part AS pid FROM plan',
+        'SELECT plan.*, part.text, part.type, plan.part AS pid FROM plan',
         'JOIN part ON plan.id = part.id',
         query.is_a?(Integer) ? 'LEFT JOIN triple ON cause = plan.part OR risk = plan.part OR effect = plan.part' : '',
         'WHERE project = $1',
@@ -88,10 +88,24 @@ class Rsk::Plans
       {
         id: r['id'].to_i,
         text: r['text'],
+        target: mnemo(r['type'], r['pid']),
         part: r['pid'].to_i,
         completed: Time.parse(r['completed']),
         schedule: r['schedule']
       }
+    end
+  end
+
+  private
+
+  def mnemo(type, id)
+    case type
+    when 'Cause'
+      "C#{id}"
+    when 'Risk'
+      "R#{id}"
+    when 'Effect'
+      "E#{id}"
     end
   end
 end

@@ -540,6 +540,7 @@ if settings.config['telegram']
       next unless telechats.wired?(login)
       chat = telechats.chat_of(login)
       expired = telepings.expired(login)
+      next if expired.empty?
       telepost(
         [
           "There are #{expired.count} tasks still required to be completed:",
