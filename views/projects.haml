@@ -8,4 +8,6 @@
 
 - projects.each do |p|
   %p
-    %a{href: iri.cut('/projects/select').add(id: p[:id])}= p[:title]
+    = "##{p[:id]}:"
+    %a{href: iri.cut('/projects/select').add(id: p[:id])}<
+      &= p[:title]

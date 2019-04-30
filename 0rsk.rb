@@ -528,7 +528,7 @@ def reply(msg, login)
       [
         "Here is a full list of tasks that belong to you:\n\n",
         list.map do |t|
-          "`T#{t[:id]}`: \"#{t[:text]}\" in [#{t[:title]}](https://www.0rsk.com/project?id=#{t[:pid]})\n"
+          "`T#{t[:id]}`: \"#{t[:text]}\" in [#{t[:title]}](https://www.0rsk.com/projects/#{t[:pid]})\n"
         end
       ]
     end
@@ -583,7 +583,7 @@ if settings.config['telegram']
             task = tasks.fetch(query: t)
             [
               "`T#{task[:id]}`: #{task[:text]}",
-              "in [#{task[:title]}](https://www.0rsk.com/project?id=#{task[:pid]})"
+              "in [#{task[:title]}](https://www.0rsk.com/projects/#{task[:pid]})"
             ].join(' ')
           end
         ].flatten.join("\n\n"),

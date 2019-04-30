@@ -27,7 +27,7 @@
       %br
       &= t[:text]
       %br
-      %a.item.small{href: iri.cut('/project').add(id: t[:pid])}<
+      %a.item.small{href: iri.cut("/projects/#{t[:pid]}")}<
         &= t[:title]
       %span.item.small<
         &= t[:schedule]
