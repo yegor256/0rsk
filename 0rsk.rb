@@ -266,7 +266,7 @@ get '/plans.json' do
 end
 
 get '/triple' do
-  vars = { title: '/triple' }
+  vars = { title: '/triple', project: current_project }
   id = params[:id].to_i
   if id.positive?
     triple = triples.fetch(query: id, limit: 1)[0]

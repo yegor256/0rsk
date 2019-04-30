@@ -7,7 +7,8 @@
     Edit
     = "##{triple[:id]}"
   - else
-    Add
+    Add to the project
+    = "##{project}"
 
 %form{method: 'POST', action: iri.cut('/triple/save')}
   %fieldset
