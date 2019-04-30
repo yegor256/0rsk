@@ -151,7 +151,6 @@ get '/ranked/delete' do
 end
 
 get '/tasks' do
-  tasks.create
   offset = [(params[:offset] || '0').to_i, 0].max
   limit = (params[:limit] || '25').to_i
   query = params[:q] || ''
