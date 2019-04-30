@@ -31,10 +31,15 @@
           %td
             %code= "P#{r[:id]}"
           %td
-            %code= "#{r[:prefix]}#{r[:part]}"
+            %a{href: iri.cut('/responses').add(id: r[:triple])}<
+              %code= "#{r[:prefix]}#{r[:part]}"
           %td
             &= r[:text]
           %td.right
+            - if r[:positive]
+              %img.up
+            - else
+              %img.down
             = r[:rank]
           %td
             = r[:schedule]

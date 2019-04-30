@@ -75,6 +75,8 @@ class Rsk::Plans
     rows = @pgsql.exec(
       [
         'SELECT plan.*, part.text, plan.part AS pid,',
+        'triple.id AS tid,',
+        'effect.positive AS positive,',
         'CASE WHEN p.type = \'Cause\' THEN \'C\' WHEN p.type = \'Risk\' THEN \'R\' ELSE \'E\' END AS prefix,',
         '(risk.probability * effect.impact) AS rank',
         'FROM plan',
@@ -94,8 +96,10 @@ class Rsk::Plans
     rows.map do |r|
       {
         id: r['id'].to_i,
+        triple: r['tid'].to_i,
         text: r['text'],
         prefix: r['prefix'],
+        positive: r['positive'] == 't',
         part: r['pid'].to_i,
         rank: r['rank'].to_i,
         completed: Time.parse(r['completed']),
