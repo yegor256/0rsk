@@ -133,7 +133,7 @@ end
 
 get '/ranked' do
   offset = [(params[:offset] || '0').to_i, 0].max
-  limit = (params[:limit] || '25').to_i
+  limit = (params[:limit] || '10').to_i
   query = params[:q] || ''
   haml :ranked, layout: :layout, locals: merged(
     title: '/ranked',
