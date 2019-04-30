@@ -534,7 +534,15 @@ if settings.config['telegram']
             response = ["Task `T#{id}` was marked as completed, thanks!"]
           end
         rescue StandardError => e
-          response = ["Oops... #{e.message}"]
+          response = [
+            "Oops, there was a problem:\n\n",
+            "```\n#{e.message}\n```\n\n",
+            'Most probably you did something wrong, but this could also be a defect on the server.',
+            'If you think it\'s our bug, please, report it to us via a GitHub issue,',
+            '[here](https://github.com/yegor256/0rsk/issues).',
+            'We will take care of it as soon as we can.',
+            'Thanks, we appreciate your help and your patience!'
+          ]
         end
         telepost(response.join(' '), chat)
       else
