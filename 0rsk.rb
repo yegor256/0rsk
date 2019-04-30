@@ -323,44 +323,52 @@ end
 get '/causes' do
   offset = [(params[:offset] || '0').to_i, 0].max
   limit = (params[:limit] || '25').to_i
+  query = params[:q] || ''
   haml :causes, layout: :layout, locals: merged(
     title: '/causes',
+    query: query,
     offset: offset,
     limit: limit,
-    causes: causes.fetch(offset: offset, limit: limit)
+    causes: causes.fetch(query: query, offset: offset, limit: limit)
   )
 end
 
 get '/risks' do
   offset = [(params[:offset] || '0').to_i, 0].max
   limit = (params[:limit] || '25').to_i
+  query = params[:q] || ''
   haml :risks, layout: :layout, locals: merged(
     title: '/risks',
+    query: query,
     offset: offset,
     limit: limit,
-    risks: risks.fetch(offset: offset, limit: limit)
+    risks: risks.fetch(query: query, offset: offset, limit: limit)
   )
 end
 
 get '/effects' do
   offset = [(params[:offset] || '0').to_i, 0].max
   limit = (params[:limit] || '25').to_i
+  query = params[:q] || ''
   haml :effects, layout: :layout, locals: merged(
     title: '/effects',
+    query: query,
     offset: offset,
     limit: limit,
-    effects: effects.fetch(offset: offset, limit: limit)
+    effects: effects.fetch(query: query, offset: offset, limit: limit)
   )
 end
 
 get '/plans' do
   offset = [(params[:offset] || '0').to_i, 0].max
   limit = (params[:limit] || '25').to_i
+  query = params[:q] || ''
   haml :plans, layout: :layout, locals: merged(
     title: '/plans',
+    query: query,
     offset: offset,
     limit: limit,
-    plans: plans.fetch(offset: offset, limit: limit)
+    plans: plans.fetch(query: query, offset: offset, limit: limit)
   )
 end
 

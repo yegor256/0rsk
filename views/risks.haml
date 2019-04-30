@@ -1,6 +1,10 @@
 %h2
   Risks
 
+%form{method: 'GET', action: ''}
+  %input{type: 'text', name: 'q', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: query}
+  %input{type: 'submit', value: 'Search', tabindex: 2}
+
 - if risks.empty?
   %p
     No risks as of yet.

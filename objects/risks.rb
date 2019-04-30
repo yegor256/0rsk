@@ -60,12 +60,12 @@ class Rsk::Risks
         'JOIN part ON part.id = risk.id',
         'LEFT JOIN triple ON triple.risk = risk.id',
         'LEFT JOIN effect ON triple.effect = effect.id',
-        'WHERE project = $1 AND text LIKE $2',
+        'WHERE project = $1 AND LOWER(text) LIKE $2',
         'GROUP BY risk.id, part.id',
         'ORDER BY rank DESC',
         'OFFSET $3 LIMIT $4'
       ],
-      [@project, "%#{query}%", offset, limit]
+      [@project, "%#{query.to_s.downcase.strip}%", offset, limit]
     )
     rows.map do |r|
       {

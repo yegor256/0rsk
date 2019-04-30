@@ -1,6 +1,10 @@
 %h2
   Effects
 
+%form{method: 'GET', action: ''}
+  %input{type: 'text', name: 'q', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: query}
+  %input{type: 'submit', value: 'Search', tabindex: 2}
+
 - if effects.empty?
   %p
     No effects as of yet.

@@ -38,7 +38,7 @@ class Rsk::RisksTest < Minitest::Test
     text = 'we may lose data'
     rid = risks.add(text)
     assert(rid.positive?)
-    assert(!risks.fetch.empty?)
+    assert(!risks.fetch(query: 'Data').empty?)
     assert(risks.fetch.any? { |r| r[:id] == rid })
     assert(risks.fetch.any? { |r| r[:text] == text })
   end

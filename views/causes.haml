@@ -1,6 +1,10 @@
 %h2
   Causes
 
+%form{method: 'GET', action: ''}
+  %input{type: 'text', name: 'q', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: query}
+  %input{type: 'submit', value: 'Search', tabindex: 2}
+
 - if causes.empty?
   %p
     No causes as of yet.
