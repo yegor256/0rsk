@@ -74,7 +74,7 @@ class Rsk::Plans
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
       [
-        'SELECT plan.*, part.text, plan.part AS pid,',
+        'SELECT DISTINCT plan.*, part.text, plan.part AS pid,',
         'triple.id AS tid,',
         'effect.positive AS positive,',
         'CASE WHEN p.type = \'Cause\' THEN \'C\' WHEN p.type = \'Risk\' THEN \'R\' ELSE \'E\' END AS prefix,',
