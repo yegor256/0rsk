@@ -532,6 +532,12 @@ def reply(msg, login)
         end
       ]
     end
+  else
+    [
+      "I'm still with you, [#{login}](https://github.com/#{login})!",
+      'In this chat I inform you about the most important tasks you have in your agenda',
+      'in [0rsk.com](https://www.0rsk.com).'
+    ]
   end
 end
 
@@ -541,16 +547,10 @@ if settings.config['telegram']
       chat = message.chat.id
       if telechats.exists?(chat)
         login = telechats.login_of(chat)
-        msg = message.text
-        response = [
-          "I'm still with you, [#{login}](https://github.com/#{login})!",
-          'In this chat I inform you about the most important tasks you have in your agenda',
-          'in [0rsk.com](https://www.0rsk.com).'
-        ]
-        begin
-          response = reply(msg, login)
+        response = begin
+          reply(message.text, login)
         rescue StandardError => e
-          response = [
+          [
             "Oops, there was a problem with your request, [#{login}](https://github.com/#{login}):\n\n",
             "```\n#{e.message}\n```\n\nMost probably",
             'you did something wrong, but this could also be a defect on the server.',
