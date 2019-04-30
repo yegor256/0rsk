@@ -21,8 +21,9 @@
     %input{type: 'hidden', name: 'id', value: triple[:id]}
     %label Strategy:
     %select{id: 'strategy', name: 'strategy', tabindex: 1}
-      - {"Eliminate C#{triple[:cid]}" => triple[:cid], "Avoid R#{triple[:rid]}" => triple[:rid], "Mitigate E#{triple[:eid]}" => triple[:eid]}.each do |k, v|
-        %option{value: v}= k
+      %option{value: triple[:cid]}= "Eliminate C#{triple[:cid]}"
+      %option{value: triple[:rid], selected: true}= "Avoid R#{triple[:rid]}"
+      %option{value: triple[:eid]}= "Mitigate E#{triple[:eid]}"
     %label Plan:
     %input{id: 'plan', type: 'text', name: 'plan', size: 60, maxlength: 160, autocomplete: 'off', tabindex: 2}
     %label Schedule (daily, weekly, biweekly, monthly, quarterly, or annually):
