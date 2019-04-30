@@ -74,12 +74,15 @@ class Rsk::Plans
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
       [
-        'SELECT plan.*, part.text, part.type, plan.part AS pid FROM plan',
+        'SELECT plan.*, part.text, plan.part AS pid,',
+        'CASE WHEN p.type = \'Cause\' THEN \'C\' WHEN p.type = \'Risk\' THEN \'R\' ELSE \'E\' END AS prefix',
+        'FROM plan',
         'JOIN part ON plan.id = part.id',
+        'JOIN part AS p ON plan.part = p.id',
         query.is_a?(Integer) ? 'LEFT JOIN triple ON cause = plan.part OR risk = plan.part OR effect = plan.part' : '',
-        'WHERE project = $1',
+        'WHERE part.project = $1',
         'AND',
-        query.is_a?(Integer) ? 'triple.id = $2' : 'LOWER(text) LIKE $2',
+        query.is_a?(Integer) ? 'triple.id = $2' : 'LOWER(part.text) LIKE $2',
         'OFFSET $3 LIMIT $4'
       ],
       [@project, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip}%", offset, limit]
@@ -88,24 +91,11 @@ class Rsk::Plans
       {
         id: r['id'].to_i,
         text: r['text'],
-        target: mnemo(r['type'], r['pid']),
+        prefix: r['prefix'],
         part: r['pid'].to_i,
         completed: Time.parse(r['completed']),
         schedule: r['schedule']
       }
-    end
-  end
-
-  private
-
-  def mnemo(type, id)
-    case type
-    when 'Cause'
-      "C#{id}"
-    when 'Risk'
-      "R#{id}"
-    when 'Effect'
-      "E#{id}"
     end
   end
 end
