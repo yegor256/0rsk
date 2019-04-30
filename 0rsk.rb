@@ -529,7 +529,7 @@ if settings.config['telegram']
         ]
         begin
           if %r{^/done [0-9]+$}.match?(msg)
-            tasks(login).done(id)
+            tasks(login: login).done(id)
             response = ["Task `T#{id}` was marked as completed, thanks!"]
           end
         rescue StandardError => e
