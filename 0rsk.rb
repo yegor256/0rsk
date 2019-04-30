@@ -519,7 +519,14 @@ if settings.config['telegram']
       chat = message.chat.id
       if telechats.exists?(chat)
         login = telechats.login_of(chat)
-        telepost("Glad to see you, #{login}", chat)
+        telepost(
+          [
+            "I'm still with you, [#{login}](https://github.com/#{login})!",
+            'In this chat I inform you about the most important tasks you have in your agenda',
+            'in [0rsk.com](https://www.0rsk.com).'
+          ].join(' '),
+          chat
+        )
       else
         telepost("[Click here](https://www.0rsk.com/telegram?id=#{chat}) to identify yourself.", chat)
       end
