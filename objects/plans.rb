@@ -75,14 +75,18 @@ class Rsk::Plans
     rows = @pgsql.exec(
       [
         'SELECT plan.*, part.text, plan.part AS pid,',
-        'CASE WHEN p.type = \'Cause\' THEN \'C\' WHEN p.type = \'Risk\' THEN \'R\' ELSE \'E\' END AS prefix',
+        'CASE WHEN p.type = \'Cause\' THEN \'C\' WHEN p.type = \'Risk\' THEN \'R\' ELSE \'E\' END AS prefix,',
+        '(risk.probability * effect.impact) AS rank',
         'FROM plan',
         'JOIN part ON plan.id = part.id',
         'JOIN part AS p ON plan.part = p.id',
-        query.is_a?(Integer) ? 'LEFT JOIN triple ON cause = plan.part OR risk = plan.part OR effect = plan.part' : '',
+        'LEFT JOIN triple ON cause = plan.part OR risk = plan.part OR effect = plan.part',
+        'LEFT JOIN risk ON risk.id = triple.risk',
+        'LEFT JOIN effect ON effect.id = triple.effect',
         'WHERE part.project = $1',
         'AND',
         query.is_a?(Integer) ? 'triple.id = $2' : 'LOWER(part.text) LIKE $2',
+        'ORDER BY rank DESC',
         'OFFSET $3 LIMIT $4'
       ],
       [@project, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip}%", offset, limit]
@@ -93,6 +97,7 @@ class Rsk::Plans
         text: r['text'],
         prefix: r['prefix'],
         part: r['pid'].to_i,
+        rank: r['rank'].to_i,
         completed: Time.parse(r['completed']),
         schedule: r['schedule']
       }

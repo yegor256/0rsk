@@ -1,6 +1,10 @@
 %h2
   Plans
 
+%form{method: 'GET', action: ''}
+  %input{type: 'text', name: 'q', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: query}
+  %input{type: 'submit', value: 'Search', tabindex: 2}
+
 - if plans.empty?
   %p
     No plans as of yet.
@@ -10,6 +14,7 @@
       %col{style: 'width: 3em'}
       %col{style: 'width: 3em'}
       %col{style: ''}
+      %col{style: 'width: 4em'}
       %col{style: 'width: 8em'}
       %col{style: 'width: 8em'}
     %thead
@@ -17,6 +22,7 @@
         %th Id
         %th Target
         %th Text
+        %th.right Rank
         %th Schedule
         %th Completed
     %tbody
@@ -28,10 +34,12 @@
             %code= "#{r[:prefix]}#{r[:part]}"
           %td
             &= r[:text]
+          %td.right
+            = r[:rank]
           %td
             = r[:schedule]
           %td
-            = r[:completed].utc.iso8601
+            = RelativeTime.in_words(r[:completed].utc.iso8601)
   %p
     - if offset.positive?
       %a.item{href: iri.over(offset: offset - 25)} Previous

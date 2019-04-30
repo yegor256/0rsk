@@ -110,6 +110,8 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.10.0)
       ffi (~> 1.0)
+    relative_time (1.1.0)
+      i18n
     rerun (0.13.0)
       listen (~> 3.0)
     rspec-core (3.8.0)
@@ -211,6 +213,7 @@ DEPENDENCIES
   rack-ssl (= 1.4.1)
   rack-test (= 1.1.0)
   rake (= 12.3.1)
+  relative_time (= 1.1.0)
   rerun (= 0.13.0)
   rspec-rails (= 3.8.1)
   rubocop (= 0.62.0)
