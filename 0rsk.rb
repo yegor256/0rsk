@@ -494,7 +494,7 @@ end
 
 def telebot
   return nil unless settings.config['telegram']
-  @telebot ||= Telebot::Bot.new(settings.config['telegram']['token'])
+  @telebot ||= Telebot::Client.new(settings.config['telegram']['token'])
 end
 
 def telepings
@@ -514,7 +514,7 @@ end
 
 if settings.config['telegram']
   Thread.start do
-    telebot.run do |_, message|
+    Telebot::Bot.new(settings.config['telegram']['token']).run do |_, message|
       chat = message.chat.id
       if telechats.exists?(chat)
         login = telechats.login_of(chat)
