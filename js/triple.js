@@ -56,4 +56,15 @@ $(function() {
   on_detach("#ctext_detach", "#cid");
   on_detach("#rtext_detach", "#rid");
   on_detach("#etext_detach", "#eid");
+  $('#positive').change(function() {
+    if ($(this).is(':checked')) {
+      $('#impact option[type="negative"]').attr('hidden', true);
+      $('#impact option[type="positive"]').attr('hidden', false);
+      $('#impact').val(5);
+    } else {
+      $('#impact option[type="negative"]').attr('hidden', false);
+      $('#impact option[type="positive"]').attr('hidden', true);
+      $('#impact').val(5);
+    }
+  });
 });

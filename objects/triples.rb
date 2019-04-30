@@ -68,6 +68,7 @@ class Rsk::Triples
     rows = @pgsql.exec(
       [
         'SELECT t.id, cause.id AS cid, risk.id AS rid, effect.id AS eid,',
+        '  effect.positive,',
         '  risk.probability AS probability, effect.impact AS impact,',
         '  cpart.text AS ctext, rpart.text AS rtext, epart.text AS etext,',
         '  (probability * impact) AS rank,',
@@ -100,6 +101,7 @@ class Rsk::Triples
         etext: r['etext'],
         probability: r['probability'].to_i,
         impact: r['impact'].to_i,
+        positive: r['positive'] == 't',
         rank: r['rank'].to_i,
         plans: r['plans'].to_i
       }

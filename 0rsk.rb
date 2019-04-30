@@ -288,6 +288,7 @@ post '/triple/save' do
   effects.get(eid).text = etext
   risks.get(rid).probability = params[:probability].to_i
   effects.get(eid).impact = params[:impact].to_i
+  effects.get(eid).positive = !params[:positive].nil?
   triples.add(cid, rid, eid)
   flash('/ranked', 'Thanks, saved')
 end

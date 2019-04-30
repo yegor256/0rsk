@@ -73,6 +73,7 @@ class Rsk::Effects
         id: r['id'].to_i,
         text: r['text'],
         impact: r['impact'].to_i,
+        positive: r['positive'] == 't',
         rank: r['rank'].to_i,
         risks: r['risks'].to_i
       }

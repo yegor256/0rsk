@@ -11,9 +11,15 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/51006993d98c150f21fc/maintainability)](https://codeclimate.com/github/yegor256/0rsk/maintainability)
 [![Hits-of-Code](https://hitsofcode.com/github/yegor256/0rsk)](https://hitsofcode.com/view/github/yegor256/0rsk)
 
-It's an online risk manager.
+This is an online risk manager, where you register
+all know risks in your project, assign probabilities
+and impacts, and then create mitigation and avoidance
+plans for them. Using this information the system
+generates an agenda of the most critical tasks for you.
 
-# How to contribute
+It's free for everybody.
+
+## How to contribute
 
 Read [these guidelines](https://www.yegor256.com/2014/04/15/github-guidelines.html).
 Make sure you build is green before you contribute
@@ -37,7 +43,7 @@ $ bundle exec rake run
 And then, in another terminal (for example):
 
 ```bash
-$ ruby test/test_agenda.rb -n test_adds_and_fetches
+$ ruby test/test_risks.rb -n test_adds_and_fetches
 ```
 
 Should work.

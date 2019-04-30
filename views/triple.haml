@@ -32,8 +32,13 @@
     %input{id: 'etext', type: 'text', name: 'etext', size: 60, maxlength: 160, autocomplete: 'off', tabindex: 4, value: defined?(triple) ? triple[:etext] : ''}
     %input{id: 'eid', type: 'text', name: 'eid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:eid] : ''}
     %label
+      Consequences are positive?
+    %input{id: 'positive', type: 'checkbox', name: 'positive', tabindex: 5, value: 'positive'}
+    %label
       Impact:
-    %select{id: 'impact', name: 'impact', tabindex: 5}
+    %select{id: 'impact', name: 'impact', tabindex: 6}
       - {'Fatal' => 9, 'Catastrophic' => 8, 'Serious' => 6, 'Average' => 5, 'Moderate' => 4, 'Minor' => 2, 'Unnoticable' => 1}.each do |k, v|
-        %option{value: v, selected: defined?(triple) && triple[:impact] == v}= "#{k} (#{v})"
-    %input{type: 'submit', value: 'Submit', tabindex: 9}
+        %option{value: v, selected: defined?(triple) && triple[:impact] == v, type: 'negative'}= "#{k} (#{v})"
+      - {'Fantastic' => 9, 'Awesome' => 8, 'Very good' => 6, 'Average' => 5, 'Good to have' => 4, 'Minor' => 2, 'Unnoticable' => 1}.each do |k, v|
+        %option{value: v, selected: defined?(triple) && triple[:impact] == v, type: 'positive', hidden: true}= "#{k} (#{v})"
+    %input{type: 'submit', value: 'Submit', tabindex: 7}

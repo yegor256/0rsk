@@ -20,44 +20,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require_relative 'rsk'
+require 'minitest/autorun'
+require 'rack/test'
+require_relative 'test__helper'
+require_relative '../objects/rsk'
+require_relative '../objects/effects'
+require_relative '../objects/projects'
 
-# Effect.
+# Test of Effect.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2019 Yegor Bugayenko
 # License:: MIT
-class Rsk::Effect
-  attr_reader :id
-
-  def initialize(pgsql, id)
-    @pgsql = pgsql
-    @id = id
-  end
-
-  def text
-    @pgsql.exec('SELECT text FROM part WHERE id = $1', [@id])[0]['text']
-  end
-
-  def text=(text)
-    @pgsql.exec('UPDATE part SET text = $2 WHERE id = $1', [@id, text])
-  end
-
-  def impact
-    @pgsql.exec('SELECT impact FROM effect WHERE id = $1', [@id])[0]['impact'].to_i
-  end
-
-  def impact=(value)
-    @pgsql.exec(
-      'UPDATE effect SET impact = $2 WHERE id = $1',
-      [@id, value]
-    )
-  end
-
-  def positive?
-    @pgsql.exec('SELECT positive FROM effect WHERE id = $1', [@id])[0]['positive'] == 't'
-  end
-
-  def positive=(v)
-    @pgsql.exec('UPDATE effect SET positive = $2 WHERE id = $1', [@id, v])
+class Rsk::EffectTest < Minitest::Test
+  def test_adds_and_fetches
+    pid = Rsk::Projects.new(test_pgsql, 'jeff053').add("test#{rand(999)}")
+    effects = Rsk::Effects.new(test_pgsql, pid)
+    text = 'the business will halt'
+    eid = effects.add(text)
+    effect = effects.get(eid)
+    assert(!effect.positive?)
+    effect.positive = true
+    assert(effect.positive?)
   end
 end

@@ -21,6 +21,10 @@
           %td
             &= r[:text]
           %td.right
+            - if r[:positive]
+              = '&#x1F44D;'
+            - else
+              = '&#x1F44E;'
             = r[:impact]
           %td.right
             = r[:rank]
