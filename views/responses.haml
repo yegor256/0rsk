@@ -7,10 +7,10 @@
 
 %p
   - if triple[:positive]
-    = '&#x1F44D;'
+    %img.up
   - else
-    = '&#x1F44E;'
-  %span{style: 'color:' + (triple[:rank] >= 64 ? 'darkred' : (triple[:rank] <= 32 ? 'darkgreen' : 'inherit'))}
+    %img.down
+  %span{class: (triple[:rank] >= 64 ? 'red' : (triple[:rank] <= 32 ? 'green' : ''))}
     = triple[:rank]
   %code= "C#{triple[:cid]}"
   %code= "R#{triple[:rid]}"

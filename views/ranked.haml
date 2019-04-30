@@ -10,10 +10,10 @@
   - triples.each do |r|
     %p
       - if r[:positive]
-        = '&#x1F44D;'
+        %img.up
       - else
-        = '&#x1F44E;'
-      %span{style: 'color:' + (r[:rank] >= 64 ? 'darkred' : (r[:rank] <= 32 ? 'darkgreen' : 'inherit'))}
+        %img.down
+      %span{class: (r[:rank] >= 64 ? 'red' : (r[:rank] <= 32 ? 'green' : ''))}
         = r[:rank]
       %code= "C#{r[:cid]}"
       %code= "R#{r[:rid]}"
