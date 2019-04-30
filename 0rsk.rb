@@ -515,6 +515,26 @@ def telepost(msg, chat = telechats.chat_of(current_user))
   )
 end
 
+def reply(msg, login)
+  if %r{^/done [0-9]+$}.match?(msg)
+    id = msg.split(' ')[1].to_i
+    tasks(login: login).done(id)
+    ["Task `T#{id}` was marked as completed, thanks!"]
+  elsif %r{^/tasks$}.match?(msg)
+    list = tasks(login: login).fetch
+    if list.empty?
+      ['There are no tasks in your agenda, good job!']
+    else
+      [
+        "Here is a full list of tasks that belong to you:\n\n",
+        list.map do |t|
+          "`T#{t[:id]}`: \"#{t[:text]}\" in [#{t[:title]}](https://www.0rsk.com/project?id=#{t[:pid]})\n"
+        end
+      ]
+    end
+  end
+end
+
 if settings.config['telegram']
   Thread.start do
     Telebot::Bot.new(settings.config['telegram']['token']).run do |_, message|
@@ -528,23 +548,19 @@ if settings.config['telegram']
           'in [0rsk.com](https://www.0rsk.com).'
         ]
         begin
-          if %r{^/done [0-9]+$}.match?(msg)
-            id = msg.split(' ')[1].to_i
-            tasks(login: login).done(id)
-            response = ["Task `T#{id}` was marked as completed, thanks!"]
-          end
+          response = reply(msg, login)
         rescue StandardError => e
           response = [
-            "Oops, there was a problem:\n\n",
-            "```\n#{e.message}\n```\n\n",
-            'Most probably you did something wrong, but this could also be a defect on the server.',
+            "Oops, there was a problem with your request, [#{login}](https://github.com/#{login}):\n\n",
+            "```\n#{e.message}\n```\n\nMost probably",
+            'you did something wrong, but this could also be a defect on the server.',
             'If you think it\'s our bug, please, report it to us via a GitHub issue,',
             '[here](https://github.com/yegor256/0rsk/issues).',
             'We will take care of it as soon as we can.',
             'Thanks, we appreciate your help and your patience!'
           ]
         end
-        telepost(response.join(' '), chat)
+        telepost(response.flatten.join(' '), chat)
       else
         telepost("[Click here](https://www.0rsk.com/telegram?id=#{chat}) to identify yourself.", chat)
       end
