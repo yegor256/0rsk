@@ -75,7 +75,8 @@ class Rsk::Tasks
     rows = @pgsql.exec(
       [
         'SELECT task.*, plan.schedule AS schedule, plan.part AS part,',
-        '  part.text AS text, target.text AS ptext',
+        '  part.text AS text, target.text AS ptext,',
+        '  project.id AS pid, project.title AS title',
         'FROM task',
         'JOIN plan ON plan.id = task.plan',
         'JOIN part ON plan.id = part.id',
@@ -90,6 +91,8 @@ class Rsk::Tasks
     rows.map do |r|
       {
         id: r['id'].to_i,
+        pid: r['pid'].to_i,
+        title: r['title'],
         plan: r['plan'].to_i,
         part: r['part'].to_i,
         text: r['text'],

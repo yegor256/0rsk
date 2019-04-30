@@ -35,6 +35,7 @@ class Rsk::Plans
     @project = project
   end
 
+  # Returns plan ID.
   def add(part, text)
     @pgsql.transaction do |t|
       id = t.exec(
