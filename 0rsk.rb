@@ -289,8 +289,8 @@ post '/triple/save' do
   risks.get(rid).probability = params[:probability].to_i
   effects.get(eid).impact = params[:impact].to_i
   effects.get(eid).positive = !params[:positive].nil?
-  triples.add(cid, rid, eid)
-  flash('/ranked', 'Thanks, saved')
+  tid = triples.add(cid, rid, eid)
+  flash("/responses?id=#{tid}", "Thanks, the triple ##{tid} successfully saved!")
 end
 
 get '/responses' do

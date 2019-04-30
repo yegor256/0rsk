@@ -37,11 +37,11 @@ class Rsk::Triples
       [
         'INSERT INTO triple (cause, risk, effect)',
         'VALUES ($1, $2, $3)',
-        'ON CONFLICT(cause, risk, effect) DO NOTHING',
+        'ON CONFLICT(cause, risk, effect) DO UPDATE SET cause = $1',
         'RETURNING id'
       ],
       [cid, rid, eid]
-    )
+    )[0]['id'].to_i
   end
 
   def delete(id)
