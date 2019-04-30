@@ -20,36 +20,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require 'minitest/autorun'
-require 'rack/test'
-require_relative 'test__helper'
-require_relative '../objects/rsk'
-require_relative '../objects/causes'
-require_relative '../objects/risks'
-require_relative '../objects/effects'
-require_relative '../objects/projects'
-require_relative '../objects/triples'
-require_relative '../objects/tasks'
-require_relative '../objects/plans'
+require_relative 'rsk'
 
-# Test of Tasks.
+# Telepings.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2019 Yegor Bugayenko
 # License:: MIT
-class Rsk::TasksTest < Minitest::Test
-  def test_adds_and_fetches
-    login = 'jeff0933'
-    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(999)}")
-    cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
-    rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
-    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
-    triples = Rsk::Triples.new(test_pgsql, project)
-    triples.add(cid, rid, eid)
-    plans = Rsk::Plans.new(test_pgsql, project)
-    pid = plans.add(rid, 'solve it!')
-    plans.get(pid).schedule = (Time.now - 5 * 24 * 60 * 60).strftime('%d-%m-%Y')
-    tasks = Rsk::Tasks.new(test_pgsql, login)
-    tasks.create
-    assert(tasks.fetch.any? { |t| t[:plan] == pid })
+class Rsk::Telepings
+  def initialize(pgsql)
+    @pgsql = pgsql
+  end
+
+  def add(task, chat)
+    @pgsql.exec(
+      'INSERT INTO teleping (task, telechat) VALUES ($1, $2)',
+      [task, chat]
+    )
+  end
+
+  # Returns a list of task IDs, which need to be pinged ASAP.
+  def expired(login)
+    @pgsql.exec(
+      [
+        'SELECT id FROM',
+        '(SELECT task.id AS id, MAX(teleping.created) AS latest FROM task',
+        'JOIN plan ON task.plan = plan.id',
+        'JOIN part ON plan.part = part.id',
+        'JOIN project ON project.id = part.project',
+        'LEFT JOIN teleping ON teleping.task = task.id',
+        'WHERE project.login = $1',
+        'GROUP BY task.id) t',
+        'WHERE latest IS NULL or latest < NOW() - INTERVAL \'4 DAYS\''
+      ],
+      [login]
+    ).map { |r| r['id'].to_i }
   end
 end

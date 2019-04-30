@@ -42,6 +42,10 @@ class Rsk::Telechats
     !@pgsql.exec('SELECT * FROM telechat WHERE id = $1', [id]).empty?
   end
 
+  def wired?(login)
+    !@pgsql.exec('SELECT * FROM telechat WHERE login = $1', [login]).empty?
+  end
+
   def login_of(id)
     @pgsql.exec('SELECT login FROM telechat WHERE id = $1', [id])[0]['login']
   end

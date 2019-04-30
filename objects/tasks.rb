@@ -83,10 +83,11 @@ class Rsk::Tasks
         'JOIN project ON part.project = project.id',
         'JOIN part AS target ON plan.part = target.id',
         'WHERE project.login = $1',
-        'AND part.text LIKE $2',
+        'AND',
+        query.is_a?(Integer) ? 'task.id = $2' : 'LOWER(part.text) LIKE $2',
         'OFFSET $3 LIMIT $4'
       ],
-      [@login, "%#{query}%", offset, limit]
+      [@login, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip}%", offset, limit]
     )
     rows.map do |r|
       {

@@ -33,7 +33,7 @@ require_relative '../objects/projects'
 # License:: MIT
 class Rsk::CauseTest < Minitest::Test
   def test_modifies_text
-    pid = Rsk::Projects.new(test_pgsql, 'jeff32').add('test')
+    pid = Rsk::Projects.new(test_pgsql, 'jeff037').add('test')
     before = 'text first'
     after = 'another text to set'
     causes = Rsk::Causes.new(test_pgsql, pid)

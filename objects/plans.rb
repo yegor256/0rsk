@@ -79,10 +79,10 @@ class Rsk::Plans
         query.is_a?(Integer) ? 'LEFT JOIN triple ON cause = plan.part OR risk = plan.part OR effect = plan.part' : '',
         'WHERE project = $1',
         'AND',
-        query.is_a?(Integer) ? "triple.id = #{query} AND (text = $2 OR text != $2)" : 'text LIKE $2',
+        query.is_a?(Integer) ? 'triple.id = $2' : 'LOWER(text) LIKE $2',
         'OFFSET $3 LIMIT $4'
       ],
-      [@project, "%#{query}%", offset, limit]
+      [@project, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip}%", offset, limit]
     )
     rows.map do |r|
       {

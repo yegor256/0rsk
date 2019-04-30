@@ -33,7 +33,7 @@ require_relative '../objects/projects'
 # License:: MIT
 class Rsk::RisksTest < Minitest::Test
   def test_adds_and_fetches
-    pid = Rsk::Projects.new(test_pgsql, 'jeff19').add('test')
+    pid = Rsk::Projects.new(test_pgsql, 'jeff094').add('test09')
     risks = Rsk::Risks.new(test_pgsql, pid)
     text = 'we may lose data'
     rid = risks.add(text)

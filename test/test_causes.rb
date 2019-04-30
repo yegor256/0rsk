@@ -33,7 +33,7 @@ require_relative '../objects/projects'
 # License:: MIT
 class Rsk::CausesTest < Minitest::Test
   def test_adds_and_fetches
-    pid = Rsk::Projects.new(test_pgsql, 'jeff11').add('test')
+    pid = Rsk::Projects.new(test_pgsql, 'jeff097').add('test88')
     causes = Rsk::Causes.new(test_pgsql, pid)
     text = 'we use Ruby'
     cid = causes.add(text)

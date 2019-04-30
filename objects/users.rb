@@ -32,6 +32,6 @@ class Rsk::Users
   end
 
   def fetch
-    @pgsql.exec('SELECT login FROM project').map { |r| r['login'] }
+    @pgsql.exec('SELECT login FROM project GROUP BY login').map { |r| r['login'] }
   end
 end

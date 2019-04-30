@@ -31,15 +31,16 @@ require_relative '../objects/projects'
 require_relative '../objects/triples'
 require_relative '../objects/tasks'
 require_relative '../objects/plans'
+require_relative '../objects/telepings'
 
-# Test of Tasks.
+# Test of Telepings.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2019 Yegor Bugayenko
 # License:: MIT
-class Rsk::TasksTest < Minitest::Test
+class Rsk::TelepingsTest < Minitest::Test
   def test_adds_and_fetches
-    login = 'jeff0933'
-    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(999)}")
+    login = 'jeff309'
+    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(9999)}")
     cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
     rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
     eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
@@ -51,5 +52,7 @@ class Rsk::TasksTest < Minitest::Test
     tasks = Rsk::Tasks.new(test_pgsql, login)
     tasks.create
     assert(tasks.fetch.any? { |t| t[:plan] == pid })
+    telepings = Rsk::Telepings.new(test_pgsql)
+    assert(!telepings.expired(login).empty?)
   end
 end

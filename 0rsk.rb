@@ -497,6 +497,11 @@ def telebot
   @telebot ||= Telebot::Bot.new(settings.config['telegram']['token'])
 end
 
+def telepings
+  require_relative 'objects/telepings'
+  @telepings ||= Rsk::Telepings.new(settings.pgsql)
+end
+
 def telepost(msg, chat = telechats.chat_of(current_user))
   return unless settings.config['telegram']
   telebot.send_message(
@@ -517,6 +522,31 @@ if settings.config['telegram']
       else
         telepost("[Click here](https://www.0rsk.com/telegram?id=#{chat}) to identify yourself.", chat)
       end
+    end
+  end
+end
+
+if settings.config['telegram']
+  Thread.start do
+    sleep(10 * 60)
+    users.fetch.each do |login|
+      next unless telechats.wired?(login)
+      chat = telechats.chat_of(login)
+      expired = telepings.expired(login)
+      telepost(
+        [
+          "There are #{expired.count} tasks still required to be completed:",
+          expired.map do |t|
+            task = tasks.fetch(query: t)
+            [
+              "`T#{task[:id]}`: #{task[:text]}",
+              "in [#{task[:title]}](https://www.0rsk.com/project?id=#{task[:pid]})"
+            ].join(' ')
+          end
+        ].flatten.join("\n\n"),
+        chat
+      )
+      expired.each { |t| telepings.add(t, chat) }
     end
   end
 end
