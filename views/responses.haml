@@ -6,7 +6,7 @@
   = "##{triple[:id]}"
 
 %p
-  - if r[:positive]
+  - if triple[:positive]
     = '&#x1F44D;'
   - else
     = '&#x1F44E;'
@@ -16,16 +16,18 @@
   %code= "R#{triple[:rid]}"
   %code= "E#{triple[:eid]}"
   %br
-  &= "#{triple[:ctext]};"
-  &= "#{triple[:rtext]};"
-  &= "#{triple[:etext]}."
+  &= triple[:ctext]
+  %br
+  &= triple[:rtext]
+  %br
+  &= triple[:etext]
 
 %form{method: 'POST', action: iri.cut('/responses/add')}
   %fieldset
     %input{type: 'hidden', name: 'id', value: triple[:id]}
     %label Strategy:
     %select{id: 'strategy', name: 'strategy', tabindex: 1}
-      - if r[:positive]
+      - if triple[:positive]
         %option{value: triple[:cid]}= "Promote C#{triple[:cid]}"
         %option{value: triple[:rid], selected: true}= "Exploit R#{triple[:rid]}"
         %option{value: triple[:eid]}= "Enhance E#{triple[:eid]}"
