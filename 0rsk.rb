@@ -590,7 +590,7 @@ if settings.config['telegram']
         [
           "There are #{expired.count} tasks still required to be completed:",
           expired.map do |t|
-            task = tasks(login: login).fetch(query: t)
+            task = tasks(login: login).fetch(query: t)[0]
             [
               "`T#{task[:id]}`: #{task[:text]}",
               "in [#{task[:title]}](https://www.0rsk.com/projects/#{task[:pid]})"
