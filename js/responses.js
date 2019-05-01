@@ -19,9 +19,9 @@ function on_mnemo(id) {
 
 $(function() {
   "use strict";
-  on_schedule("asap", function(today) { return dateFns.addDays(today, 3); });
-  on_schedule("week", function(today) { return dateFns.addWeeks(today, 1); });
-  on_schedule("month", function(today) { return dateFns.addMonths(today, 1); });
+  on_schedule("asap", function(today) { return dateFns.addDays(today, 2); });
+  on_schedule("week", function(today) { return dateFns.addDays(today, 4); });
+  on_schedule("month", function(today) { return dateFns.addDays(today, 20); });
   on_schedule("later", function(today) { return dateFns.addMonths(today, 3); });
   on_mnemo("daily");
   on_mnemo("weekly");

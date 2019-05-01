@@ -540,7 +540,11 @@ def reply(msg, login)
       [
         "Here is a full list of tasks that belong to you:\n\n",
         list.map do |t|
-          "`T#{t[:id]}`: \"#{t[:text]}\" in [#{t[:title]}](https://www.0rsk.com/projects/#{t[:pid]})\n"
+          [
+            "[`T#{t[:id]}`](https://www.0rsk.com/responses?id=#{t[:triple]})",
+            "\"#{t[:text]}\" in [#{t[:title]}](https://www.0rsk.com/projects/#{t[:pid]})",
+            "#{t[:ctext]}; #{t[:rtext]}; #{t[:etext]}"
+          ].join(' ') + "\n\n"
         end
       ]
     end
@@ -594,8 +598,9 @@ if settings.config['telegram']
           expired.map do |t|
             task = tasks(login: login).fetch(query: t)[0]
             [
-              "`T#{task[:id]}`: #{task[:text]}",
-              "in [#{task[:title]}](https://www.0rsk.com/projects/#{task[:pid]})"
+              "`T#{task[:id]}` \"#{task[:text]}\"",
+              "in [#{task[:title]}](https://www.0rsk.com/projects/#{task[:pid]}):",
+              "#{task[:ctext]}; #{task[:rtext]}; #{task[:etext]}."
             ].join(' ')
           end
         ].flatten.join("\n\n"),
