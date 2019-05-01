@@ -531,17 +531,21 @@ end
 def reply(msg, login)
   if %r{^/done$}.match?(msg)
     left = tasks(login: login).fetch
-    Telebot::ReplyKeyboardMarkup.new(
-      keyboard: [
-        left.map do |t|
-          {
-            text: "/done #{t[:id]}"
-          }
-        end
-      ],
-      one_time_keyboard: true,
-      resize_keyboard: true
-    )
+    if left.empty?
+      ['There are no tasks in your agenda, nothing to complete.']
+    else
+      Telebot::ReplyKeyboardMarkup.new(
+        keyboard: [
+          left.map do |t|
+            {
+              text: "/done #{t[:id]}"
+            }
+          end
+        ],
+        one_time_keyboard: true,
+        resize_keyboard: true
+      )
+    end
   elsif %r{^/done [0-9]+$}.match?(msg)
     id = msg.split(' ')[1].to_i
     tasks(login: login).done(id)
