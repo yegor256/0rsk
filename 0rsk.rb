@@ -517,18 +517,30 @@ def telepings
   @telepings ||= Rsk::Telepings.new(settings.pgsql)
 end
 
-def telepost(msg, chat = telechats.chat_of(current_user))
+def telepost(msg, chat = telechats.chat_of(current_user), reply_markup: nil)
   return unless settings.config['telegram']
   telebot.send_message(
     chat_id: chat,
     parse_mode: 'Markdown',
     disable_web_page_preview: true,
-    text: msg
+    text: msg,
+    reply_markup: reply_markup
   )
 end
 
 def reply(msg, login)
-  if %r{^/done [0-9]+$}.match?(msg)
+  if %r{^/done$}.match?(msg)
+    left = tasks(login: login).fetch
+    Telegram::Bot::Types::ReplyKeyboardMarkup.new(
+      keyboard: left.map do |t|
+        {
+          text: "T#{t[:id]} #{t[:text]}",
+          callback_data: "/done #{t[:id]}"
+        }
+      end,
+      one_time_keyboard: true
+    )
+  elsif %r{^/done [0-9]+$}.match?(msg)
     id = msg.split(' ')[1].to_i
     tasks(login: login).done(id)
     left = tasks(login: login).fetch
@@ -580,7 +592,11 @@ if settings.config['telegram']
             'Thanks, we appreciate your help and your patience!'
           ]
         end
-        telepost(response.flatten.join(' '), chat)
+        if response.is_a?(Array)
+          telepost(response.flatten.join(' '), chat)
+        else
+          telepost('Please, go on:', chat, reply_markup: response)
+        end
       else
         telepost("[Click here](https://www.0rsk.com/telegram?id=#{chat}) to identify yourself.", chat)
       end
@@ -602,12 +618,12 @@ if settings.config['telegram']
           expired.map do |t|
             task = tasks(login: login).fetch(query: t)[0]
             [
-              "`T#{task[:id]}` \"#{task[:text]}\"",
+              "[T#{task[:id]}](https://www.0rsk.com/responses?id=#{task[:triple]}) \"#{task[:text]}\"",
               "in [#{task[:title]}](https://www.0rsk.com/projects/#{task[:pid]}):",
               "#{task[:ctext]}; #{task[:rtext]}; #{task[:etext]}."
             ].join(' ')
           end,
-          'When done with a task, say /done and the number of the task and I will remove it from the agenda.'
+          'When done with a task, say /done and I will remove it from the agenda.'
         ].flatten.join("\n\n"),
         chat
       )
