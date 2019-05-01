@@ -12,14 +12,16 @@
     %img.down
   %span{class: (triple[:rank] >= 64 ? 'red' : (triple[:rank] <= 32 ? 'green' : ''))}
     = triple[:rank]
-  %code= "C#{triple[:cid]}"
-  %code= "R#{triple[:rid]}"
-  %code= "E#{triple[:eid]}"
-  %br
+  = succeed ':' do
+    %code= "C#{triple[:cid]}"
   &= triple[:ctext]
   %br
+  = succeed ':' do
+    %code= "R#{triple[:rid]}"
   &= triple[:rtext]
   %br
+  = succeed ':' do
+    %code= "E#{triple[:eid]}"
   &= triple[:etext]
 
 %form{method: 'POST', action: iri.cut('/responses/add')}
