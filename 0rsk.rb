@@ -546,8 +546,8 @@ def reply(msg, login)
         list.map do |t|
           "\n\n" + [
             "[T#{t[:id]}](https://www.0rsk.com/responses?id=#{t[:triple]}):",
-            "\"#{t[:text]}\" in [#{t[:title]}](https://www.0rsk.com/projects/#{t[:pid]})\n",
-            "#{t[:ctext]}; #{t[:rtext]}; #{t[:etext]}"
+            "\"#{t[:text]}\" in [#{t[:title]}](https://www.0rsk.com/projects/#{t[:pid]})",
+            "\n#{t[:ctext]}; #{t[:rtext]}; #{t[:etext]}"
           ].join(' ')
         end
       ]
