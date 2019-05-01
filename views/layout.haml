@@ -41,9 +41,6 @@
                   Login
             - if defined?(user)
               %li
-                %a{href: iri.cut('/projects')}
-                  Projects
-              %li
                 %a{href: iri.cut('/triple')}
                   Add
               %li
@@ -58,17 +55,21 @@
       %article
         = yield
       %footer.small.gray
-        - if defined?(user) && @cookies['0rsk-project']
+        - if defined?(user)
           %nav
             %ul
               %li
-                %a{href: iri.cut('/causes')} Causes
-              %li
-                %a{href: iri.cut('/risks')} Risks
-              %li
-                %a{href: iri.cut('/effects')} Effects
-              %li
-                %a{href: iri.cut('/plans')} Plans
+                %a{href: iri.cut('/projects')}
+                  Projects
+              - if @cookies['0rsk-project']
+                %li
+                  %a{href: iri.cut('/causes')} Causes
+                %li
+                  %a{href: iri.cut('/risks')} Risks
+                %li
+                  %a{href: iri.cut('/effects')} Effects
+                %li
+                  %a{href: iri.cut('/plans')} Plans
               %li
                 %img{src: iri.cut('/telegram-logo.svg'), style: 'height: 1.1em; vertical-align: middle;'}
                 %a{href: 'https://t.me/zerorsk_bot'} Talk to me
