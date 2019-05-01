@@ -531,20 +531,24 @@ def reply(msg, login)
   if %r{^/done [0-9]+$}.match?(msg)
     id = msg.split(' ')[1].to_i
     tasks(login: login).done(id)
-    ["Task `T#{id}` was marked as completed, thanks!"]
+    left = tasks(login: login).fetch
+    [
+      "Task `T#{id}` was marked as completed, thanks!",
+      left.empty? ? 'Your agenda is empty, good job!' : "There are still #{left.count} tasks in your agenda."
+    ]
   elsif %r{^/tasks$}.match?(msg)
     list = tasks(login: login).fetch
     if list.empty?
       ['There are no tasks in your agenda, good job!']
     else
       [
-        "Here is a full list of tasks that belong to you:\n\n",
+        'Here is a full list of tasks that belong to you:',
         list.map do |t|
-          [
-            "[`T#{t[:id]}`](https://www.0rsk.com/responses?id=#{t[:triple]})",
-            "\"#{t[:text]}\" in [#{t[:title]}](https://www.0rsk.com/projects/#{t[:pid]})",
+          "\n\n" + [
+            "[T#{t[:id]}](https://www.0rsk.com/responses?id=#{t[:triple]}):",
+            "\"#{t[:text]}\" in [#{t[:title]}](https://www.0rsk.com/projects/#{t[:pid]})\n",
             "#{t[:ctext]}; #{t[:rtext]}; #{t[:etext]}"
-          ].join(' ') + "\n\n"
+          ].join(' ')
         end
       ]
     end
