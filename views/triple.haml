@@ -38,10 +38,8 @@
     %label
       Impact:
     %select{id: 'impact', name: 'impact', tabindex: 6}
-      - unless defined?(triple) && triple[:positive]
-        - {'Fatal' => 9, 'Catastrophic' => 8, 'Serious' => 6, 'Average' => 5, 'Moderate' => 4, 'Minor' => 2, 'Unnoticable' => 1}.each do |k, v|
-          %option{value: v, selected: defined?(triple) && triple[:impact] == v, type: 'negative', hidden: !defined?(triple) || triple[:positive]}= "#{k} (#{v})"
-      - unless defined?(triple) && !triple[:positive]
-        - {'Fantastic' => 9, 'Awesome' => 8, 'Very good' => 6, 'Average' => 5, 'Good to have' => 4, 'Minor' => 2, 'Unnoticable' => 1}.each do |k, v|
-          %option{value: v, selected: defined?(triple) && triple[:impact] == v, type: 'positive', hidden: !defined?(triple) || !triple[:positive]}= "#{k} (#{v})"
+      - {'Fatal' => 9, 'Catastrophic' => 8, 'Serious' => 6, 'Average' => 5, 'Moderate' => 4, 'Minor' => 2, 'Unnoticable' => 1}.each do |k, v|
+        %option{value: v, selected: defined?(triple) && triple[:impact] == v, type: 'negative', hidden: !defined?(triple) || triple[:positive]}= "#{k} (#{v})"
+      - {'Fantastic' => 9, 'Awesome' => 8, 'Very good' => 6, 'Average' => 5, 'Good to have' => 4, 'Minor' => 2, 'Unnoticable' => 1}.each do |k, v|
+        %option{value: v, selected: defined?(triple) && triple[:impact] == v, type: 'positive', hidden: !defined?(triple) || !triple[:positive]}= "#{k} (#{v})"
     %input{type: 'submit', value: 'Submit', tabindex: 7}
