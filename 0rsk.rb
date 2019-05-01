@@ -606,7 +606,8 @@ if settings.config['telegram']
               "in [#{task[:title]}](https://www.0rsk.com/projects/#{task[:pid]}):",
               "#{task[:ctext]}; #{task[:rtext]}; #{task[:etext]}."
             ].join(' ')
-          end
+          end,
+          'When done with a task, say /done and the number of the task and I will remove it from the agenda.'
         ].flatten.join("\n\n"),
         chat
       )
