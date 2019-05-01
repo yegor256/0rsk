@@ -536,7 +536,8 @@ def reply(msg, login)
         left.map do |t|
           {
             text: "T#{t[:id]} #{t[:text]}",
-            callback_data: "/done #{t[:id]}"
+            callback_data: "/done #{t[:id]}",
+            switch_inline_query_current_chat: "/done #{t[:id]}"
           }
         end
       ],
