@@ -12,6 +12,7 @@
     %img.down
   %span{class: (triple[:rank] >= 64 ? 'red' : (triple[:rank] <= 32 ? 'green' : ''))}
     = triple[:rank]
+  %br
   = succeed ':' do
     %code= "C#{triple[:cid]}"
   &= triple[:ctext]
