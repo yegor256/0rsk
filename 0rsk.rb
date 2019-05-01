@@ -532,12 +532,14 @@ def reply(msg, login)
   if %r{^/done$}.match?(msg)
     left = tasks(login: login).fetch
     Telebot::ReplyKeyboardMarkup.new(
-      keyboard: left.map do |t|
-        {
-          text: "T#{t[:id]} #{t[:text]}",
-          callback_data: "/done #{t[:id]}"
-        }
-      end,
+      keyboard: [
+        left.map do |t|
+          {
+            text: "T#{t[:id]} #{t[:text]}",
+            callback_data: "/done #{t[:id]}"
+          }
+        end
+      ],
       one_time_keyboard: true
     )
   elsif %r{^/done [0-9]+$}.match?(msg)
