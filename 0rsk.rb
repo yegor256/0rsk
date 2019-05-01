@@ -554,7 +554,7 @@ def reply(msg, login)
     end
   else
     [
-      "I'm still with you, [#{login}](https://github.com/#{login})!",
+      "I didn't understand you, but I'm still with you, [#{login}](https://github.com/#{login})!",
       'In this chat I inform you about the most important tasks you have in your agenda',
       'in [0rsk.com](https://www.0rsk.com).'
     ]

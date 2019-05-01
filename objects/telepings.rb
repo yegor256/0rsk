@@ -39,7 +39,7 @@ class Rsk::Telepings
   end
 
   # Returns a list of task IDs, which need to be pinged ASAP.
-  def expired(login)
+  def expired(login, hours: 4)
     @pgsql.exec(
       [
         'SELECT id FROM',
@@ -50,7 +50,7 @@ class Rsk::Telepings
         'LEFT JOIN teleping ON teleping.task = task.id',
         'WHERE project.login = $1',
         'GROUP BY task.id) t',
-        'WHERE latest IS NULL or latest < NOW() - INTERVAL \'4 DAYS\''
+        "WHERE latest IS NULL or latest < NOW() - INTERVAL \'#{hours.to_i} HOURS\'"
       ],
       [login]
     ).map { |r| r['id'].to_i }
