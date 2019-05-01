@@ -531,7 +531,7 @@ end
 def reply(msg, login)
   if %r{^/done$}.match?(msg)
     left = tasks(login: login).fetch
-    Telegram::Bot::Types::ReplyKeyboardMarkup.new(
+    Telebot::ReplyKeyboardMarkup.new(
       keyboard: left.map do |t|
         {
           text: "T#{t[:id]} #{t[:text]}",
