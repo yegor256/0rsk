@@ -37,7 +37,27 @@
         %option{value: triple[:eid]}= "Mitigate E#{triple[:eid]}"
     %label Plan:
     %input{id: 'plan', type: 'text', name: 'plan', size: 60, maxlength: 160, autocomplete: 'off', tabindex: 2}
-    %label Schedule (daily, weekly, biweekly, monthly, quarterly, or annually):
+    %label<
+      %span> Schedule (
+      = succeed ',' do
+        %a{href: '#', id: 'daily'}<
+          daily
+      = succeed ',' do
+        %a{href: '#', id: 'weekly'}<
+          weekly
+      = succeed ',' do
+        %a{href: '#', id: 'biweekly'}<
+          biweekly
+      = succeed ',' do
+        %a{href: '#', id: 'monthly'}<
+          monthly
+      = succeed ',' do
+        %a{href: '#', id: 'quarterly'}<
+          quarterly
+      or
+      = succeed '):' do
+        %a{href: '#', id: 'annually'}<
+          annually
     %input{id: 'schedule', type: 'text', name: 'schedule', size: 22, maxlength: 20, autocomplete: 'off', tabindex: 3}
     %label
       %span.item.small Or just once:
