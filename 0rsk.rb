@@ -535,13 +535,12 @@ def reply(msg, login)
       keyboard: [
         left.map do |t|
           {
-            text: "T#{t[:id]} #{t[:text]}",
-            callback_data: "/done #{t[:id]}",
-            switch_inline_query_current_chat: "/done #{t[:id]}"
+            text: "/done #{t[:id]}"
           }
         end
       ],
-      one_time_keyboard: true
+      one_time_keyboard: true,
+      resize_keyboard: true
     )
   elsif %r{^/done [0-9]+$}.match?(msg)
     id = msg.split(' ')[1].to_i
