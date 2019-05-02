@@ -26,7 +26,7 @@
       Probability:
     %select{id: 'probability', name: 'probability', tabindex: 3}
       - {'Definitely' => 9, 'Extremely high' => 8, 'High' => 6, 'Average' => 5, 'Low' => 4, 'Very low' => 2, 'Unlikely' => 1}.each do |k, v|
-        %option{value: v, selected: defined?(triple) && triple[:probability] == v}= "#{k} (#{v})"
+        %option{value: v, selected: defined?(triple) && triple[:probability] == v || v == 5}= "#{k} (#{v})"
     %label
       Effect:
       %a.small.item{id: 'etext_detach', href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
@@ -39,7 +39,7 @@
       Impact:
     %select{id: 'impact', name: 'impact', tabindex: 6}
       - {'Fatal' => 9, 'Catastrophic' => 8, 'Serious' => 6, 'Average' => 5, 'Moderate' => 4, 'Minor' => 2, 'Unnoticable' => 1}.each do |k, v|
-        %option{value: v, selected: defined?(triple) && triple[:impact] == v, type: 'negative', hidden: defined?(triple) && triple[:positive]}= "#{k} (#{v})"
+        %option{value: v, selected: defined?(triple) && triple[:impact] == v || v == 5, type: 'negative', hidden: defined?(triple) && triple[:positive]}= "#{k} (#{v})"
       - {'Fantastic' => 9, 'Awesome' => 8, 'Very good' => 6, 'Average' => 5, 'Good to have' => 4, 'Minor' => 2, 'Unnoticable' => 1}.each do |k, v|
         %option{value: v, selected: defined?(triple) && triple[:impact] == v, type: 'positive', hidden: !defined?(triple) || !triple[:positive]}= "#{k} (#{v})"
     %input{type: 'submit', value: 'Submit', tabindex: 7}
