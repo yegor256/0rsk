@@ -23,7 +23,12 @@ function auto(kind, uri) {
     },
     select: function(event, ui) {
       $.each(ui.item.fields, function(field, v) {
-        $("#" + field).val(v);
+        var $field = $("#" + field);
+        if (typeof v === "boolean") {
+          $field.prop("checked", v);
+        } else {
+          $field.val(v);
+        }
         $("#" + kind + "_detach").show().removeClass("red");
       });
     },
