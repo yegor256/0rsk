@@ -3,7 +3,8 @@
 
 %h2
   Responses to
-  = "##{triple[:id]}"
+  %a{href: iri.cut('/triple').add(id: triple[:id])}
+    = "##{triple[:id]}"
 
 %p
   - if triple[:positive]
