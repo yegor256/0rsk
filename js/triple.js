@@ -29,6 +29,7 @@ function auto(kind, uri) {
         } else {
           $field.val(v);
         }
+        $field.trigger("change");
         $("#" + kind + "_detach").show().removeClass("red");
       });
     },
