@@ -29,7 +29,7 @@
           %span.red No plans
         - else
           = "#{r[:plans]} plan#{r[:plans] == 1 ? '' : 's'}"
-      %a.item.small{href: iri.cut('/ranked/delete').add(id: r[:id])} Delete
+      %a.item.small{href: iri.iri('/ranked/delete').add(id: r[:id])} Delete
   %p
     - if offset.positive?
       %a.item{href: iri.over(offset: offset - 25)} Previous

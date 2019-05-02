@@ -245,7 +245,8 @@ get '/effects.json' do
         value: r[:text],
         fields: {
           eid: r[:id],
-          impact: r[:impact]
+          impact: r[:impact],
+          positive: r[:positive]
         }
       }
     end
