@@ -58,10 +58,12 @@ $(function() {
   on_detach("#etext_detach", "#eid");
   $('#positive').change(function() {
     if ($(this).is(':checked')) {
+      $('#marker').addClass('up').removeClass('down');
       $('#impact option[type="negative"]').attr('hidden', true);
       $('#impact option[type="positive"]').attr('hidden', false);
       $('#impact').val(5);
     } else {
+      $('#marker').addClass('down').removeClass('up');
       $('#impact option[type="negative"]').attr('hidden', false);
       $('#impact option[type="positive"]').attr('hidden', true);
       $('#impact').val(5);
