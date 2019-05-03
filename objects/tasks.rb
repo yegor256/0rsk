@@ -99,6 +99,7 @@ class Rsk::Tasks
         'WHERE project.login = $1',
         'AND',
         query.is_a?(Integer) ? 'task.id = $2' : 'LOWER(part.text) LIKE $2',
+        'ORDER BY rank DESC',
         'OFFSET $3 LIMIT $4'
       ],
       [@login, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip}%", offset, limit]
