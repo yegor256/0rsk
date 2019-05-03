@@ -26,7 +26,7 @@ gem 'codecov', '0.1.14'
 gem 'eslintrb', '2.1.0'
 gem 'glogin', '~> 0.4'
 gem 'haml', '5.0.4'
-gem 'iri', '0.4.0'
+gem 'iri', '0.4.1'
 gem 'minitest', '5.11.3', require: false
 gem 'pgtk', '0.5.1'
 gem 'rack', '2.0.6'
