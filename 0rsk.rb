@@ -228,10 +228,10 @@ def current_user
 end
 
 def current_project
-  pid = @cookies['0rsk-project']
+  pid = cookies['0rsk-project']
   flash('/projects', 'Pick up a project to work with, or create a new one') unless pid
   unless projects.exists?(pid)
-    @cookies.delete('0rsk-project')
+    cookies.delete('0rsk-project')
     flash('/projects', 'Pick up a new project')
   end
   pid
