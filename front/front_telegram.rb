@@ -140,7 +140,7 @@ if settings.config['telegram']
 end
 
 if settings.config['telegram']
-  Rsk::Daemon.new.start(10) do
+  Rsk::Daemon.new(10).start do
     users.fetch.each do |login|
       next unless telechats.wired?(login)
       chat = telechats.chat_of(login)
