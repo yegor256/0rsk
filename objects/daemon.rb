@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+require 'raven'
 require_relative 'rsk'
 
 # Daemon.
@@ -34,7 +35,11 @@ class Rsk::Daemon
   def start
     Thread.start do
       sleep(@minutes * 60)
-      yield
+      begin
+        yield
+      rescue StandardError => e
+        Raven.capture_exception(e)
+      end
     end
   end
 end
