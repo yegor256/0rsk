@@ -32,7 +32,7 @@
           %ul
             %li
               - if defined?(user)
-                %a{href: '/ranked'}= "@#{user[:login]}"
+                %a{href: '/projects'}= "@#{user[:login]}"
                 - if @cookies['0rsk-project']
                   = '/'
                   %a{href: iri.cut('/projects').append(current_project)}= "##{current_project}"

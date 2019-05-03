@@ -90,13 +90,7 @@ def reply(msg, login)
     else
       [
         'Here is a full list of tasks that belong to you:',
-        list.map do |t|
-          "\n\n" + [
-            "[T#{t[:id]}](https://www.0rsk.com/responses?id=#{t[:triple]}):",
-            "\"#{t[:text]}\" in [#{t[:title]}](https://www.0rsk.com/projects/#{t[:pid]})",
-            "\n#{t[:ctext]}; #{t[:rtext]}; #{t[:etext]}"
-          ].join(' ')
-        end
+        list.map { |t| "\n\n" + task_md(t) }
       ]
     end
   else
@@ -148,15 +142,8 @@ if settings.config['telegram']
       next if expired.empty?
       telepost(
         [
-          "There are #{expired.count} tasks still required to be completed:",
-          expired.map do |t|
-            task = tasks(login: login).fetch(query: t)[0]
-            [
-              "[T#{task[:id]}](https://www.0rsk.com/responses?id=#{task[:triple]}) \"#{task[:text]}\"",
-              "in [#{task[:title]}](https://www.0rsk.com/projects/#{task[:pid]}):",
-              "#{task[:ctext]}; #{task[:rtext]}; #{task[:etext]}."
-            ].join(' ')
-          end,
+          "Let me remind you that there are #{expired.count} tasks still required to be completed:",
+          expired.map { |t| task_md(tasks(login: login).fetch(query: t)[0]) },
           'When done with a task, say /done and I will remove it from the agenda.'
         ].flatten.join("\n\n"),
         chat
@@ -164,4 +151,14 @@ if settings.config['telegram']
       expired.each { |t| telepings.add(t, chat) }
     end
   end
+end
+
+def task_md(task)
+  [
+    "[T#{task[:id]}](https://www.0rsk.com/responses?id=#{task[:triple]})",
+    "\"#{task[:text]}\"",
+    "in [#{task[:title]}](https://www.0rsk.com/projects/#{task[:pid]}):",
+    "#{task[:ctext]}; #{task[:rtext]}; #{task[:etext]}",
+    "(#{task[:schedule]})"
+  ].join(' ')
 end
