@@ -41,7 +41,7 @@
             = RelativeTime.in_words(r[:completed].utc.iso8601)
           %td.right
             = thumb(r)
-            = r[:rank]
+            = rank(r)
   %p
     - if offset.positive?
       %a.item{href: iri.over(offset: offset - 25)} Previous

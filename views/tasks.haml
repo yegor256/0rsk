@@ -18,8 +18,7 @@
   - tasks.each do |t|
     %p
       = thumb(t)
-      %span{class: (t[:rank] >= 64 ? 'red' : (t[:rank] <= 32 ? 'green' : ''))}
-        = t[:rank]
+      = rank(t)
       %br
       %code= "T#{t[:id]}"
       = '&rarr;'

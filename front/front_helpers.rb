@@ -24,4 +24,12 @@ helpers do
   def thumb(i)
     "<img class='#{i[:positive] ? 'up' : 'down'}/>"
   end
+
+  def rank(i)
+    rank = i[:rank].to_i
+    css = ''
+    css = 'red' if rank >= 64
+    css = 'green' if rank <= 32
+    "<span class='#{css}'>#{rank}</span>"
+  end
 end

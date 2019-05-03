@@ -10,8 +10,7 @@
   - triples.each do |r|
     %p
       = thumb(r)
-      %span{class: (r[:rank] >= 64 ? 'red' : (r[:rank] <= 32 ? 'green' : ''))}
-        = r[:rank]
+      = rank(r)
       %code= "C#{r[:cid]}"
       %code= "R#{r[:rid]}"
       %code= "E#{r[:eid]}"

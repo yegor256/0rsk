@@ -8,8 +8,7 @@
 
 %p
   = thumb(triple)
-  %span{class: (triple[:rank] >= 64 ? 'red' : (triple[:rank] <= 32 ? 'green' : ''))}
-    = triple[:rank]
+  = rank(triple)
   %br
   %code= "C#{triple[:cid]}"
   &= triple[:ctext]
