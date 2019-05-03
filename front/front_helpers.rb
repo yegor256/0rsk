@@ -22,7 +22,7 @@
 
 helpers do
   def thumb(i)
-    "<img class='#{i[:positive] ? 'up' : 'down'}/>"
+    "<img class='#{i[:positive] ? 'up' : 'down'}'/>"
   end
 
   def rank(i)
