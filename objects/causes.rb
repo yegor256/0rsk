@@ -53,7 +53,8 @@ class Rsk::Causes
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
       [
-        'SELECT cause.*, part.text, SUM(risk.probability * effect.impact) AS rank,',
+        'SELECT cause.*, part.text,',
+        '  SUM(risk.probability * effect.impact) / COUNT(risk.id) AS rank,',
         '  COUNT(risk.id) AS risks',
         'FROM cause',
         'JOIN part ON part.id = cause.id',

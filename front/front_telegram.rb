@@ -156,6 +156,7 @@ end
 def task_md(task)
   [
     "[T#{task[:id]}](https://www.0rsk.com/responses?id=#{task[:triple]})",
+    "(#{task[:positive] ? '+' : '-'}#{task[:rank]})",
     "\"#{task[:text]}\"",
     "in [#{task[:title]}](https://www.0rsk.com/projects/#{task[:pid]}):",
     "#{task[:ctext]}; #{task[:rtext]}; #{task[:etext]}",

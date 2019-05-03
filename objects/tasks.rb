@@ -80,6 +80,8 @@ class Rsk::Tasks
         '  part.text AS text, t.text AS ptext,',
         '  project.id AS pid, project.title AS title,',
         '  triple.id AS tid,',
+        '  risk.probability * effect.impact AS rank,',
+        '  effect.positive AS positive,',
         '  cpart.text AS ctext, rpart.text AS rtext, epart.text AS etext,',
         '  CASE WHEN t.type = \'Cause\' THEN \'C\' WHEN t.type = \'Risk\' THEN \'R\' ELSE \'E\' END AS prefix',
         'FROM task',
@@ -105,6 +107,8 @@ class Rsk::Tasks
       {
         id: r['id'].to_i,
         pid: r['pid'].to_i,
+        rank: r['rank'].to_i,
+        positive: r['positive'] == 't',
         triple: r['tid'].to_i,
         prefix: r['prefix'],
         title: r['title'],

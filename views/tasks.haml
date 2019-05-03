@@ -17,6 +17,13 @@
 - else
   - tasks.each do |t|
     %p
+      - if t[:positive]
+        %img.up
+      - else
+        %img.down
+      %span{class: (t[:rank] >= 64 ? 'red' : (t[:rank] <= 32 ? 'green' : ''))}
+        = t[:rank]
+      %br
       %code= "T#{t[:id]}"
       = '&rarr;'
       %a{href: iri.cut('/responses').add(id: t[:triple])}<
