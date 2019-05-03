@@ -54,7 +54,7 @@ class Rsk::Effects
       [
         'SELECT effect.*, part.text AS text,',
         '  SUM(risk.probability) AS probability,',
-        '  effect.impact * SUM(risk.probability) AS rank,',
+        '  effect.impact * SUM(risk.probability) / COUNT(risk.id) AS rank,',
         '  COUNT(risk.id) AS risks',
         'FROM effect',
         'JOIN part ON part.id = effect.id',
