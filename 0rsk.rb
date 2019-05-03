@@ -90,43 +90,6 @@ configure do
   ).start(4)
 end
 
-before '/*' do
-  @locals = {
-    ver: Rsk::VERSION,
-    login_link: settings.glogin.login_uri,
-    request_ip: request.ip,
-    iri: Iri.new(request.url)
-  }
-  cookies[:glogin] = params[:glogin] if params[:glogin]
-  if cookies[:glogin]
-    begin
-      @locals[:user] = GLogin::Cookie::Closed.new(
-        cookies[:glogin],
-        settings.config['github']['encryption_secret'],
-        context
-      ).to_user
-    rescue OpenSSL::Cipher::CipherError => _
-      cookies.delete(:glogin)
-    end
-  end
-end
-
-get '/github-callback' do
-  code = params[:code]
-  error(400) if code.nil?
-  cookies[:glogin] = GLogin::Cookie::Open.new(
-    settings.glogin.user(code),
-    settings.config['github']['encryption_secret'],
-    context
-  ).to_s
-  flash('/', 'You have been logged in')
-end
-
-get '/logout' do
-  cookies.delete(:glogin)
-  flash('/', 'You have been logged out')
-end
-
 get '/' do
   flash('/ranked') if @locals[:user]
   haml :index, layout: :layout, locals: merged(
@@ -151,31 +114,6 @@ get '/ranked/delete' do
   id = params[:id]
   triples.delete(id)
   flash('/ranked', "The ranked triple ##{id} deleted")
-end
-
-get '/tasks' do
-  offset = [(params[:offset] || '0').to_i, 0].max
-  limit = (params[:limit] || '25').to_i
-  query = params[:q] || ''
-  haml :tasks, layout: :layout, locals: merged(
-    title: '/tasks',
-    offset: offset,
-    limit: limit,
-    query: query,
-    tasks: tasks.fetch(query: query, offset: offset, limit: limit),
-    wired: telechats.wired?(current_user)
-  )
-end
-
-get '/tasks/done' do
-  id = params[:id].to_i
-  tasks.done(id)
-  flash('/tasks', "Thanks, task ##{id} was completed!")
-end
-
-get '/tasks/create' do
-  tasks.create
-  flash('/tasks', 'All necessary tasks were created, thanks!')
 end
 
 get '/projects' do
@@ -203,98 +141,6 @@ get '/projects/{id}' do
     title: "##{pid}",
     pid: pid
   )
-end
-
-get '/causes.json' do
-  content_type('application/json')
-  JSON.pretty_generate(
-    causes.fetch(query: params[:query] || '').map do |r|
-      {
-        label: "C#{r[:id]}: #{r[:text]}",
-        value: r[:text],
-        fields: {
-          cid: r[:id]
-        }
-      }
-    end
-  )
-end
-
-get '/risks.json' do
-  content_type('application/json')
-  JSON.pretty_generate(
-    risks.fetch(query: params[:query] || '').map do |r|
-      {
-        label: "R#{r[:id]}: #{r[:text]}",
-        value: r[:text],
-        fields: {
-          rid: r[:id],
-          probability: r[:probability]
-        }
-      }
-    end
-  )
-end
-
-get '/effects.json' do
-  content_type('application/json')
-  JSON.pretty_generate(
-    effects.fetch(query: params[:query] || '').map do |r|
-      {
-        label: "E#{r[:id]}: #{r[:text]}",
-        value: r[:text],
-        fields: {
-          eid: r[:id],
-          impact: r[:impact],
-          positive: r[:positive]
-        }
-      }
-    end
-  )
-end
-
-get '/plans.json' do
-  content_type('application/json')
-  JSON.pretty_generate(
-    plans.fetch(query: params[:query] || '').map do |r|
-      {
-        label: "P#{r[:id]}: #{r[:text]}",
-        value: r[:text],
-        fields: {
-          pid: r[:id],
-          schedule: r[:schedule]
-        }
-      }
-    end
-  )
-end
-
-get '/triple' do
-  vars = { title: '/triple', project: current_project }
-  id = params[:id].to_i
-  if id.positive?
-    triple = triples.fetch(query: id, limit: 1)[0]
-    raise Rsk::Urror, "Triple ##{id} not found" if triple.nil?
-    vars[:triple] = triple
-  end
-  haml :triple, layout: :layout, locals: merged(vars)
-end
-
-post '/triple/save' do
-  ctext = params[:ctext].strip
-  rtext = params[:rtext].strip
-  etext = params[:etext].strip
-  cid = params[:cid].empty? ? causes.add(ctext) : params[:cid]
-  rid = params[:rid].empty? ? risks.add(rtext) : params[:rid]
-  eid = params[:eid].empty? ? effects.add(etext) : params[:eid]
-  causes.get(cid).text = ctext
-  risks.get(rid).text = rtext
-  effects.get(eid).text = etext
-  risks.get(rid).probability = params[:probability].to_i
-  effects.get(eid).impact = params[:impact].to_i
-  effects.get(eid).positive = !params[:positive].nil?
-  tid = triples.add(cid, rid, eid)
-  flash("/responses?id=#{tid}", "Thanks, the triple ##{tid} successfully saved!")
 end
 
 get '/responses' do
@@ -376,78 +222,6 @@ get '/plans' do
   )
 end
 
-get '/telegram' do
-  id = params[:id].to_i
-  telechats.add(id, current_user)
-  telepost("We identified you as [@#{current_user}](https://github.com/#{current_user}), thanks!")
-  flash('/', "Your account linked with Telegram chat ##{id}, thanks!")
-end
-
-get '/js/*.js' do
-  file = File.join('js', params[:splat].first) + '.js'
-  error(404, "File not found: #{file}") unless File.exist?(file)
-  content_type 'application/javascript'
-  IO.read(file)
-end
-
-get '/robots.txt' do
-  content_type 'text/plain'
-  "User-agent: *\nDisallow: /"
-end
-
-get '/version' do
-  content_type 'text/plain'
-  Rsk::VERSION
-end
-
-not_found do
-  status 404
-  content_type 'text/html', charset: 'utf-8'
-  haml :not_found, layout: :layout, locals: merged(
-    title: request.url
-  )
-end
-
-error do
-  status 503
-  e = env['sinatra.error']
-  if e.is_a?(Rsk::Urror)
-    flash(@locals[:user] ? '/ranked' : '/', e.message, color: 'darkred')
-  else
-    Raven.capture_exception(e)
-    haml(
-      :error,
-      layout: :layout,
-      locals: merged(
-        title: 'error',
-        error: "#{e.message}\n\t#{e.backtrace.join("\n\t")}"
-      )
-    )
-  end
-end
-
-def context
-  "#{request.ip} #{request.user_agent} #{Rsk::VERSION} #{Time.now.strftime('%Y/%m')}"
-end
-
-def merged(hash)
-  out = @locals.merge(hash)
-  out[:local_assigns] = out
-  if cookies[:flash_msg]
-    out[:flash_msg] = cookies[:flash_msg]
-    cookies.delete(:flash_msg)
-  end
-  out[:flash_color] = cookies[:flash_color] || 'darkgreen'
-  cookies.delete(:flash_color)
-  out
-end
-
-def flash(uri, msg = '', color: 'darkgreen')
-  cookies[:flash_msg] = msg
-  cookies[:flash_color] = color
-  redirect(uri)
-end
-
 def current_user
   redirect '/' unless @locals[:user]
   @locals[:user][:login].downcase
@@ -478,11 +252,6 @@ def triples(project: current_project)
   Rsk::Triples.new(settings.pgsql, project)
 end
 
-def tasks(login: current_user)
-  require_relative 'objects/tasks'
-  Rsk::Tasks.new(settings.pgsql, login)
-end
-
 def causes(project: current_project)
   require_relative 'objects/causes'
   Rsk::Causes.new(settings.pgsql, project)
@@ -503,145 +272,8 @@ def plans(project: current_project)
   Rsk::Plans.new(settings.pgsql, project)
 end
 
-def telechats
-  require_relative 'objects/telechats'
-  @telechats ||= Rsk::Telechats.new(settings.pgsql)
-end
-
-def telebot
-  return nil unless settings.config['telegram']
-  @telebot ||= Telebot::Client.new(settings.config['telegram']['token'])
-end
-
-def telepings
-  require_relative 'objects/telepings'
-  @telepings ||= Rsk::Telepings.new(settings.pgsql)
-end
-
-def telepost(msg, chat = telechats.chat_of(current_user), reply_markup: nil)
-  return unless settings.config['telegram']
-  telebot.send_message(
-    chat_id: chat,
-    parse_mode: 'Markdown',
-    disable_web_page_preview: true,
-    text: msg,
-    reply_markup: reply_markup
-  )
-end
-
-def reply(msg, login)
-  if %r{^/done$}.match?(msg)
-    left = tasks(login: login).fetch
-    if left.empty?
-      ['There are no tasks in your agenda, nothing to complete.']
-    else
-      Telebot::ReplyKeyboardMarkup.new(
-        keyboard: [
-          left.map do |t|
-            {
-              text: "/done #{t[:id]}"
-            }
-          end
-        ],
-        one_time_keyboard: true,
-        resize_keyboard: true
-      )
-    end
-  elsif %r{^/done [0-9]+$}.match?(msg)
-    id = msg.split(' ')[1].to_i
-    tasks(login: login).done(id)
-    left = tasks(login: login).fetch
-    [
-      "Task `T#{id}` was marked as completed, thanks!",
-      left.empty? ? 'Your agenda is empty, good job!' : "There are still #{left.count} tasks in your agenda."
-    ]
-  elsif %r{^/tasks$}.match?(msg)
-    list = tasks(login: login).fetch
-    if list.empty?
-      ['There are no tasks in your agenda, good job!']
-    else
-      [
-        'Here is a full list of tasks that belong to you:',
-        list.map do |t|
-          "\n\n" + [
-            "[T#{t[:id]}](https://www.0rsk.com/responses?id=#{t[:triple]}):",
-            "\"#{t[:text]}\" in [#{t[:title]}](https://www.0rsk.com/projects/#{t[:pid]})",
-            "\n#{t[:ctext]}; #{t[:rtext]}; #{t[:etext]}"
-          ].join(' ')
-        end
-      ]
-    end
-  else
-    [
-      "I didn't understand you, but I'm still with you, [#{login}](https://github.com/#{login})!",
-      'In this chat I inform you about the most important tasks you have in your agenda',
-      'in [0rsk.com](https://www.0rsk.com).'
-    ]
-  end
-end
-
-if settings.config['telegram']
-  Thread.start do
-    Telebot::Bot.new(settings.config['telegram']['token']).run do |_, message|
-      chat = message.chat.id
-      if telechats.exists?(chat)
-        login = telechats.login_of(chat)
-        response = begin
-          reply(message.text, login)
-        rescue StandardError => e
-          [
-            "Oops, there was a problem with your request, [#{login}](https://github.com/#{login}):\n\n",
-            "```\n#{e.message}\n```\n\nMost probably",
-            'you did something wrong, but this could also be a defect on the server.',
-            'If you think it\'s our bug, please, report it to us via a GitHub issue,',
-            '[here](https://github.com/yegor256/0rsk/issues).',
-            'We will take care of it as soon as we can.',
-            'Thanks, we appreciate your help and your patience!'
-          ]
-        end
-        if response.is_a?(Array)
-          telepost(response.flatten.join(' '), chat)
-        else
-          telepost('Please, go on:', chat, reply_markup: response)
-        end
-      else
-        telepost("[Click here](https://www.0rsk.com/telegram?id=#{chat}) to identify yourself.", chat)
-      end
-    end
-  end
-end
-
-if settings.config['telegram']
-  Thread.start do
-    sleep(10 * 60)
-    users.fetch.each do |login|
-      next unless telechats.wired?(login)
-      chat = telechats.chat_of(login)
-      expired = telepings.expired(login)
-      next if expired.empty?
-      telepost(
-        [
-          "There are #{expired.count} tasks still required to be completed:",
-          expired.map do |t|
-            task = tasks(login: login).fetch(query: t)[0]
-            [
-              "[T#{task[:id]}](https://www.0rsk.com/responses?id=#{task[:triple]}) \"#{task[:text]}\"",
-              "in [#{task[:title]}](https://www.0rsk.com/projects/#{task[:pid]}):",
-              "#{task[:ctext]}; #{task[:rtext]}; #{task[:etext]}."
-            ].join(' ')
-          end,
-          'When done with a task, say /done and I will remove it from the agenda.'
-        ].flatten.join("\n\n"),
-        chat
-      )
-      expired.each { |t| telepings.add(t, chat) }
-    end
-  end
-end
-
-Thread.start do
-  sleep(10 * 60)
-  users.fetch.each do |login|
-    tasks(login: login).create
-  end
-end
+require_relative 'front/front_tasks.rb'
+require_relative 'front/front_telegram.rb'
+require_relative 'front/front_triple.rb'
+require_relative 'front/front_misc.rb'
+require_relative 'front/front_login.rb'
