@@ -7,10 +7,7 @@
     = "##{triple[:id]}"
 
 %p
-  - if triple[:positive]
-    %img.up
-  - else
-    %img.down
+  = thumb(triple)
   %span{class: (triple[:rank] >= 64 ? 'red' : (triple[:rank] <= 32 ? 'green' : ''))}
     = triple[:rank]
   %br

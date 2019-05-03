@@ -40,10 +40,7 @@
           %td
             = RelativeTime.in_words(r[:completed].utc.iso8601)
           %td.right
-            - if r[:positive]
-              %img.up
-            - else
-              %img.down
+            = thumb(r)
             = r[:rank]
   %p
     - if offset.positive?

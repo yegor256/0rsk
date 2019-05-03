@@ -31,10 +31,7 @@
           %td
             &= r[:text]
           %td.right
-            - if r[:positive]
-              %img.up
-            - else
-              %img.down
+            = thumb(r)
             = r[:impact]
           %td.right
             = r[:rank]

@@ -9,10 +9,7 @@
 - else
   - triples.each do |r|
     %p
-      - if r[:positive]
-        %img.up
-      - else
-        %img.down
+      = thumb(r)
       %span{class: (r[:rank] >= 64 ? 'red' : (r[:rank] <= 32 ? 'green' : ''))}
         = r[:rank]
       %code= "C#{r[:cid]}"
