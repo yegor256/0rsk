@@ -30,7 +30,8 @@
         %div.small
           - r[:plans].each do |p|
             %br
-            &= p
+            %code= "P#{p[:id]}"
+            &= p[:text]
   %p
     - if offset.positive?
       %a.item{href: iri.over(offset: offset - 25)} Previous

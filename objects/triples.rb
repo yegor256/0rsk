@@ -72,7 +72,7 @@ class Rsk::Triples
         '  risk.probability AS probability, effect.impact AS impact,',
         '  cpart.text AS ctext, rpart.text AS rtext, epart.text AS etext,',
         '  (probability * impact) AS rank,',
-        '  (SELECT ARRAY_AGG(\'P\' || part.id || \': \' || part.text) FROM plan',
+        '  (SELECT ARRAY_AGG(part.id || \':\' || part.text) FROM plan',
         '    JOIN part ON plan.id = part.id',
         '    WHERE plan.part = t.cause OR plan.part = t.risk OR plan.part = t.effect) AS plans',
         'FROM triple t',
@@ -105,7 +105,10 @@ class Rsk::Triples
         impact: r['impact'].to_i,
         positive: r['positive'] == 't',
         rank: r['rank'].to_i,
-        plans: r['plans'].nil? ? [] : JSON.parse("[#{r['plans'][1..-2]}]")
+        plans: r['plans'].nil? ? [] : JSON.parse("[#{r['plans'][1..-2]}]").map do |p|
+          id, text = p.split(':', 2)
+          { id: id.to_i, text: text }
+        end
       }
     end
   end
