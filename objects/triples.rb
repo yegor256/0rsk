@@ -72,7 +72,7 @@ class Rsk::Triples
         '  risk.probability AS probability, effect.impact AS impact,',
         '  cpart.text AS ctext, rpart.text AS rtext, epart.text AS etext,',
         '  (probability * impact) AS rank,',
-        '  (SELECT ARRAY_AGG(part.id || \':\' || part.text) FROM plan',
+        '  (SELECT ARRAY_AGG(part.id || \':\' || part.text || \' (\' || plan.schedule || \')\') FROM plan',
         '    JOIN part ON plan.id = part.id',
         '    WHERE plan.part = t.cause OR plan.part = t.risk OR plan.part = t.effect) AS plans',
         'FROM triple t',
