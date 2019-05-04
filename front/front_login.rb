@@ -22,6 +22,7 @@
 
 before '/*' do
   @locals = {
+    http_start: Time.now,
     ver: Rsk::VERSION,
     login_link: settings.glogin.login_uri,
     request_ip: request.ip,
