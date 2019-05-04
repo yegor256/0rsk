@@ -33,7 +33,7 @@
         %option{value: triple[:rid], selected: true}= "Avoid R#{triple[:rid]}"
         %option{value: triple[:eid]}= "Mitigate E#{triple[:eid]}"
     %label Plan:
-    %input{id: 'plan', type: 'text', name: 'plan', size: 60, maxlength: 160, autocomplete: 'off', tabindex: 2}
+    %input{id: 'plan', type: 'text', name: 'plan', size: 60, maxlength: 160, autocomplete: 'off', tabindex: 2, required: true}
     %label<
       %span> Schedule (
       = succeed ',' do
@@ -55,7 +55,7 @@
       = succeed '):' do
         %a{href: '#', id: 'annually'}<
           annually
-    %input{id: 'schedule', type: 'text', name: 'schedule', size: 22, maxlength: 20, autocomplete: 'off', tabindex: 3}
+    %input{id: 'schedule', type: 'text', name: 'schedule', size: 22, maxlength: 20, autocomplete: 'off', tabindex: 3, required: true}
     %label
       %span.item.small Or just once:
       %a.item.small{href: '#', id: 'schedule_asap'} ASAP

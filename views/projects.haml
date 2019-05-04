@@ -3,7 +3,7 @@
 
 %form{method: 'POST', action: iri.cut('/projects/create')}
   %label New one:
-  %input{type: 'text', name: 'title', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1}
+  %input{type: 'text', name: 'title', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1, required: true}
   %input{type: 'submit', value: 'Create', tabindex: 2}
 
 - projects.each do |p|
