@@ -27,9 +27,10 @@
           = "#{r[:plans].count} plan#{r[:plans].count == 1 ? '' : 's'}"
       %a.item.small{href: iri.cut('/ranked/delete').add(id: r[:id])} Delete
       - unless r[:plans].empty?
-        - r[:plans].each do |p|
-          %br
-          %span.small &= p
+        %div.small
+          - r[:plans].each do |p|
+            %br
+            &= p
   %p
     - if offset.positive?
       %a.item{href: iri.over(offset: offset - 25)} Previous
