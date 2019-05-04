@@ -21,11 +21,15 @@
       %br
       %a.item.small{href: iri.cut('/triple').add(id: r[:id])} Edit
       %a.item.small{href: iri.cut('/responses').add(id: r[:id])}<
-        - if r[:plans].zero?
+        - if r[:plans].empty?
           %span.red No plans
         - else
-          = "#{r[:plans]} plan#{r[:plans] == 1 ? '' : 's'}"
+          = "#{r[:plans].count} plan#{r[:plans].count == 1 ? '' : 's'}"
       %a.item.small{href: iri.cut('/ranked/delete').add(id: r[:id])} Delete
+      - unless r[:plans].empty?
+        - r[:plans].each do |p|
+          %br
+          %span.small &= p
   %p
     - if offset.positive?
       %a.item{href: iri.over(offset: offset - 25)} Previous
