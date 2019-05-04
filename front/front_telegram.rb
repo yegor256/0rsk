@@ -63,7 +63,7 @@ def reply(msg, login)
     if left.empty?
       ['There are no tasks in your agenda, nothing to complete.']
     else
-      Telebot::ReplyKeyboardMarkup.new(
+      {
         keyboard: [
           left.map do |t|
             {
@@ -73,7 +73,7 @@ def reply(msg, login)
         ],
         one_time_keyboard: true,
         resize_keyboard: true
-      )
+      }
     end
   elsif %r{^/done [0-9]+$}.match?(msg)
     id = msg.split(' ')[1].to_i
