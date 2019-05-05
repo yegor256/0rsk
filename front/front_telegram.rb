@@ -81,7 +81,9 @@ def reply(msg, login)
     left = tasks(login: login).fetch
     [
       "Task `T#{id}` was marked as completed, thanks!",
-      left.empty? ? 'Your agenda is empty, good job!' : "There are still #{left.count} tasks in your agenda."
+      left.empty? ?
+        'Your agenda is empty, good job!' :
+        "There are still #{left.count} tasks in your agenda. Say /tasks to see them all."
     ]
   elsif %r{^/tasks$}.match?(msg)
     list = tasks(login: login).fetch
