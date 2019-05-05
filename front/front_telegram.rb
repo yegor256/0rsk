@@ -65,7 +65,7 @@ def reply(msg, login)
     else
       {
         keyboard: [
-          left.map do |t|
+          left.sort_by { |t| t[:id] }.map do |t|
             {
               text: "/done #{t[:id]}"
             }
@@ -138,12 +138,15 @@ if settings.config['telegram']
     users.fetch.each do |login|
       next unless telechats.wired?(login)
       chat = telechats.chat_of(login)
-      expired = telepings.expired(login)
+      telepings.expired(login)
+        .map { |tid| tasks(login: login).fetch(query: tid)[0] }
+        .sort_by { |t| t[:rank] }
+        .reverse
       next if expired.empty?
       telepost(
         [
           "Let me remind you that there are #{expired.count} tasks still required to be completed:",
-          expired.map { |t| task_md(tasks(login: login).fetch(query: t)[0]) },
+          expired.map { |t| task_md(t) },
           'When done with a task, say /done and I will remove it from the agenda.'
         ].flatten.join("\n\n"),
         chat
