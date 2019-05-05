@@ -64,5 +64,7 @@ class Rsk::TriplesTest < Minitest::Test
     assert(2, triples.fetch(query: tid)[0][:plans].count)
     assert(1, triples.fetch(query: 'super').count)
     assert(1, triples.fetch(query: 'now').count)
+    assert(0, triples.fetch(query: 'something-else').count)
+    assert(1, triples.fetch.count)
   end
 end
