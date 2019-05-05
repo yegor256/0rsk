@@ -62,7 +62,7 @@ class Rsk::TriplesTest < Minitest::Test
     plans.add(rid, 'we\'ll do "it"')
     plans.add(eid, 'and this "one" too SUPER')
     assert(2, triples.fetch(query: tid)[0][:plans].count)
-    assert(1, !triples.fetch(query: 'super').count)
-    assert(1, !triples.fetch(query: 'now').count)
+    assert(1, triples.fetch(query: 'super').count)
+    assert(1, triples.fetch(query: 'now').count)
   end
 end
