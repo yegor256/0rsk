@@ -55,13 +55,14 @@ class Rsk::TriplesTest < Minitest::Test
     project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(999)}")
     cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
     rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
-    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
+    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop NOW')
     triples = Rsk::Triples.new(test_pgsql, project)
     tid = triples.add(cid, rid, eid)
     plans = Rsk::Plans.new(test_pgsql, project)
     plans.add(rid, 'we\'ll do "it"')
     plans.add(eid, 'and this "one" too SUPER')
     assert(2, triples.fetch(query: tid)[0][:plans].count)
-    assert(!triples.fetch(query: 'super').empty?)
+    assert(1, !triples.fetch(query: 'super').count)
+    assert(1, !triples.fetch(query: 'now').count)
   end
 end
