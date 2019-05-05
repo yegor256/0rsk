@@ -67,7 +67,7 @@ class Rsk::Triples
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
       [
-        'SELECT t.id, cause.id AS cid, risk.id AS rid, effect.id AS eid,',
+        'SELECT DISTINCT t.id, t.created, cause.id AS cid, risk.id AS rid, effect.id AS eid,',
         '  effect.positive,',
         '  risk.probability AS probability, effect.impact AS impact,',
         '  cpart.text AS ctext, rpart.text AS rtext, epart.text AS etext,',

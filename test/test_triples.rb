@@ -46,7 +46,7 @@ class Rsk::TriplesTest < Minitest::Test
     tid = triples.add(cid, rid, eid)
     triples.add(cid, rid, eid)
     assert(triples.fetch.any? { |t| t[:id] == tid })
-    assert(0, triples.fetch(query: tid)[0][:plans].count)
+    assert_equal(0, triples.fetch(query: tid)[0][:plans].count)
     triples.fetch.each { |t| triples.delete(t[:id]) }
   end
 
@@ -61,10 +61,10 @@ class Rsk::TriplesTest < Minitest::Test
     plans = Rsk::Plans.new(test_pgsql, project)
     plans.add(rid, 'we\'ll do "it"')
     plans.add(eid, 'and this "one" too SUPER')
-    assert(2, triples.fetch(query: tid)[0][:plans].count)
-    assert(1, triples.fetch(query: 'super').count)
-    assert(1, triples.fetch(query: 'now').count)
-    assert(0, triples.fetch(query: 'something-else').count)
-    assert(1, triples.fetch.count)
+    assert_equal(2, triples.fetch(query: tid)[0][:plans].count)
+    assert_equal(1, triples.fetch(query: 'super').count)
+    assert_equal(1, triples.fetch(query: 'now').count)
+    assert_equal(0, triples.fetch(query: 'something-else').count)
+    assert_equal(1, triples.fetch.count)
   end
 end
