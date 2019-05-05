@@ -60,7 +60,8 @@ class Rsk::TriplesTest < Minitest::Test
     tid = triples.add(cid, rid, eid)
     plans = Rsk::Plans.new(test_pgsql, project)
     plans.add(rid, 'we\'ll do "it"')
-    plans.add(eid, 'and this "one" too')
+    plans.add(eid, 'and this "one" too SUPER')
     assert(2, triples.fetch(query: tid)[0][:plans].count)
+    assert(!triples.fetch(query: 'super').empty?)
   end
 end

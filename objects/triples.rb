@@ -72,9 +72,8 @@ class Rsk::Triples
         '  risk.probability AS probability, effect.impact AS impact,',
         '  cpart.text AS ctext, rpart.text AS rtext, epart.text AS etext,',
         '  (probability * impact) AS rank,',
-        '  (SELECT ARRAY_AGG(part.id || \':\' || part.text || \' (\' || plan.schedule || \')\') FROM plan',
-        '    JOIN part ON plan.id = part.id',
-        '    WHERE plan.part = t.cause OR plan.part = t.risk OR plan.part = t.effect) AS plans',
+        '  ARRAY_AGG(ppart.id || \':\' || ppart.text || \' (\' || plan.schedule || \')\')',
+        '    OVER (PARTITION BY t.id) AS plans',
         'FROM triple t',
         'JOIN cause ON cause.id = t.cause',
         'JOIN part AS cpart ON cause.id = cpart.id',
@@ -82,11 +81,18 @@ class Rsk::Triples
         'JOIN part AS rpart ON risk.id = rpart.id',
         'JOIN effect ON effect.id = t.effect',
         'JOIN part AS epart ON effect.id = epart.id',
+        'LEFT JOIN plan ON plan.part = t.cause OR plan.part = t.risk OR plan.part = t.effect',
+        'LEFT JOIN part AS ppart ON plan.id = ppart.id',
         'WHERE cpart.project = $1 AND rpart.project = $1 AND epart.project = $1',
         'AND',
         query.is_a?(Integer) ?
           't.id = $2' :
-          '(LOWER(cpart.text) LIKE $2 OR LOWER(rpart.text) LIKE $2 OR LOWER(epart.text) LIKE $2)',
+          [
+            '(LOWER(cpart.text) LIKE $2',
+            '  OR LOWER(rpart.text) LIKE $2',
+            '  OR LOWER(epart.text) LIKE $2',
+            '  OR LOWER(ppart.text) LIKE $2)'
+          ].join(' '),
         'ORDER BY rank DESC, t.created DESC',
         'OFFSET $3 LIMIT $4'
       ],
@@ -105,7 +111,7 @@ class Rsk::Triples
         impact: r['impact'].to_i,
         positive: r['positive'] == 't',
         rank: r['rank'].to_i,
-        plans: r['plans'].nil? ? [] : JSON.parse("[#{r['plans'][1..-2]}]").map do |p|
+        plans: r['plans'] == '{NULL}' ? [] : JSON.parse("[#{r['plans'][1..-2]}]").map do |p|
           id, text = p.split(':', 2)
           { id: id.to_i, text: text }
         end
