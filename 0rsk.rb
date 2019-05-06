@@ -166,7 +166,7 @@ get '/responses/detach' do
   tid = params[:tid].to_i
   id = params[:id].to_i
   part = params[:part].to_i
-  plans.detach(id, part)
+  plans.get(id, part).detach
   flash("/responses?id=#{tid}", "Thanks, plan ##{id} detached from the triple ##{tid}")
 end
 

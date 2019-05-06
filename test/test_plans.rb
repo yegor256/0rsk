@@ -43,5 +43,6 @@ class Rsk::PlansTest < Minitest::Test
     assert(id.positive?)
     assert(!plans.fetch.empty?)
     assert(plans.fetch.any? { |p| p[:text] == text })
+    plans.get(id, rid).complete
   end
 end

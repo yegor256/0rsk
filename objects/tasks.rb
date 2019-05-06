@@ -69,7 +69,7 @@ class Rsk::Tasks
     raise Rsk::Urror, "Plan for task ##{id} not found" if row.nil?
     @pgsql.transaction do |t|
       t.exec('DELETE FROM task WHERE id = $1', [id])
-      Rsk::Plans.new(@pgsql, project['id'].to_i).complete(row['id'].to_i, row['part'].to_i)
+      Rsk::Plans.new(@pgsql, project['id'].to_i).get(row['id'].to_i, row['part'].to_i).complete
     end
   end
 

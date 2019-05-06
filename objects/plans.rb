@@ -47,28 +47,9 @@ class Rsk::Plans
     end
   end
 
-  def detach(id, part)
-    @pgsql.transaction do |t|
-      if t.exec('SELECT * FROM part WHERE id = $1 AND project = $2', [id, @project]).empty?
-        raise Rsk::Urror, "##{id} is not in your project ##{@project}"
-      end
-      t.exec('DELETE FROM plan WHERE id = $1 AND part = $2', [id, part])
-      t.exec('DELETE FROM part WHERE id = $1', [id]) if t.exec('SELECT * FROM plan WHERE id = $1', [id]).empty?
-    end
-  end
-
-  def complete(id, part)
-    p = get(id)
-    if /^[a-z]+$/.match?(p.schedule)
-      @pgsql.exec('UPDATE plan SET completed = NOW() WHERE id = $1 AND part = $2', [id, part])
-    else
-      detach(id, part)
-    end
-  end
-
-  def get(id)
+  def get(id, part)
     require_relative 'plan'
-    Rsk::Plan.new(@pgsql, id)
+    Rsk::Plan.new(@pgsql, id, part)
   end
 
   def fetch(query: '', limit: 10, offset: 0)

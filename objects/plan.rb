@@ -28,21 +28,46 @@ require_relative 'urror'
 # Copyright:: Copyright (c) 2019 Yegor Bugayenko
 # License:: MIT
 class Rsk::Plan
-  attr_reader :id
+  attr_reader :id, :part
 
-  def initialize(pgsql, id)
+  def initialize(pgsql, id, part)
     @pgsql = pgsql
     @id = id
+    @part = part
+  end
+
+  def detach
+    @pgsql.transaction do |t|
+      if t.exec('SELECT * FROM part WHERE id = $1 AND part = $2 AND project = $2', [@id, @part, pid]).empty?
+        raise Rsk::Urror, "##{@id} is not in your project ##{pid}"
+      end
+      t.exec('DELETE FROM plan WHERE id = $1 AND part = $2', [@id, @part])
+      t.exec('DELETE FROM part WHERE id = $1', [@id]) if t.exec('SELECT * FROM plan WHERE id = $1', [@id]).empty?
+    end
+  end
+
+  def complete(time: Time.now)
+    if /^[a-z]+$/.match?(schedule)
+      @pgsql.exec('UPDATE plan SET completed = $3 WHERE id = $1 AND part = $2', [@id, @part, time])
+    else
+      detach
+    end
   end
 
   def schedule
-    @pgsql.exec('SELECT schedule FROM plan WHERE id = $1', [@id])[0]['schedule']
+    @pgsql.exec('SELECT schedule FROM plan WHERE id = $1 AND part = $2', [@id, @part])[0]['schedule']
   end
 
   def schedule=(text)
     unless /^(daily|weekly|biweekly|monthly|quarterly|annually|\d{2}-\d{2}-\d{4})$/.match?(text)
       raise Rsk::Urror, "Schedule can either be a word or a date DD-MM-YYYY: #{text.inspect}"
     end
-    @pgsql.exec('UPDATE plan SET schedule = $2 WHERE id = $1', [@id, text])
+    @pgsql.exec('UPDATE plan SET schedule = $3 WHERE id = $1 AND part = $2', [@id, @part, text])
+  end
+
+  private
+
+  def pid
+    @pgsql.exec('SELECT project FROM part WHERE id = $1', [@id])[0]['project'].to_i
   end
 end
