@@ -158,7 +158,7 @@ post '/responses/add' do
   id = params[:id].to_i
   part = params[:strategy].to_i
   pid = plans.add(part, params[:plan])
-  plans.get(pid).schedule = params[:schedule].strip
+  plans.get(pid, part).schedule = params[:schedule].strip
   flash("/responses?id=#{id}", "Thanks, plan ##{pid} added to the triple ##{id}")
 end
 
