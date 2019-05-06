@@ -159,7 +159,7 @@ post '/responses/add' do
   part = params[:strategy].to_i
   pid = plans.add(part, params[:plan])
   plans.get(pid, part).schedule = params[:schedule].strip
-  flash("/responses?id=#{id}", "Thanks, plan ##{pid} added to the triple ##{id}")
+  flash("/responses?id=#{id}", "Thanks, plan ##{pid}/#{part} added to the triple ##{id}")
 end
 
 get '/responses/detach' do
