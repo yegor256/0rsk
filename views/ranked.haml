@@ -2,6 +2,14 @@
   %input{type: 'text', name: 'q', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: query}
   %input{type: 'submit', value: 'Search', tabindex: 2}
 
+- unless alone.empty?
+  %p
+    = succeed ':' do
+      %strong.red ATTENTION
+    There are
+    %a{href: iri.cut('/ranked').add(query: '+alone')} a few risks
+    without any plans!
+
 - if triples.empty?
   %p
     %span.red Nothing

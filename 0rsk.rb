@@ -106,7 +106,8 @@ get '/ranked' do
     query: query,
     limit: limit,
     offset: offset,
-    triples: triples.fetch(query: query, offset: offset, limit: limit)
+    triples: triples.fetch(query: query, offset: offset, limit: limit),
+    alone: triples.fetch(query: '+alone', limit: 1)
   )
 end
 
