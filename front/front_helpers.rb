@@ -22,7 +22,7 @@
 
 helpers do
   def part(prefix, id)
-    "<code><a href='#{iri.cut('/ranked').add(q: '+' + id.to_s)}'>#{prefix}#{id}</a></code>"
+    "<a href='#{iri.cut('/ranked').add(q: '+' + id.to_s)}'><code>#{prefix}#{id}</code></a>"
   end
 
   def thumb(i)
