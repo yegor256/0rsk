@@ -25,8 +25,7 @@ before '/*' do
     http_start: Time.now,
     ver: Rsk::VERSION,
     login_link: settings.glogin.login_uri,
-    request_ip: request.ip,
-    iri: Iri.new(request.url)
+    request_ip: request.ip
   }
   cookies[:glogin] = params[:glogin] if params[:glogin]
   if cookies[:glogin]

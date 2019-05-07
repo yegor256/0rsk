@@ -273,6 +273,10 @@ def plans(project: current_project)
   Rsk::Plans.new(settings.pgsql, project)
 end
 
+def iri
+  Iri.new(request.url)
+end
+
 require_relative 'front/front_tasks.rb'
 require_relative 'front/front_telegram.rb'
 require_relative 'front/front_triple.rb'
