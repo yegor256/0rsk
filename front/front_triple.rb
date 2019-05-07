@@ -88,7 +88,7 @@ get '/triple' do
   vars = { title: '/triple', project: current_project }
   id = params[:id].to_i
   if id.positive?
-    triple = triples.fetch(query: id, limit: 1)[0]
+    triple = triples.fetch(id: id, limit: 1)[0]
     raise Rsk::Urror, "Triple ##{id} not found" if triple.nil?
     vars[:triple] = triple
   end

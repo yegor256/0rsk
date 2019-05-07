@@ -46,7 +46,7 @@ class Rsk::Triples
 
   def delete(id)
     @pgsql.transaction do |t|
-      triple = fetch(query: id.to_i)[0]
+      triple = fetch(id: id.to_i)[0]
       raise Rsk::Urror, "Triple ##{id} not found in your project ##{@project}" if triple.nil?
       if t.exec('SELECT * FROM part WHERE id = $1 AND project = $2', [triple[:cid], @project]).empty?
         raise Rsk::Urror, "Triple ##{id} is not in your project ##{@project}"
@@ -64,7 +64,25 @@ class Rsk::Triples
     end
   end
 
-  def fetch(query: '', limit: 10, offset: 0)
+  def fetch(id: 0, query: '', limit: 10, offset: 0)
+    where = []
+    words = []
+    unless id.positive?
+      query.strip.downcase.split(' ').each do |w|
+        if w.start_with?('+')
+          if w == '+alone'
+            where << 'plan.id IS NULL'
+          elsif /^\+[0-9]+$/.match?(w)
+            p = w[1..-1].to_i
+            where << "t.cause = #{p} OR t.risk = #{p} OR t.effect = #{p}"
+          else
+            raise Rsk::Urror, "Can't understand query operator #{w.inspect}"
+          end
+        else
+          words << w
+        end
+      end
+    end
     rows = @pgsql.exec(
       [
         'SELECT DISTINCT t.id, t.created, cause.id AS cid, risk.id AS rid, effect.id AS eid,',
@@ -85,7 +103,7 @@ class Rsk::Triples
         'LEFT JOIN part AS ppart ON plan.id = ppart.id',
         'WHERE cpart.project = $1 AND rpart.project = $1 AND epart.project = $1',
         'AND',
-        query.is_a?(Integer) ?
+        id.positive? ?
           't.id = $2' :
           [
             '(LOWER(cpart.text) LIKE $2',
@@ -93,10 +111,11 @@ class Rsk::Triples
             '  OR LOWER(epart.text) LIKE $2',
             '  OR LOWER(ppart.text) LIKE $2)'
           ].join(' '),
+        where.empty? ? '' : 'AND (' + where.join(') AND (') + ')',
         'ORDER BY rank DESC, t.created DESC',
         'OFFSET $3 LIMIT $4'
       ],
-      [@project, query.is_a?(Integer) ? query : "%#{query.to_s.strip.downcase}%", offset, limit]
+      [@project, id.positive? ? id : "%#{words.join(' ')}%", offset, limit]
     )
     rows.map do |r|
       {

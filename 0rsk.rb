@@ -145,7 +145,7 @@ end
 
 get '/responses' do
   id = params[:id].to_i
-  triple = triples.fetch(query: id, limit: 1)[0]
+  triple = triples.fetch(id: id, limit: 1)[0]
   raise Rsk::Urror, "Triple ##{id} not found" if triple.nil?
   haml :responses, layout: :layout, locals: merged(
     title: '/triple',
