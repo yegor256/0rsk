@@ -40,6 +40,7 @@ class Rsk::PlansTest < Minitest::Test
     plans = Rsk::Plans.new(test_pgsql, pid)
     text = 'we make backups'
     id = plans.add(rid, text)
+    plans.get(id, rid).schedule = '01-01-2001'
     assert(id.positive?)
     assert(!plans.fetch.empty?)
     assert(plans.fetch.any? { |p| p[:text] == text })
