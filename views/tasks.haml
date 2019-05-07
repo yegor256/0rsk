@@ -20,12 +20,12 @@
       = thumb(t)
       = rank(t)
       %br
-      %code= "T#{t[:id]}"
+      = part('T', t[:id])
       = '&rarr;'
       %a{href: iri.cut('/responses').add(id: t[:triple])}<
         %code= "P#{t[:plan]}"
       = '&rarr;'
-      %code= "#{t[:prefix]}#{t[:part]}"
+      = part(t[:prefix], t[:part])
       %br
       &= t[:ctext]
       %br

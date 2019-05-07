@@ -7,7 +7,7 @@
     = succeed ':' do
       %strong.red ATTENTION
     There are
-    %a{href: iri.cut('/ranked').add(query: '+alone')} a few risks
+    %a{href: iri.cut('/ranked').add(q: '+alone')} a few risks
     without any plans!
 
 - if triples.empty?
@@ -19,9 +19,9 @@
     %p
       = thumb(r)
       = rank(r)
-      %code= "C#{r[:cid]}"
-      %code= "R#{r[:rid]}"
-      %code= "E#{r[:eid]}"
+      = part('C', r[:cid])
+      = part('R', r[:rid])
+      = part('E', r[:eid])
       %br
       &= "#{r[:ctext]};"
       &= "#{r[:rtext]};"

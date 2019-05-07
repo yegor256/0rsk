@@ -10,13 +10,13 @@
   = thumb(triple)
   = rank(triple)
   %br
-  %code= "C#{triple[:cid]}"
+  = part('C', triple[:cid])
   &= triple[:ctext]
   %br
-  %code= "R#{triple[:rid]}"
+  = part('R', triple[:rid])
   &= triple[:rtext]
   %br
-  %code= "E#{triple[:eid]}"
+  = part('E', triple[:eid])
   &= triple[:etext]
 
 %form{method: 'POST', action: iri.cut('/responses/add')}
