@@ -46,7 +46,10 @@ class Rsk::Plan
     end
   end
 
-  def complete(time: Time.now)
+  # Set it as complete, with the completion time slighly in the past. This
+  # is done in order to let the task be generated again at the same time
+  # next day if it was completed "daily".
+  def complete(time: Time.now - 4 * 60 * 60)
     if /^[a-z]+$/.match?(schedule)
       @pgsql.exec('UPDATE plan SET completed = $3 WHERE id = $1 AND part = $2', [@id, @part, time])
     else

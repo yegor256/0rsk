@@ -48,4 +48,11 @@
       %a.item{href: iri.over(offset: offset + 25)} Next
 
 %p
-  %a{href: iri.cut('/tasks/create')} Create now
+  We're checking all your plans regularly and create tasks
+  accordingly, when time comes. You can
+  %a{href: iri.cut('/tasks/create')} click here
+  to pull the latest plans in, right now.
+  - if updated
+    The last time plans were checked
+    = succeed '.' do
+      - RelativeTime.in_words(updated.utc.iso8601)

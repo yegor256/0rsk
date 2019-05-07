@@ -27,6 +27,7 @@ Rsk::Daemon.new(10).start do
   users.fetch.each do |login|
     tasks(login: login).create
   end
+  @tasks_updated = Time.now
 end
 
 get '/tasks' do
@@ -39,7 +40,8 @@ get '/tasks' do
     limit: limit,
     query: query,
     tasks: tasks.fetch(query: query, offset: offset, limit: limit),
-    wired: telechats.wired?(current_user)
+    wired: telechats.wired?(current_user),
+    updated: @tasks_updated
   )
 end
 
