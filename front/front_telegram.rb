@@ -140,7 +140,7 @@ if settings.config['telegram']
     users.fetch.each do |login|
       next unless telechats.wired?(login)
       chat = telechats.chat_of(login)
-      telepings.expired(login)
+      expired = telepings.expired(login)
         .map { |tid| tasks(login: login).fetch(query: tid)[0] }
         .sort_by { |t| t[:rank] }
         .reverse
