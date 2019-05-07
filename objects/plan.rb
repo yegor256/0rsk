@@ -38,7 +38,7 @@ class Rsk::Plan
 
   def detach
     @pgsql.transaction do |t|
-      if t.exec('SELECT * FROM part WHERE id = $1 AND part = $2 AND project = $2', [@id, @part, pid]).empty?
+      if t.exec('SELECT * FROM part WHERE id = $1 AND part = $2 AND project = $3', [@id, @part, pid]).empty?
         raise Rsk::Urror, "##{@id} is not in your project ##{pid}"
       end
       t.exec('DELETE FROM plan WHERE id = $1 AND part = $2', [@id, @part])
