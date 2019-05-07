@@ -52,7 +52,7 @@ def telepost(msg, chat = telechats.chat_of(current_user), reply_markup: nil)
     chat_id: chat,
     parse_mode: 'Markdown',
     disable_web_page_preview: true,
-    text: msg,
+    text: msg.length > 4000 ? msg[0..4000] + '...' : msg,
     reply_markup: reply_markup
   )
 end
