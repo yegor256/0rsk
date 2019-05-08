@@ -62,6 +62,13 @@ def reply(msg, login)
     left = tasks(login: login).fetch
     if left.empty?
       ['There are no tasks in your agenda, nothing to complete.']
+    elsif left.count > 16
+      [
+        "There are #{left.count} tasks in your agenda.",
+        'Just pick one and say `/done <id>` and I will understand you.',
+        'I can\'t show you a menu, because you\'ve got so many tasks,',
+        'which is an obvious sign of your management problems :('
+      ]
     else
       {
         keyboard: left.sort_by { |t| t[:id] }.map.with_index do |t, i|
