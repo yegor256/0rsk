@@ -65,13 +65,13 @@ def reply(msg, login)
     else
       {
         keyboard: [
-          left.sort_by { |t| t[:id] }.each_with_index.map do |t, i|
+          left.sort_by { |t| t[:id] }.map.with_index do |t, i|
             {
-              idx: i,
+              index: i,
               text: "/done #{t[:id]}"
             }
           end
-        ].group_by { |x| (x[:idx] / 4).round }.values,
+        ].group_by { |x| (x[:index] / 4).round }.values,
         one_time_keyboard: true,
         resize_keyboard: true
       }
@@ -105,30 +105,35 @@ def reply(msg, login)
   end
 end
 
+def process_request(chat, message)
+  login = telechats.login_of(chat)
+  response = begin
+    reply(message.text, login)
+  rescue StandardError => e
+    Raven.capture_exception(e) unless e.is_a?(Rsk::Urror)
+    [
+      "Oops, there was a problem with your request, [#{login}](https://github.com/#{login}):\n\n",
+      "```\n#{e.message}\n```\n\nMost probably",
+      'you did something wrong, but this could also be a defect on the server.',
+      'If you think it\'s our bug, please, report it to us via a GitHub issue,',
+      '[here](https://github.com/yegor256/0rsk/issues).',
+      'We will take care of it as soon as we can.',
+      'Thanks, we appreciate your help and your patience!'
+    ]
+  end
+  if response.is_a?(Array)
+    telepost(response.flatten.join(' '), chat)
+  else
+    telepost('Please, go on:', chat, reply_markup: response)
+  end
+end
+
 if settings.config['telegram']
   Rsk::Daemon.new.start do
     Telebot::Bot.new(settings.config['telegram']['token']).run do |_, message|
       chat = message.chat.id
       if telechats.exists?(chat)
-        login = telechats.login_of(chat)
-        response = begin
-          reply(message.text, login)
-        rescue StandardError => e
-          [
-            "Oops, there was a problem with your request, [#{login}](https://github.com/#{login}):\n\n",
-            "```\n#{e.message}\n```\n\nMost probably",
-            'you did something wrong, but this could also be a defect on the server.',
-            'If you think it\'s our bug, please, report it to us via a GitHub issue,',
-            '[here](https://github.com/yegor256/0rsk/issues).',
-            'We will take care of it as soon as we can.',
-            'Thanks, we appreciate your help and your patience!'
-          ]
-        end
-        if response.is_a?(Array)
-          telepost(response.flatten.join(' '), chat)
-        else
-          telepost('Please, go on:', chat, reply_markup: response)
-        end
+        process_request(chat, message)
       else
         telepost("[Click here](https://www.0rsk.com/telegram?id=#{chat}) to identify yourself.", chat)
       end
