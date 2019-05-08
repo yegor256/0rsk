@@ -65,12 +65,13 @@ def reply(msg, login)
     else
       {
         keyboard: [
-          left.sort_by { |t| t[:id] }.map do |t|
+          left.sort_by { |t| t[:id] }.each_with_index.map do |t, i|
             {
+              idx: i,
               text: "/done #{t[:id]}"
             }
           end
-        ],
+        ].group_by { |x| (x[:idx] / 4).round }.values,
         one_time_keyboard: true,
         resize_keyboard: true
       }
