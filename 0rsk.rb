@@ -52,13 +52,6 @@ configure do
       'client_secret' => '?',
       'encryption_secret' => ''
     },
-    'pgsql' => {
-      'host' => 'localhost',
-      'port' => 0,
-      'user' => 'test',
-      'dbname' => 'test',
-      'password' => 'test'
-    },
     'sentry' => ''
   }
   config = YAML.safe_load(File.open(File.join(File.dirname(__FILE__), 'config.yml'))) unless ENV['RACK_ENV'] == 'test'
@@ -79,15 +72,28 @@ configure do
     config['github']['client_secret'],
     'https://www.0rsk.com/github-callback'
   )
-  cfg = File.exist?('target/pgsql-config.yml') ? YAML.load_file('target/pgsql-config.yml') : config
-  set :pgsql, Pgtk::Pool.new(
-    host: cfg['pgsql']['host'],
-    port: cfg['pgsql']['port'],
-    dbname: cfg['pgsql']['dbname'],
-    user: cfg['pgsql']['user'],
-    password: cfg['pgsql']['password'],
-    log: nil
-  ).start(4)
+  if File.exist?('target/pgsql-config.yml')
+    cfg = YAML.load_file('target/pgsql-config.yml')
+    set :pgsql, Pgtk::Pool.new(
+      host: cfg['pgsql']['host'],
+      port: cfg['pgsql']['port'],
+      dbname: cfg['pgsql']['dbname'],
+      user: cfg['pgsql']['user'],
+      password: cfg['pgsql']['password'],
+      log: nil
+    )
+  else
+    uri = URI(ENV['DATABASE_URL'])
+    set :pgsql, Pgtk::Pool.new(
+      host: uri.host,
+      port: uri.port,
+      dbname: uri.path[1..-1],
+      user: uri.userinfo.split(':')[0],
+      password: uri.userinfo.split(':')[1],
+      log: nil
+    )
+  end
+  settings.pgsql.start(4)
 end
 
 get '/' do
