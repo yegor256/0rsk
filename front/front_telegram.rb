@@ -64,7 +64,7 @@ def reply(msg, login)
       ['There are no tasks in your agenda, nothing to complete.']
     else
       {
-        keyboard: left.sort_by { |t| t[:id] }.map_with_index do |t, i|
+        keyboard: left.sort_by { |t| t[:id] }.map.with_index do |t, i|
           {
             index: i,
             text: "/done #{t[:id]}"
