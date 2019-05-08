@@ -153,7 +153,7 @@ if settings.config['telegram']
         ].flatten.join("\n\n"),
         chat
       )
-      expired.each { |t| telepings.add(t, chat) }
+      expired.each { |t| telepings.add(t[:id], chat) }
     end
   end
 end

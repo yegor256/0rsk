@@ -15,6 +15,10 @@
     Tasks will show up here where plan schedules will be due.
     Stay tuned.
 - else
+  %p
+    There are
+    = "#{tasks.count} task#{tasks.count == 1 ? '' : 's'}"
+    that require your immediate attention:
   - tasks.each do |t|
     %p
       = thumb(t)
