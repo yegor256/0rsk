@@ -64,14 +64,12 @@ def reply(msg, login)
       ['There are no tasks in your agenda, nothing to complete.']
     else
       {
-        keyboard: [
-          left.sort_by { |t| t[:id] }.map.with_index do |t, i|
-            {
-              index: i,
-              text: "/done #{t[:id]}"
-            }
-          end
-        ].group_by { |x| (x[:index] / 4).round }.values,
+        keyboard: left.sort_by { |t| t[:id] }.map_with_index do |t, i|
+          {
+            index: i,
+            text: "/done #{t[:id]}"
+          }
+        end.group_by { |x| (x[:index] / 4).round }.values,
         one_time_keyboard: true,
         resize_keyboard: true
       }
