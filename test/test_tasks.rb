@@ -38,18 +38,21 @@ require_relative '../objects/plans'
 # License:: MIT
 class Rsk::TasksTest < Minitest::Test
   def test_adds_and_fetches
-    login = 'jeff0933'
+    login = "bobby#{rand(999)}"
     project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(999)}")
     cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
     rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
+    rid2 = Rsk::Risks.new(test_pgsql, project).add('we may lose it again')
     eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
     triples = Rsk::Triples.new(test_pgsql, project)
     triples.add(cid, rid, eid)
+    triples.add(cid, rid2, eid)
     plans = Rsk::Plans.new(test_pgsql, project)
-    pid = plans.add(rid, 'solve it!')
-    plans.get(pid, rid).schedule = (Time.now - 5 * 24 * 60 * 60).strftime('%d-%m-%Y')
+    pid = plans.add(eid, 'solve it!')
+    plans.get(pid, eid).schedule = (Time.now - 5 * 24 * 60 * 60).strftime('%d-%m-%Y')
     tasks = Rsk::Tasks.new(test_pgsql, login)
     tasks.create
+    assert_equal(1, tasks.fetch.count)
     assert(tasks.fetch.any? { |t| t[:plan] == pid })
   end
 end

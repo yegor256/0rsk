@@ -76,7 +76,8 @@ class Rsk::Tasks
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
       [
-        'SELECT task.*, plan.schedule AS schedule, plan.part AS part,',
+        'SELECT * FROM (SELECT DISTINCT ON (task.id) task.id, task.plan,',
+        '  plan.schedule AS schedule, plan.part AS part,',
         '  part.text AS text, t.text AS ptext,',
         '  project.id AS pid, project.title AS title,',
         '  triple.id AS tid,',
@@ -99,8 +100,8 @@ class Rsk::Tasks
         'WHERE project.login = $1',
         'AND',
         query.is_a?(Integer) ? 'task.id = $2' : 'LOWER(part.text) LIKE $2',
-        'ORDER BY rank DESC',
-        'OFFSET $3 LIMIT $4'
+        'ORDER BY task.id ASC',
+        'OFFSET $3 LIMIT $4) x ORDER BY rank DESC'
       ],
       [@login, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip}%", offset, limit]
     )
