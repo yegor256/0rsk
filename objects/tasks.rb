@@ -52,6 +52,8 @@ class Rsk::Tasks
     end
   end
 
+  # Close this task, remove it from the list and destroy the plan
+  # it was attached to, if it was a one-time plan.
   def done(id)
     project = @pgsql.exec(
       [
@@ -73,6 +75,7 @@ class Rsk::Tasks
     end
   end
 
+  # Total amount of tasks in this user account.
   def count
     @pgsql.exec(
       [
@@ -85,6 +88,7 @@ class Rsk::Tasks
     )[0]['count'].to_i
   end
 
+  # Fetch them all and return an array of hashes.
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
       [

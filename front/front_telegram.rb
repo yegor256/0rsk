@@ -96,10 +96,7 @@ def reply(msg, login)
     if list.empty?
       ['There are no tasks in your agenda, good job!']
     else
-      [
-        'Here is a full list of tasks that belong to you:',
-        list.map { |t| "\n\n" + task_md(t) }
-      ]
+      task_list(list)
     end
   else
     [
@@ -158,10 +155,10 @@ if settings.config['telegram']
       next if expired.empty?
       telepost(
         [
-          "Let me remind you that there are #{expired.count} tasks still required to be completed:",
-          expired.map { |t| task_md(t) },
-          'When done with a task, say /done and I will remove it from the agenda.'
-        ].flatten.join("\n\n"),
+          'Let me remind you that there are some tasks still required to be completed.',
+          task_list(expired),
+          "\n\nWhen done with a task, say /done and I will remove it from the agenda."
+        ].flatten.join(' '),
         chat
       )
       expired.each { |t| telepings.add(t[:id], chat) }
@@ -169,13 +166,36 @@ if settings.config['telegram']
   end
 end
 
-def task_md(task)
-  [
-    "[T#{task[:id]}](https://www.0rsk.com/responses?id=#{task[:triple]})",
-    "(#{task[:positive] ? '+' : '-'}#{task[:rank]})",
-    "\"#{task[:text]}\"",
-    "in [#{task[:title]}](https://www.0rsk.com/projects/#{task[:pid]}):",
-    "#{task[:ctext]}; #{task[:rtext]}; #{task[:etext]}",
-    "(#{task[:schedule]})"
-  ].join(' ')
+def task_list(list)
+  if list.count < 8
+    [
+      'Here is a full list of them:',
+      list.map do |t|
+        [
+          "\n\n[T#{t[:id]}](https://www.0rsk.com/responses?id=#{t[:triple]})",
+          "(#{t[:positive] ? '+' : '-'}#{t[:rank]})",
+          t[:text].inspect,
+          "in [#{t[:title]}](https://www.0rsk.com/projects/#{t[:pid]}):",
+          "#{t[:ctext]}; #{t[:rtext]}; #{t[:etext]}",
+          "(#{t[:schedule]})"
+        ].join(' ')
+      end
+    ]
+  elsif list.count < 16
+    [
+      "There are #{list.count} tasks in the list:\n",
+      list.map do |t|
+        [
+          "\n`T#{t[:id]}` (#{t[:positive] ? '+' : '-'}#{t[:rank]})",
+          t[:text].inspect,
+          "#{t[:ctext]}; #{t[:rtext]}; #{t[:etext]}"
+        ].join(' ')
+      end
+    ]
+  else
+    [
+      "There are too many tasks in the list (#{list.count}), here is the top of it:\n",
+      list.take(16).map { |t| "\n`T#{t[:id]}` (#{t[:positive] ? '+' : '-'}#{t[:rank]}) #{t[:text].inspect}" }
+    ]
+  end
 end
