@@ -59,7 +59,7 @@ end
 
 def reply(msg, login)
   if %r{^/done$}.match?(msg)
-    left = tasks(login: login).fetch
+    left = tasks(login: login).fetch(limit: 1000)
     if left.empty?
       ['There are no tasks in your agenda, nothing to complete.']
     elsif left.count > 16
@@ -186,7 +186,7 @@ def task_list(list)
       "There are #{list.count} tasks in the list:\n",
       list.map do |t|
         [
-          "\n`T#{t[:id]}` (#{t[:positive] ? '+' : '-'}#{t[:rank]})",
+          "\n  * `T#{t[:id]}` (#{t[:positive] ? '+' : '-'}#{t[:rank]})",
           t[:text].inspect,
           "#{t[:ctext]}; #{t[:rtext]}; #{t[:etext]}"
         ].join(' ')
