@@ -32,13 +32,14 @@ end
 
 get '/tasks' do
   offset = [(params[:offset] || '0').to_i, 0].max
-  limit = (params[:limit] || '25').to_i
+  limit = (params[:limit] || '10').to_i
   query = params[:q] || ''
   haml :tasks, layout: :layout, locals: merged(
     title: '/tasks',
     offset: offset,
     limit: limit,
     query: query,
+    total: tasks.count,
     tasks: tasks.fetch(query: query, offset: offset, limit: limit),
     wired: telechats.wired?(current_user),
     updated: @tasks_updated

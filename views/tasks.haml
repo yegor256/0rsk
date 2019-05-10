@@ -17,7 +17,7 @@
 - else
   %p
     There are
-    = "#{tasks.count} task#{tasks.count == 1 ? '' : 's'}"
+    = "#{total} task#{total == 1 ? '' : 's'}"
     that require your immediate attention:
   - tasks.each do |t|
     %p

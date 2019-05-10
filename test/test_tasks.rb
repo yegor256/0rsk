@@ -53,6 +53,7 @@ class Rsk::TasksTest < Minitest::Test
     tasks = Rsk::Tasks.new(test_pgsql, login)
     tasks.create
     assert_equal(1, tasks.fetch.count)
+    assert_equal(1, tasks.count)
     assert(tasks.fetch.any? { |t| t[:plan] == pid })
   end
 end

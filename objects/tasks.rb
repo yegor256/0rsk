@@ -73,6 +73,18 @@ class Rsk::Tasks
     end
   end
 
+  def count
+    @pgsql.exec(
+      [
+        'SELECT COUNT(*) FROM task',
+        'JOIN part ON task.plan = part.id',
+        'JOIN project ON part.project = project.id',
+        'WHERE project.login = $1'
+      ],
+      [@login]
+    )[0]['count'].to_i
+  end
+
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
       [
