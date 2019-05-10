@@ -59,14 +59,14 @@ end
 
 def reply(msg, login)
   if %r{^/done$}.match?(msg)
-    left = tasks(login: login).fetch(limit: 1000)
+    left = tasks(login: login).fetch(limit: 100)
     if left.empty?
       ['There are no tasks in your agenda, nothing to complete.']
     elsif left.count > 16
       [
         "There are #{left.count} tasks in your agenda.",
         'Just pick one and say `/done <id>` and I will understand you.',
-        'I can\'t show you a menu, because you\'ve got so many tasks,',
+        "I can't show you a menu, because you've got so many tasks (#{left.count}),",
         'which is an obvious sign of your management problems :('
       ]
     else
@@ -92,7 +92,7 @@ def reply(msg, login)
         "There are still #{left.count} tasks in your agenda. Say /tasks to see them all."
     ]
   elsif %r{^/tasks$}.match?(msg)
-    list = tasks(login: login).fetch
+    list = tasks(login: login).fetch(limit: 100)
     if list.empty?
       ['There are no tasks in your agenda, good job!']
     else
@@ -186,7 +186,7 @@ def task_list(list)
       "There are #{list.count} tasks in the list:\n",
       list.map do |t|
         [
-          "\n  * `T#{t[:id]}` (#{t[:positive] ? '+' : '-'}#{t[:rank]})",
+          "\n  `T#{t[:id]}` (#{t[:positive] ? '+' : '-'}#{t[:rank]})",
           t[:text].inspect,
           "#{t[:ctext]}; #{t[:rtext]}; #{t[:etext]}"
         ].join(' ')
