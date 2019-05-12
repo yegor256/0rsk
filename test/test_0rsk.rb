@@ -106,6 +106,8 @@ class Rsk::AppTest < Minitest::Test
       ].join('&')
     )
     assert_equal(302, last_response.status, last_response.body)
+    get('/ranked')
+    assert_equal(200, last_response.status, last_response.body)
   end
 
   private

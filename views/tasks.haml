@@ -49,7 +49,7 @@
     - if offset.positive?
       %a.item{href: iri.over(offset: offset - limit)} Previous
     - current = (offset / limit).round
-    - (total / limit).round.each do |p|
+    - (0..(total / limit).round).each do |p|
       - next if p < current - 5 || p > current + 5
       %a.item{href: iri.over(offset: p * limit), style: p == current ? 'text-weight:bold' : ''}= p + 1
     - if tasks.count >= limit
