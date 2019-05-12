@@ -77,7 +77,7 @@ end
 
 desc 'Check the quality of config file'
 task(:config) do
-  puts YAML.safe_load(File.open('config.yml')).to_yaml
+  YAML.safe_load(File.open('config.yml')).to_yaml
 end
 
 task(run: %i[pgsql liquibase]) do

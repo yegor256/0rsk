@@ -79,7 +79,7 @@ class Rsk::Tasks
   def count(query: '')
     @pgsql.exec(
       [
-        'SELECT COUNT(id) FROM (SELECT DISTINCT task.id FROM task',
+        'SELECT COUNT(id) FROM (SELECT DISTINCT task.id FROM task ',
         'JOIN plan ON plan.id = task.plan',
         'JOIN part AS ppart ON plan.id = ppart.id',
         'JOIN triple AS t ON risk = plan.part OR cause = plan.part OR effect = plan.part',
