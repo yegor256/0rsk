@@ -48,4 +48,7 @@ And then, in another terminal (for example):
 $ ruby test/test_risks.rb -n test_adds_and_fetches
 ```
 
+If you want to test it in your browser, open `http://localhost:9292`. If you
+want to login as a test user, just open this: `http://localhost:9292?glogin=test`.
+
 Should work.
