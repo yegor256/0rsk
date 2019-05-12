@@ -115,7 +115,12 @@ class Rsk::Tasks
         'JOIN part AS t ON plan.part = t.id',
         'WHERE project.login = $1',
         'AND',
-        query.is_a?(Integer) ? 'task.id = $2' : 'LOWER(part.text) LIKE $2',
+        query.is_a?(Integer) ? 'task.id = $2' : [
+          '(LOWER(part.text) LIKE $2',
+          'OR LOWER(cpart.text) LIKE $2',
+          'OR LOWER(rpart.text) LIKE $2',
+          'OR LOWER(epart.text) LIKE $2)'
+        ].join(' '),
         'ORDER BY task.id ASC) x',
         'ORDER BY rank DESC OFFSET $3 LIMIT $4'
       ],
