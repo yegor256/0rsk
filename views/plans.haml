@@ -9,6 +9,10 @@
   %p
     No plans as of yet.
 - else
+  %p
+    There are
+    = total
+    plans:
   %table
     %colgroup
       %col{style: 'width: 3em'}
@@ -42,9 +46,4 @@
           %td.right
             = thumb(r)
             = rank(r)
-  %p
-    - if offset.positive?
-      %a.item{href: iri.over(offset: offset - 25)} Previous
-    - if plans.count >= limit
-      %a.item{href: iri.over(offset: offset + 25)} Next
-
+  = Haml::Engine.new(File.read('views/_paging.haml')).render(self, locals.merge(count: plans.count))

@@ -41,9 +41,4 @@
           %span.small{style: 'margin-left: 2em;'}
             %code.small= "P#{p[:id]}"
             &= p[:text]
-  %p
-    - if offset.positive?
-      %a.item{href: iri.over(offset: offset - 25)} Previous
-    - if triples.count >= limit
-      %a.item{href: iri.over(offset: offset + 25)} Next
-
+  = Haml::Engine.new(File.read('views/_paging.haml')).render(self, locals.merge(count: triples.count))

@@ -9,6 +9,10 @@
   %p
     No causes as of yet.
 - else
+  %p
+    There are
+    = total
+    causes:
   %table
     %colgroup
       %col{style: 'width: 3em'}
@@ -32,9 +36,4 @@
             = rank(r)
           %td.right
             = r[:risks]
-  %p
-    - if offset.positive?
-      %a.item{href: iri.over(offset: offset - 25)} Previous
-    - if causes.count >= limit
-      %a.item{href: iri.over(offset: offset + 25)} Next
-
+  = Haml::Engine.new(File.read('views/_paging.haml')).render(self, locals.merge(count: causes.count))

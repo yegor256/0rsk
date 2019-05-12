@@ -49,6 +49,13 @@ class Rsk::Effects
     Rsk::Effect.new(@pgsql, id)
   end
 
+  def count
+    @pgsql.exec(
+      'SELECT COUNT(effect.id) FROM effect JOIN part ON part.id = effect.id WHERE project = $1',
+      [@project]
+    )[0]['count'].to_i
+  end
+
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
       [

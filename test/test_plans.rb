@@ -42,6 +42,7 @@ class Rsk::PlansTest < Minitest::Test
     id = plans.add(rid, text)
     plans.get(id, rid).schedule = '01-01-2001'
     assert(id.positive?)
+    assert_equal(1, plans.count)
     assert(!plans.fetch.empty?)
     assert(plans.fetch.any? { |p| p[:text] == text })
     plans.get(id, rid).complete

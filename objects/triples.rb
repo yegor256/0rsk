@@ -64,6 +64,17 @@ class Rsk::Triples
     end
   end
 
+  def count
+    @pgsql.exec(
+      [
+        'SELECT COUNT(id) FROM (SELECT DISTINCT triple.id FROM triple',
+        'JOIN part ON part.id = triple.cause OR part.id = triple.risk OR part.id = triple.effect',
+        'WHERE project = $1) x'
+      ],
+      [@project]
+    )[0]['count'].to_i
+  end
+
   def fetch(id: 0, query: '', limit: 10, offset: 0)
     where = []
     words = []

@@ -52,6 +52,13 @@ class Rsk::Plans
     Rsk::Plan.new(@pgsql, id, part)
   end
 
+  def count
+    @pgsql.exec(
+      'SELECT COUNT(plan.id) FROM plan JOIN part ON part.id = plan.id WHERE project = $1',
+      [@project]
+    )[0]['count'].to_i
+  end
+
   def fetch(query: '', limit: 10, offset: 0)
     rows = @pgsql.exec(
       [

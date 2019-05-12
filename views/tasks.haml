@@ -45,15 +45,7 @@
       %span.item.small<
         &= t[:schedule]
       %a.item.small{href: iri.cut('/tasks/done').add(id: t[:id])} Done
-  %p.small
-    - if offset.positive?
-      %a.item{href: iri.over(offset: offset - limit)} Previous
-    - current = (offset / limit).round
-    - (0..(total / limit).round).each do |p|
-      - next if p < current - 5 || p > current + 5
-      %a.item{href: iri.over(offset: p * limit), style: p == current ? 'text-weight:bold' : ''}= p + 1
-    - if tasks.count >= limit
-      %a.item{href: iri.over(offset: offset + limit)} Next
+  = Haml::Engine.new(File.read('views/_paging.haml')).render(self, locals.merge(count: tasks.count))
 
 %p
   We're checking all your plans regularly and create tasks

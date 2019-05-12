@@ -43,8 +43,10 @@ class Rsk::TriplesTest < Minitest::Test
     rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
     eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
     triples = Rsk::Triples.new(test_pgsql, project)
+    assert_equal(0, triples.count)
     tid = triples.add(cid, rid, eid)
     triples.add(cid, rid, eid)
+    assert_equal(1, triples.count)
     assert(triples.fetch.any? { |t| t[:id] == tid })
     assert_equal(0, triples.fetch(id: tid)[0][:plans].count)
     triples.fetch.each { |t| triples.delete(t[:id]) }
