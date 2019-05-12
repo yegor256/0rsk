@@ -15,6 +15,10 @@
     %span.red Nothing
     found, sorry.
 - else
+  %p
+    There are
+    = total
+    risks:
   - triples.each do |r|
     %p
       = thumb(r)
