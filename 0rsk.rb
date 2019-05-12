@@ -112,7 +112,7 @@ get '/ranked' do
     query: query,
     limit: limit,
     offset: offset,
-    total: triples.count,
+    total: triples.count(query: query),
     triples: triples.fetch(query: query, offset: offset, limit: limit),
     alone: triples.fetch(query: '+alone', limit: 1)
   )
@@ -187,7 +187,7 @@ get '/causes' do
     query: query,
     offset: offset,
     limit: limit,
-    total: causes.count,
+    total: causes.count(query: query),
     causes: causes.fetch(query: query, offset: offset, limit: limit)
   )
 end
@@ -201,7 +201,7 @@ get '/risks' do
     query: query,
     offset: offset,
     limit: limit,
-    total: risks.count,
+    total: risks.count(query: query),
     risks: risks.fetch(query: query, offset: offset, limit: limit)
   )
 end
@@ -215,7 +215,7 @@ get '/effects' do
     query: query,
     offset: offset,
     limit: limit,
-    total: effects.count,
+    total: effects.count(query: query),
     effects: effects.fetch(query: query, offset: offset, limit: limit)
   )
 end
@@ -229,7 +229,7 @@ get '/plans' do
     query: query,
     offset: offset,
     limit: limit,
-    total: plans.count,
+    total: plans.count(query: query),
     plans: plans.fetch(query: query, offset: offset, limit: limit)
   )
 end

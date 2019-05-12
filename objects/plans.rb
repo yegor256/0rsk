@@ -52,10 +52,14 @@ class Rsk::Plans
     Rsk::Plan.new(@pgsql, id, part)
   end
 
-  def count
+  def count(query: '')
     @pgsql.exec(
-      'SELECT COUNT(plan.id) FROM plan JOIN part ON part.id = plan.id WHERE project = $1',
-      [@project]
+      [
+        'SELECT COUNT(plan.id) FROM plan',
+        'JOIN part ON part.id = plan.id',
+        'WHERE project = $1 and LOWER(text) LIKE $2'
+      ],
+      [@project, "%#{query}%"]
     )[0]['count'].to_i
   end
 

@@ -50,10 +50,14 @@ class Rsk::Causes
     Rsk::Cause.new(@pgsql, id)
   end
 
-  def count
+  def count(query: '')
     @pgsql.exec(
-      'SELECT COUNT(cause.id) FROM cause JOIN part ON part.id = cause.id WHERE project = $1',
-      [@project]
+      [
+        'SELECT COUNT(cause.id) FROM cause',
+        'JOIN part ON part.id = cause.id',
+        'WHERE project = $1 and LOWER(text) LIKE $2'
+      ],
+      [@project, "%#{query}%"]
     )[0]['count'].to_i
   end
 

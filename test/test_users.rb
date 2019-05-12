@@ -33,7 +33,7 @@ require_relative '../objects/users'
 # License:: MIT
 class Rsk::UsersTest < Minitest::Test
   def test_adds_and_fetches
-    login = 'jeff094'
+    login = "bobby#{rand(999)}"
     projects = Rsk::Projects.new(test_pgsql, login)
     projects.add("test#{rand(999)}")
     projects.add("test#{rand(999)}")

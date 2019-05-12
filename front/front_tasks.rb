@@ -39,7 +39,7 @@ get '/tasks' do
     offset: offset,
     limit: limit,
     query: query,
-    total: tasks.count,
+    total: tasks.count(query: query),
     tasks: tasks.fetch(query: query, offset: offset, limit: limit),
     wired: telechats.wired?(current_user),
     updated: @tasks_updated

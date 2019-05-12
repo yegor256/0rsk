@@ -49,10 +49,14 @@ class Rsk::Effects
     Rsk::Effect.new(@pgsql, id)
   end
 
-  def count
+  def count(query: '')
     @pgsql.exec(
-      'SELECT COUNT(effect.id) FROM effect JOIN part ON part.id = effect.id WHERE project = $1',
-      [@project]
+      [
+        'SELECT COUNT(effect.id) FROM effect',
+        'JOIN part ON part.id = effect.id',
+        'WHERE project = $1 and LOWER(text) LIKE $2'
+      ],
+      [@project, "%#{query}%"]
     )[0]['count'].to_i
   end
 

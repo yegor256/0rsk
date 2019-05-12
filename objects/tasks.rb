@@ -76,15 +76,25 @@ class Rsk::Tasks
   end
 
   # Total amount of tasks in this user account.
-  def count
+  def count(query: '')
     @pgsql.exec(
       [
-        'SELECT COUNT(*) FROM task',
-        'JOIN part ON task.plan = part.id',
-        'JOIN project ON part.project = project.id',
-        'WHERE project.login = $1'
+        'SELECT COUNT(id) FROM (SELECT DISTINCT task.id FROM task',
+        'JOIN plan ON plan.id = task.plan',
+        'JOIN part AS ppart ON plan.id = ppart.id',
+        'JOIN triple AS t ON risk = plan.part OR cause = plan.part OR effect = plan.part',
+        'JOIN part AS cpart ON t.cause = cpart.id',
+        'JOIN part AS rpart ON t.risk = rpart.id',
+        'JOIN part AS epart ON t.effect = epart.id',
+        'JOIN project ON ppart.project = project.id',
+        'WHERE project.login = $1',
+        'AND (LOWER(ppart.text) LIKE $2',
+        'OR LOWER(cpart.text) LIKE $2',
+        'OR LOWER(rpart.text) LIKE $2',
+        'OR LOWER(epart.text) LIKE $2)',
+        ') x'
       ],
-      [@login]
+      [@login, "%#{query}%"]
     )[0]['count'].to_i
   end
 

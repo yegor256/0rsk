@@ -49,10 +49,14 @@ class Rsk::Risks
     Rsk::Risk.new(@pgsql, id)
   end
 
-  def count
+  def count(query: '')
     @pgsql.exec(
-      'SELECT COUNT(risk.id) FROM risk JOIN part ON part.id = risk.id WHERE project = $1',
-      [@project]
+      [
+        'SELECT COUNT(risk.id) FROM risk',
+        'JOIN part ON part.id = risk.id',
+        'WHERE project = $1 and LOWER(text) LIKE $2'
+      ],
+      [@project, "%#{query}%"]
     )[0]['count'].to_i
   end
 

@@ -64,14 +64,24 @@ class Rsk::Triples
     end
   end
 
-  def count
+  def count(query: '')
     @pgsql.exec(
       [
-        'SELECT COUNT(id) FROM (SELECT DISTINCT triple.id FROM triple',
-        'JOIN part ON part.id = triple.cause OR part.id = triple.risk OR part.id = triple.effect',
-        'WHERE project = $1) x'
+        'SELECT COUNT(id) FROM (',
+        'SELECT DISTINCT t.id FROM triple t',
+        'JOIN part AS cpart ON t.cause = cpart.id',
+        'JOIN part AS rpart ON t.risk = rpart.id',
+        'JOIN part AS epart ON t.effect = epart.id',
+        'LEFT JOIN plan ON plan.part = t.cause OR plan.part = t.risk OR plan.part = t.effect',
+        'LEFT JOIN part AS ppart ON plan.id = ppart.id',
+        'WHERE cpart.project = $1 AND rpart.project = $1 AND epart.project = $1',
+        'AND (LOWER(cpart.text) LIKE $2',
+        '  OR LOWER(rpart.text) LIKE $2',
+        '  OR LOWER(epart.text) LIKE $2',
+        '  OR LOWER(ppart.text) LIKE $2)',
+        ') x'
       ],
-      [@project]
+      [@project, "%#{query}%"]
     )[0]['count'].to_i
   end
 
