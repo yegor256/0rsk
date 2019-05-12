@@ -9,11 +9,16 @@
   %input{type: 'submit', value: 'Search', tabindex: 2}
 
 - if tasks.empty?
-  %p
-    Good job, the agenda is empty!
-  %p
-    Tasks will show up here where plan schedules will be due.
-    Stay tuned.
+  - if query.empty?
+    %p
+      Good job, the agenda is empty!
+    %p
+      Tasks will show up here where plan schedules will be due.
+      Stay tuned.
+  - else
+    %p
+      %span.red Nothing
+      found, sorry.
 - else
   %p
     There are

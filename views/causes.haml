@@ -6,8 +6,13 @@
   %input{type: 'submit', value: 'Search', tabindex: 2}
 
 - if causes.empty?
-  %p
-    No causes as of yet.
+  - if query.empty?
+    %p
+      No causes as of yet.
+  - else
+    %p
+      %span.red Nothing
+      found, sorry.
 - else
   %p
     There are
