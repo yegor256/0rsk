@@ -108,6 +108,7 @@ class Rsk::Triples
       [
         'SELECT DISTINCT t.id, t.created, cause.id AS cid, risk.id AS rid, effect.id AS eid,',
         '  effect.positive,',
+        '  cause.emoji,',
         '  risk.probability AS probability, effect.impact AS impact,',
         '  cpart.text AS ctext, rpart.text AS rtext, epart.text AS etext,',
         '  (probability * impact) AS rank,',
@@ -127,7 +128,7 @@ class Rsk::Triples
         id.positive? ?
           't.id = $2' :
           [
-            '(LOWER(cpart.text) LIKE $2',
+            '(emoji LIKE $2 OR LOWER(cpart.text) LIKE $2',
             '  OR LOWER(rpart.text) LIKE $2',
             '  OR LOWER(epart.text) LIKE $2',
             '  OR LOWER(ppart.text) LIKE $2)'
@@ -144,6 +145,7 @@ class Rsk::Triples
         cid: r['cid'].to_i,
         rid: r['rid'].to_i,
         eid: r['eid'].to_i,
+        emoji: r['emoji'],
         ctext: r['ctext'],
         rtext: r['rtext'],
         etext: r['etext'],

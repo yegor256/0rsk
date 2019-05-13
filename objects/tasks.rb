@@ -104,6 +104,7 @@ class Rsk::Tasks
       [
         'SELECT * FROM (SELECT DISTINCT ON (task.id) task.id, task.plan,',
         '  plan.schedule AS schedule, plan.part AS part,',
+        '  emoji,',
         '  part.text AS text, t.text AS ptext,',
         '  project.id AS pid, project.title AS title,',
         '  triple.id AS tid,',
@@ -126,7 +127,7 @@ class Rsk::Tasks
         'WHERE project.login = $1',
         'AND',
         query.is_a?(Integer) ? 'task.id = $2' : [
-          '(LOWER(part.text) LIKE $2',
+          '(emoji LIKE $2 OR LOWER(part.text) LIKE $2',
           'OR LOWER(cpart.text) LIKE $2',
           'OR LOWER(rpart.text) LIKE $2',
           'OR LOWER(epart.text) LIKE $2)'
@@ -140,6 +141,7 @@ class Rsk::Tasks
       {
         id: r['id'].to_i,
         pid: r['pid'].to_i,
+        emoji: r['emoji'],
         rank: r['rank'].to_i,
         positive: r['positive'] == 't',
         triple: r['tid'].to_i,

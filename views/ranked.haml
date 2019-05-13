@@ -23,6 +23,8 @@
     %p
       = thumb(r)
       = rank(r)
+      %a{href: iri.over(q: r[:emoji])}<
+        &= r[:emoji]
       = part('C', r[:cid])
       = part('R', r[:rid])
       = part('E', r[:eid])

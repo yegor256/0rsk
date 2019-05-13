@@ -21,12 +21,14 @@
   %table
     %colgroup
       %col{style: 'width: 3em'}
+      %col{style: 'width: 3em'}
       %col{style: ''}
       %col{style: 'width: 4em'}
       %col{style: 'width: 4em'}
     %thead
       %tr
         %th Id
+        %th Emoji
         %th Text
         %th.right Rank
         %th.right Risks
@@ -35,6 +37,9 @@
         %tr
           %td
             = part('C', r[:id])
+          %td
+            %a{href: iri.over(q: r[:emoji])}<
+              &= r[:emoji]
           %td
             &= r[:text]
           %td.right

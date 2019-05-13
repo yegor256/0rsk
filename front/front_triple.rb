@@ -28,7 +28,8 @@ get '/causes.json' do
         label: "C#{r[:id]}: #{r[:text]}",
         value: r[:text],
         fields: {
-          cid: r[:id]
+          cid: r[:id],
+          emoji: r[:emoji]
         }
       }
     end
@@ -85,7 +86,7 @@ get '/plans.json' do
 end
 
 get '/triple' do
-  vars = { title: '/triple', project: current_project }
+  vars = { title: '/triple', project: current_project, emojis: causes.emojis }
   id = params[:id].to_i
   if id.positive?
     triple = triples.fetch(id: id, limit: 1)[0]
@@ -103,6 +104,7 @@ post '/triple/save' do
   rid = params[:rid].empty? ? risks.add(rtext) : params[:rid]
   eid = params[:eid].empty? ? effects.add(etext) : params[:eid]
   causes.get(cid).text = ctext
+  causes.get(cid).emoji = params[:emoji]
   risks.get(rid).text = rtext
   effects.get(eid).text = etext
   risks.get(rid).probability = params[:probability].to_i

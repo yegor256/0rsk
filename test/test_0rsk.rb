@@ -98,6 +98,7 @@ class Rsk::AppTest < Minitest::Test
         'ctext=test+cause',
         'rtext=test+risk',
         'probability=5',
+        'emoji=A',
         'etext=test+effect',
         'impact=5',
         'cid=',

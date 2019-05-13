@@ -45,6 +45,17 @@ class Rsk::Causes
     end
   end
 
+  def emojis
+    @pgsql.exec(
+      [
+        'SELECT DISTINCT emoji FROM cause',
+        'JOIN part ON part.id = cause.id',
+        'WHERE project = $1'
+      ],
+      [@project]
+    ).map { |r| r['emoji'] }
+  end
+
   def get(id)
     require_relative 'cause'
     Rsk::Cause.new(@pgsql, id)
@@ -72,7 +83,7 @@ class Rsk::Causes
         'LEFT JOIN triple ON triple.cause = cause.id',
         'LEFT JOIN risk ON triple.risk = risk.id',
         'LEFT JOIN effect ON triple.effect = effect.id',
-        'WHERE project = $1 AND LOWER(text) LIKE $2',
+        'WHERE project = $1 AND (LOWER(text) LIKE $2 OR emoji LIKE $2)',
         'GROUP BY cause.id, part.id',
         'ORDER BY rank DESC',
         'OFFSET $3 LIMIT $4'
@@ -83,6 +94,7 @@ class Rsk::Causes
       {
         id: r['id'].to_i,
         text: r['text'],
+        emoji: r['emoji'],
         rank: r['rank'].to_i,
         risks: r['risks'].to_i
       }

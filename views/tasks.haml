@@ -28,6 +28,8 @@
     %p
       = thumb(t)
       = rank(t)
+      %a{href: iri.over(q: t[:emoji])}<
+        &= t[:emoji]
       %br
       = part('T', t[:id])
       = '&rarr;'
