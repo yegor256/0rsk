@@ -36,7 +36,7 @@
       - effects.each do |r|
         %tr
           %td
-            %code= "E#{r[:id]}"
+            = part('E', r[:id])
           %td
             &= r[:text]
           %td.right

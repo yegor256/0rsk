@@ -34,7 +34,7 @@
       - causes.each do |r|
         %tr
           %td
-            %code= "C#{r[:id]}"
+            = part('C', r[:id])
           %td
             &= r[:text]
           %td.right

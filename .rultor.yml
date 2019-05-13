@@ -17,6 +17,7 @@ release:
   sensitive:
     - config.yml
   script: |-
+    sudo wget -qO- https://toolbelt.heroku.com/install-ubuntu.sh | sh
     pdd -f /dev/null
     export GEM_HOME=~/.ruby
     export GEM_PATH=$GEM_HOME:$GEM_PATH
@@ -34,13 +35,13 @@ release:
     git add ./version.rb
     git commit -m 'build number set'
     cp ../config.yml config.yml
-    LC_ALL=en_US.UTF-8 rake config
+    bundle exec rake config --no-color
     git add config.yml
     git commit -m 'config.yml'
     git push -f heroku $(git symbolic-ref --short HEAD):master
     git reset HEAD~1
     rm -f target/pgsql-config.yml
-    LC_ALL=en_US.UTF-8 bundle exec rake liquibase
+    bundle exec rake liquibase --no-color
     rm -rf config.yml
     curl -f --connect-timeout 15 --retry 5 --retry-delay 30 https://www.0rsk.com > /dev/null
   commanders:
