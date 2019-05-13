@@ -47,7 +47,7 @@ class Rsk::CauseTest < Minitest::Test
     pid = Rsk::Projects.new(test_pgsql, "bill#{rand(999)}").add("test#{rand(999)}")
     causes = Rsk::Causes.new(test_pgsql, pid)
     cause = causes.get(causes.add('test me'))
-    assert_equal('💰', cause.emoji)
+    assert_equal('💾', cause.emoji)
     cause.emoji = '📚'
     assert_equal('📚', cause.emoji)
   end
