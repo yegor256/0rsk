@@ -22,6 +22,7 @@
 
 require_relative 'rsk'
 require_relative 'plans'
+require_relative 'query'
 
 # Tasks.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -77,30 +78,38 @@ class Rsk::Tasks
 
   # Total amount of tasks in this user account.
   def count(query: '')
-    @pgsql.exec(
-      [
-        'SELECT COUNT(id) FROM (SELECT DISTINCT task.id FROM task ',
-        'JOIN plan ON plan.id = task.plan',
-        'JOIN part AS ppart ON plan.id = ppart.id',
-        'JOIN triple AS t ON risk = plan.part OR cause = plan.part OR effect = plan.part',
-        'JOIN part AS cpart ON t.cause = cpart.id',
-        'JOIN part AS rpart ON t.risk = rpart.id',
-        'JOIN part AS epart ON t.effect = epart.id',
-        'JOIN project ON ppart.project = project.id',
-        'WHERE project.login = $1',
-        'AND (LOWER(ppart.text) LIKE $2',
-        'OR LOWER(cpart.text) LIKE $2',
-        'OR LOWER(rpart.text) LIKE $2',
-        'OR LOWER(epart.text) LIKE $2)',
-        ') x'
-      ],
-      [@login, "%#{query}%"]
-    )[0]['count'].to_i
+    query(query).count
   end
 
   # Fetch them all and return an array of hashes.
   def fetch(query: '', limit: 10, offset: 0)
-    rows = @pgsql.exec(
+    query(query).fetch(offset, limit).map do |r|
+      {
+        id: r['id'].to_i,
+        pid: r['pid'].to_i,
+        emoji: r['emoji'],
+        rank: r['rank'].to_i,
+        positive: r['positive'] == 't',
+        triple: r['tid'].to_i,
+        prefix: r['prefix'],
+        title: r['title'],
+        plan: r['plan'].to_i,
+        part: r['part'].to_i,
+        text: r['text'],
+        ctext: r['ctext'],
+        rtext: r['rtext'],
+        etext: r['etext'],
+        ptext: r['ptext'],
+        schedule: r['schedule']
+      }
+    end
+  end
+
+  private
+
+  def query(query)
+    Rsk::Query.new(
+      @pgsql,
       [
         'SELECT * FROM (SELECT DISTINCT ON (task.id) task.id, task.plan,',
         '  plan.schedule AS schedule, plan.part AS part,',
@@ -133,33 +142,11 @@ class Rsk::Tasks
           'OR LOWER(epart.text) LIKE $2)'
         ].join(' '),
         'ORDER BY task.id ASC) x',
-        'ORDER BY rank DESC OFFSET $3 LIMIT $4'
+        'ORDER BY rank DESC'
       ],
-      [@login, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip}%", offset, limit]
+      [@login, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip}%"]
     )
-    rows.map do |r|
-      {
-        id: r['id'].to_i,
-        pid: r['pid'].to_i,
-        emoji: r['emoji'],
-        rank: r['rank'].to_i,
-        positive: r['positive'] == 't',
-        triple: r['tid'].to_i,
-        prefix: r['prefix'],
-        title: r['title'],
-        plan: r['plan'].to_i,
-        part: r['part'].to_i,
-        text: r['text'],
-        ctext: r['ctext'],
-        rtext: r['rtext'],
-        etext: r['etext'],
-        ptext: r['ptext'],
-        schedule: r['schedule']
-      }
-    end
   end
-
-  private
 
   def deadline(completed, schedule)
     if schedule == 'daily'
