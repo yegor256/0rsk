@@ -41,7 +41,7 @@ release:
     git push -f heroku $(git symbolic-ref --short HEAD):master
     git reset HEAD~1
     rm -f target/pgsql-config.yml
-    bundle exec rake liquibase --no-color
+    bundle exec rake liquibase --no-color >/dev/null
     rm -rf config.yml
     curl -f --connect-timeout 15 --retry 5 --retry-delay 30 https://www.0rsk.com > /dev/null
   commanders:
