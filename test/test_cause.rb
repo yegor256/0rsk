@@ -33,7 +33,7 @@ require_relative '../objects/projects'
 # License:: MIT
 class Rsk::CauseTest < Minitest::Test
   def test_modifies_text
-    pid = Rsk::Projects.new(test_pgsql, 'jeff037').add('test')
+    pid = Rsk::Projects.new(test_pgsql, "bill#{rand(999)}").add("test#{rand(999)}")
     before = 'text first'
     after = 'another text to set'
     causes = Rsk::Causes.new(test_pgsql, pid)
@@ -41,5 +41,14 @@ class Rsk::CauseTest < Minitest::Test
     assert_equal(before, cause.text)
     cause.text = after
     assert_equal(after, cause.text)
+  end
+
+  def test_modifies_emoji
+    pid = Rsk::Projects.new(test_pgsql, "bill#{rand(999)}").add("test#{rand(999)}")
+    causes = Rsk::Causes.new(test_pgsql, pid)
+    cause = causes.get(causes.add('test me'))
+    assert_equal('💰', cause.emoji)
+    cause.emoji = '📚'
+    assert_equal('📚', cause.emoji)
   end
 end

@@ -41,4 +41,12 @@ class Rsk::Cause
   def text=(text)
     @pgsql.exec('UPDATE part SET text = $2 WHERE id = $1', [@id, text])
   end
+
+  def emoji
+    @pgsql.exec('SELECT emoji FROM cause WHERE id = $1', [@id])[0]['emoji']
+  end
+
+  def emoji=(char)
+    @pgsql.exec('UPDATE cause SET emoji = $2 WHERE id = $1', [@id, char])
+  end
 end
