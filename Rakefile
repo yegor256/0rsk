@@ -25,8 +25,6 @@ require 'rake'
 require 'rdoc'
 require 'rake/clean'
 
-raise "Invalid encoding \"#{Encoding.default_external}\"" unless Encoding.default_external.to_s == 'UTF-8'
-
 ENV['RACK_ENV'] = 'test'
 
 task default: %i[clean test eslint rubocop xcop copyright]
