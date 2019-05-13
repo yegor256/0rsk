@@ -23,6 +23,7 @@
 require_relative 'rsk'
 require_relative 'cause'
 require_relative 'urror'
+require_relative 'query'
 
 # Causes.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -62,18 +63,26 @@ class Rsk::Causes
   end
 
   def count(query: '')
-    @pgsql.exec(
-      [
-        'SELECT COUNT(cause.id) FROM cause',
-        'JOIN part ON part.id = cause.id',
-        'WHERE project = $1 and LOWER(text) LIKE $2'
-      ],
-      [@project, "%#{query}%"]
-    )[0]['count'].to_i
+    query(query).count
   end
 
   def fetch(query: '', limit: 10, offset: 0)
-    rows = @pgsql.exec(
+    query(query).fetch(offset, limit).map do |r|
+      {
+        id: r['id'].to_i,
+        text: r['text'],
+        emoji: r['emoji'],
+        rank: r['rank'].to_i,
+        risks: r['risks'].to_i
+      }
+    end
+  end
+
+  private
+
+  def query(query)
+    Rsk::Query.new(
+      @pgsql,
       [
         'SELECT cause.*, part.text,',
         '  SUM(risk.probability * effect.impact) / COUNT(risk.id) AS rank,',
@@ -85,19 +94,9 @@ class Rsk::Causes
         'LEFT JOIN effect ON triple.effect = effect.id',
         'WHERE project = $1 AND (LOWER(text) LIKE $2 OR emoji LIKE $2)',
         'GROUP BY cause.id, part.id',
-        'ORDER BY rank DESC',
-        'OFFSET $3 LIMIT $4'
+        'ORDER BY rank DESC'
       ],
-      [@project, "%#{query.to_s.downcase.strip}%", offset, limit]
+      [@project, "%#{query.to_s.downcase.strip}%"]
     )
-    rows.map do |r|
-      {
-        id: r['id'].to_i,
-        text: r['text'],
-        emoji: r['emoji'],
-        rank: r['rank'].to_i,
-        risks: r['risks'].to_i
-      }
-    end
   end
 end

@@ -24,6 +24,7 @@ require_relative 'rsk'
 require_relative 'plan'
 require_relative 'tasks'
 require_relative 'project'
+require_relative 'query'
 
 # Plans.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -53,18 +54,30 @@ class Rsk::Plans
   end
 
   def count(query: '')
-    @pgsql.exec(
-      [
-        'SELECT COUNT(plan.id) FROM plan',
-        'JOIN part ON part.id = plan.id',
-        'WHERE project = $1 and LOWER(text) LIKE $2'
-      ],
-      [@project, "%#{query}%"]
-    )[0]['count'].to_i
+    query(query).count
   end
 
   def fetch(query: '', limit: 10, offset: 0)
-    rows = @pgsql.exec(
+    query(query).fetch(offset, limit).map do |r|
+      {
+        id: r['id'].to_i,
+        triple: r['tid'].to_i,
+        text: r['text'],
+        prefix: r['prefix'],
+        positive: r['positive'] == 't',
+        part: r['pid'].to_i,
+        rank: r['rank'].to_i,
+        completed: Time.parse(r['completed']),
+        schedule: r['schedule']
+      }
+    end
+  end
+
+  private
+
+  def query(query)
+    Rsk::Query.new(
+      @pgsql,
       [
         'SELECT plan.*, part.text, plan.part AS pid,',
         '  triple.id AS tid,',
@@ -80,23 +93,9 @@ class Rsk::Plans
         'WHERE part.project = $1',
         'AND',
         query.is_a?(Integer) ? 'triple.id = $2' : 'LOWER(part.text) LIKE $2',
-        'ORDER BY rank DESC',
-        'OFFSET $3 LIMIT $4'
+        'ORDER BY rank DESC'
       ],
-      [@project, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip}%", offset, limit]
+      [@project, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip}%"]
     )
-    rows.map do |r|
-      {
-        id: r['id'].to_i,
-        triple: r['tid'].to_i,
-        text: r['text'],
-        prefix: r['prefix'],
-        positive: r['positive'] == 't',
-        part: r['pid'].to_i,
-        rank: r['rank'].to_i,
-        completed: Time.parse(r['completed']),
-        schedule: r['schedule']
-      }
-    end
   end
 end

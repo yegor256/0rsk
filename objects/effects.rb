@@ -22,6 +22,7 @@
 
 require_relative 'rsk'
 require_relative 'effect'
+require_relative 'query'
 
 # Effects.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -50,18 +51,27 @@ class Rsk::Effects
   end
 
   def count(query: '')
-    @pgsql.exec(
-      [
-        'SELECT COUNT(effect.id) FROM effect',
-        'JOIN part ON part.id = effect.id',
-        'WHERE project = $1 and LOWER(text) LIKE $2'
-      ],
-      [@project, "%#{query}%"]
-    )[0]['count'].to_i
+    query(query).count
   end
 
   def fetch(query: '', limit: 10, offset: 0)
-    rows = @pgsql.exec(
+    query(query).fetch(offset, limit).map do |r|
+      {
+        id: r['id'].to_i,
+        text: r['text'],
+        impact: r['impact'].to_i,
+        positive: r['positive'] == 't',
+        rank: r['rank'].to_i,
+        risks: r['risks'].to_i
+      }
+    end
+  end
+
+  private
+
+  def query(query)
+    Rsk::Query.new(
+      @pgsql,
       [
         'SELECT effect.*, part.text AS text,',
         '  SUM(risk.probability) AS probability,',
@@ -74,20 +84,9 @@ class Rsk::Effects
         'WHERE project = $1',
         'AND LOWER(text) LIKE $2',
         'GROUP BY effect.id, part.id',
-        'ORDER BY rank DESC',
-        'OFFSET $3 LIMIT $4'
+        'ORDER BY rank DESC'
       ],
-      [@project, "%#{query.to_s.downcase.strip}%", offset, limit]
+      [@project, "%#{query.to_s.downcase.strip}%"]
     )
-    rows.map do |r|
-      {
-        id: r['id'].to_i,
-        text: r['text'],
-        impact: r['impact'].to_i,
-        positive: r['positive'] == 't',
-        rank: r['rank'].to_i,
-        risks: r['risks'].to_i
-      }
-    end
   end
 end
