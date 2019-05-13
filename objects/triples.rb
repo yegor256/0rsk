@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 require_relative 'rsk'
+require_relative 'query'
 
 # Triples.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -65,27 +66,35 @@ class Rsk::Triples
   end
 
   def count(query: '')
-    @pgsql.exec(
-      [
-        'SELECT COUNT(id) FROM (',
-        'SELECT DISTINCT t.id FROM triple t',
-        'JOIN part AS cpart ON t.cause = cpart.id',
-        'JOIN part AS rpart ON t.risk = rpart.id',
-        'JOIN part AS epart ON t.effect = epart.id',
-        'LEFT JOIN plan ON plan.part = t.cause OR plan.part = t.risk OR plan.part = t.effect',
-        'LEFT JOIN part AS ppart ON plan.id = ppart.id',
-        'WHERE cpart.project = $1 AND rpart.project = $1 AND epart.project = $1',
-        'AND (LOWER(cpart.text) LIKE $2',
-        '  OR LOWER(rpart.text) LIKE $2',
-        '  OR LOWER(epart.text) LIKE $2',
-        '  OR LOWER(ppart.text) LIKE $2)',
-        ') x'
-      ],
-      [@project, "%#{query}%"]
-    )[0]['count'].to_i
+    query(0, query).count
   end
 
   def fetch(id: 0, query: '', limit: 10, offset: 0)
+    query(id, query).fetch(offset, limit).map do |r|
+      {
+        id: r['id'].to_i,
+        cid: r['cid'].to_i,
+        rid: r['rid'].to_i,
+        eid: r['eid'].to_i,
+        emoji: r['emoji'],
+        ctext: r['ctext'],
+        rtext: r['rtext'],
+        etext: r['etext'],
+        probability: r['probability'].to_i,
+        impact: r['impact'].to_i,
+        positive: r['positive'] == 't',
+        rank: r['rank'].to_i,
+        plans: r['plans'] == '{NULL}' ? [] : JSON.parse("[#{r['plans'][1..-2]}]").map do |p|
+          id, text = p.split(':', 2)
+          { id: id.to_i, text: text }
+        end
+      }
+    end
+  end
+
+  private
+
+  def query(id, query)
     where = []
     words = []
     unless id.positive?
@@ -104,7 +113,8 @@ class Rsk::Triples
         end
       end
     end
-    rows = @pgsql.exec(
+    Rsk::Query.new(
+      @pgsql,
       [
         'SELECT DISTINCT t.id, t.created, cause.id AS cid, risk.id AS rid, effect.id AS eid,',
         '  effect.positive,',
@@ -134,30 +144,9 @@ class Rsk::Triples
             '  OR LOWER(ppart.text) LIKE $2)'
           ].join(' '),
         where.empty? ? '' : 'AND (' + where.join(') AND (') + ')',
-        'ORDER BY rank DESC, t.created DESC',
-        'OFFSET $3 LIMIT $4'
+        'ORDER BY rank DESC, t.created DESC'
       ],
-      [@project, id.positive? ? id : "%#{words.join(' ')}%", offset, limit]
+      [@project, id.positive? ? id : "%#{words.join(' ')}%"]
     )
-    rows.map do |r|
-      {
-        id: r['id'].to_i,
-        cid: r['cid'].to_i,
-        rid: r['rid'].to_i,
-        eid: r['eid'].to_i,
-        emoji: r['emoji'],
-        ctext: r['ctext'],
-        rtext: r['rtext'],
-        etext: r['etext'],
-        probability: r['probability'].to_i,
-        impact: r['impact'].to_i,
-        positive: r['positive'] == 't',
-        rank: r['rank'].to_i,
-        plans: r['plans'] == '{NULL}' ? [] : JSON.parse("[#{r['plans'][1..-2]}]").map do |p|
-          id, text = p.split(':', 2)
-          { id: id.to_i, text: text }
-        end
-      }
-    end
   end
 end
