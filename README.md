@@ -19,6 +19,9 @@ and impacts, and then create mitigation and avoidance
 plans for them. Using this information the system
 generates an agenda of the most critical tasks for you.
 
+Read this blog post, it explains it all in details:
+[0rsk.com: Cause + Risk + Effect](https://www.yegor256.com/2019/05/14/cause-risk-effect.html).
+
 It's free for everybody.
 
 ## How to contribute
