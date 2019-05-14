@@ -76,3 +76,9 @@
     %span.item.small
       &= p[:schedule]
     %a.item.small{href: iri.cut('/responses/detach').add(tid: triple[:id], id: p[:id], part: p[:part])} Detach
+
+%p
+  If you are in doubt and need to learn more about
+  the cause+risk+effect model of risk management, read
+  = succeed '.' do
+    %a{href: 'https://www.yegor256.com/2019/05/14/cause-risk-effect.html'} this blog post
