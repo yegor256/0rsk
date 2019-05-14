@@ -2,12 +2,19 @@
   Projects
 
 %form{method: 'POST', action: iri.cut('/projects/create')}
-  %label New one:
-  %input{type: 'text', name: 'title', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1, required: true}
+  %input{type: 'text', name: 'title', size: 20, maxlength: 12, autocomplete: 'off', autofocus: 'true', tabindex: 1, required: true, placeholder: 'Project title'}
   %input{type: 'submit', value: 'Create', tabindex: 2}
 
-- projects.each do |p|
+- if projects.empty?
   %p
-    = "##{p[:id]}:"
-    %a{href: iri.cut('/projects/select').add(id: p[:id])}<
-      &= p[:title]
+    There are no projects in your account yet.
+  %p
+    You should create one in order to start using 0rsk.
+- else
+  %p
+    Pick one of your projects to work with:
+  - projects.each do |p|
+    %p
+      = "##{p[:id]}:"
+      %a{href: iri.cut('/projects/select').add(id: p[:id]), title: 'Click to pick this project'}<
+        &= p[:title]

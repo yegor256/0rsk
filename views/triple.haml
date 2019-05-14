@@ -13,10 +13,10 @@
 %form{method: 'POST', action: iri.cut('/triple/save')}
   %label
     Cause:
-    %a#ctext_detach.small.item{href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
   %br
   %input#ctext{type: 'text', name: 'ctext', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: defined?(triple) ? triple[:ctext] : '', required: true}
-  %input#cid{type: 'text', name: 'cid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:cid] : ''}
+  %input.dimmed#cid{type: 'text', name: 'cid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:cid] : ''}
+  %a#ctext_detach.small.item{href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
   %br
   %input#emoji{type: 'text', name: 'emoji', size: 2, maxlength: 2, autocomplete: 'off', tabindex: 2, value: defined?(triple) ? triple[:emoji] : '💰', required: true}
   - unless emojis.empty?
@@ -25,10 +25,10 @@
   %br
   %label
     Risk:
-    %a#rtext_detach.small.item{href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
   %br
   %input#rtext{type: 'text', name: 'rtext', size: 50, maxlength: 160, tabindex: 3, value: defined?(triple) ? triple[:rtext] : '', required: true}
-  %input#rid{type: 'text', name: 'rid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:rid] : ''}
+  %input.dimmed#rid{type: 'text', name: 'rid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:rid] : ''}
+  %a#rtext_detach.small.item{href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
   %br
   %label
     Probability:
@@ -39,10 +39,10 @@
   %br
   %label
     Effect:
-    %a#etext_detach.small.item{href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
   %br
   %input#etext{type: 'text', name: 'etext', size: 60, maxlength: 160, autocomplete: 'off', tabindex: 5, value: defined?(triple) ? triple[:etext] : '', required: true}
-  %input#eid{type: 'text', name: 'eid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:eid] : ''}
+  %input.dimmed#eid{type: 'text', name: 'eid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:eid] : ''}
+  %a#etext_detach.small.item{href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
   %br
   %label
     Consequences are positive?
@@ -50,15 +50,21 @@
   %br
   %label
     Impact:
-    - if defined?(triple) && triple[:positive]
-      %img#marker.up
-    - else
-      %img#marker.down
   %br
   %select#impact{name: 'impact', tabindex: 7}
     - {'Fatal' => 9, 'Catastrophic' => 8, 'Serious' => 6, 'Average' => 5, 'Moderate' => 4, 'Minor' => 2, 'Unnoticable' => 1}.each do |k, v|
       %option{value: v, selected: defined?(triple) && triple[:impact] == v || v == 5, type: 'negative', hidden: defined?(triple) && triple[:positive]}= "#{k} (#{v})"
     - {'Fantastic' => 9, 'Awesome' => 8, 'Very good' => 6, 'Average' => 5, 'Good to have' => 4, 'Minor' => 2, 'Unnoticable' => 1}.each do |k, v|
       %option{value: v, selected: defined?(triple) && triple[:impact] == v, type: 'positive', hidden: !defined?(triple) || !triple[:positive]}= "#{k} (#{v})"
+  - if defined?(triple) && triple[:positive]
+    %img#marker.up
+  - else
+    %img#marker.down
   %br
   %input{type: 'submit', value: 'Submit', tabindex: 8}
+
+%p
+  If you are in doubt and need to learn more about
+  the cause+risk+effect model of risk management, read
+  = succeed '.' do
+    %a{href: 'https://www.yegor256.com/2019/05/14/cause-risk-effect.html'} this blog post
