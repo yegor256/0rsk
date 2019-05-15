@@ -47,7 +47,7 @@ class Rsk::Causes
   end
 
   def emojis
-    @pgsql.exec(
+    found = @pgsql.exec(
       [
         'SELECT DISTINCT emoji FROM cause',
         'JOIN part ON part.id = cause.id',
@@ -55,6 +55,7 @@ class Rsk::Causes
       ],
       [@project]
     ).map { |r| r['emoji'] }
+    found + ['💰', '💾', '🏢', '🤵'].uniq
   end
 
   def get(id)

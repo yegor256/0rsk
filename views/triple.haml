@@ -18,6 +18,8 @@
   %input.dimmed#cid{type: 'text', name: 'cid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:cid] : ''}
   %a#ctext_detach.small.item{href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
   %br
+  = succeed ':' do
+    %a{href: 'https://unicode.org/emoji/charts/full-emoji-list.html'} Emoji
   %input#emoji{type: 'text', name: 'emoji', size: 2, maxlength: 2, autocomplete: 'off', tabindex: 2, value: defined?(triple) ? triple[:emoji] : '💰', required: true}
   - unless emojis.empty?
     - emojis.each do |e|
