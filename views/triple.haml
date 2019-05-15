@@ -15,8 +15,8 @@
     Cause:
   %br
   %input#ctext{type: 'text', name: 'ctext', size: 40, autocomplete: 'off', autofocus: 'true', tabindex: 1, value: defined?(triple) ? triple[:ctext] : '', required: true}
-  %input.dimmed#cid{type: 'text', name: 'cid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:cid] : ''}
-  %a#ctext_detach.small.item{href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
+  %input.dimmed#cid{type: 'text', name: 'cid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:cid] : '', title: 'The ID of an existing cause'}
+  %a#ctext_detach.small.item{href: '#', style: defined?(triple) ? '' : 'display: none;', title: 'Click to detach it from the existing cause'} Detach
   %br
   = succeed ':' do
     %a{href: 'https://unicode.org/emoji/charts/full-emoji-list.html'} Emoji
@@ -29,8 +29,8 @@
     Risk:
   %br
   %input#rtext{type: 'text', name: 'rtext', size: 50, maxlength: 160, tabindex: 3, value: defined?(triple) ? triple[:rtext] : '', required: true}
-  %input.dimmed#rid{type: 'text', name: 'rid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:rid] : ''}
-  %a#rtext_detach.small.item{href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
+  %input.dimmed#rid{type: 'text', name: 'rid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:rid] : '', title: 'The ID of an existing risk'}
+  %a#rtext_detach.small.item{href: '#', style: defined?(triple) ? '' : 'display: none;', title: 'Click to detach it from the existing risk'} Detach
   %br
   %label
     Probability:
@@ -43,8 +43,8 @@
     Effect:
   %br
   %input#etext{type: 'text', name: 'etext', size: 60, maxlength: 160, autocomplete: 'off', tabindex: 5, value: defined?(triple) ? triple[:etext] : '', required: true}
-  %input.dimmed#eid{type: 'text', name: 'eid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:eid] : ''}
-  %a#etext_detach.small.item{href: '#', style: defined?(triple) ? '' : 'display: none;'} Detach
+  %input.dimmed#eid{type: 'text', name: 'eid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:eid] : '', title: 'The ID of an existing effect'}
+  %a#etext_detach.small.item{href: '#', style: defined?(triple) ? '' : 'display: none;', title: 'Click to detach it from the existing effect'} Detach
   %br
   %label
     Consequences are positive?
