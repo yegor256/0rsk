@@ -47,6 +47,7 @@ class Rsk::Cause
   end
 
   def emoji=(char)
+    raise Rsk::Urror, 'The emoji must be one-symbol only' if char.length > 1
     @pgsql.exec('UPDATE cause SET emoji = $2 WHERE id = $1', [@id, char])
   end
 end
