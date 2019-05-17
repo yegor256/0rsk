@@ -187,6 +187,7 @@ get '/causes' do
     query: query,
     offset: offset,
     limit: limit,
+    emojis: causes.emojis,
     total: causes.count(query: query),
     causes: causes.fetch(query: query, offset: offset, limit: limit)
   )
