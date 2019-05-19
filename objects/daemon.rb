@@ -35,12 +35,14 @@ class Rsk::Daemon
   def start
     sleep(1)
     Thread.start do
-      begin
-        yield
-      rescue StandardError => e
-        Raven.capture_exception(e)
+      loop do
+        begin
+          yield
+        rescue StandardError => e
+          Raven.capture_exception(e)
+        end
+        sleep(@minutes * 60)
       end
-      sleep(@minutes * 60)
     end
   end
 end
