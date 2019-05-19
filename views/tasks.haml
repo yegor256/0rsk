@@ -22,7 +22,8 @@
 - else
   %p
     There are
-    = "#{total} task#{total == 1 ? '' : 's'}"
+    %strong{class: total > 8 ? '' : 'red'}
+      = "#{total} task#{total == 1 ? '' : 's'}"
     that require your immediate attention:
   - tasks.each do |t|
     %p
