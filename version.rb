@@ -23,5 +23,5 @@
 require_relative 'objects/rsk'
 
 module Rsk
-  VERSION = '0.0.0'
+  VERSION = '0.6.5'
 end
