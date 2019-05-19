@@ -80,7 +80,7 @@
   - else
     %img#marker.down
   %br
-  %input{type: 'submit', value: 'Submit', tabindex: 8}
+  %input{type: 'submit', value: 'Submit', tabindex: 8, onclick: 'if ($("#cid").val() || $("#rid").val() || $("#eid").val()) { alert("You are going to MODIFY existing data, are you sure?"); }'}
 
 %p
   If you are in doubt and need to learn more about
