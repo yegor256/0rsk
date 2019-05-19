@@ -33,10 +33,10 @@
         &= t[:emoji]
       %br
       = part('T', t[:id])
-      = '&rarr;'
+      ➜
       %a{href: iri.cut('/responses').add(id: t[:triple])}<
         %code= "P#{t[:plan]}"
-      = '&rarr;'
+      ➜
       = part(t[:prefix], t[:part])
       %br
       &= t[:ctext]
