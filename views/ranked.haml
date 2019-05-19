@@ -40,7 +40,7 @@
         - else
           = "#{r[:plans].count} plan#{r[:plans].count == 1 ? '' : 's'}"
           = '&darr;'
-      %a.item.small{href: iri.cut('/ranked/delete').add(id: r[:id])} Delete
+      %a.item.small{href: iri.cut('/ranked/delete').add(id: r[:id]), onclick: "alert('Are sure you want to delete tripple ##{r[:id]}');"} Delete
       - unless r[:plans].empty?
         - r[:plans].each do |p|
           %br

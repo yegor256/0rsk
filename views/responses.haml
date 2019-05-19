@@ -75,7 +75,7 @@
     %br
     %span.item.small
       &= p[:schedule]
-    %a.item.small{href: iri.cut('/responses/detach').add(tid: triple[:id], id: p[:id], part: p[:part])} Detach
+    %a.item.small{href: iri.cut('/responses/detach').add(tid: triple[:id], id: p[:id], part: p[:part]), onclick: "alert('Are sure you want to detach plan ##{p[:id]}');"} Detach
 
 %p
   If you are in doubt and need to learn more about
