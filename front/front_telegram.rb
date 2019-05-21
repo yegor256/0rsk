@@ -165,7 +165,7 @@ if settings.config['telegram']
       else
         telepost(
           [
-            fresh.count > 1 ? "There are #{fresh.count} new tasks for you:" : 'There is a new task for you:',
+            fresh.count > 1 ? 'There are some new tasks for you.' : 'There is a new task for you.',
             task_list(fresh)
           ].flatten.join(' '),
           chat
