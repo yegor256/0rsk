@@ -46,7 +46,13 @@
                   Add
               %li
                 %a{href: iri.cut('/tasks')}
-                  Tasks
+                  - if tasks_count.zero?
+                    No tasks
+                  - elsif tasks_count == 1
+                    One task
+                  - else
+                    = tasks_count
+                    tasks
               %li
                 %a{href: iri.cut('/logout')}
                   Logout
