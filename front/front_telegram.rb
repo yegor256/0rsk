@@ -153,8 +153,8 @@ if settings.config['telegram']
         .sort_by { |t| t[:rank] }
         .reverse
       if fresh.empty?
-        if telepings.required(login)
-          list = tasks(login: login).fetch(limit: 100)
+        list = tasks(login: login).fetch(limit: 100)
+        if telepings.required(login) && !list.empty?
           telepost(
             [
               'Let me remind you that there are some tasks still required to be completed.',
@@ -163,6 +163,7 @@ if settings.config['telegram']
             ].flatten.join(' '),
             chat
           )
+          telepings.add(list.first[:id], chat)
         end
       else
         telepost(
