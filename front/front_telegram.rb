@@ -148,20 +148,30 @@ if settings.config['telegram']
     users.fetch.each do |login|
       next unless telechats.wired?(login)
       chat = telechats.chat_of(login)
-      expired = telepings.expired(login)
+      fresh = telepings.fresh(login)
         .map { |tid| tasks(login: login).fetch(query: tid)[0] }
         .sort_by { |t| t[:rank] }
         .reverse
-      next if expired.empty?
-      telepost(
-        [
-          'Let me remind you that there are some tasks still required to be completed.',
-          task_list(expired),
-          "\n\nWhen done with a task, say /done and I will remove it from the agenda."
-        ].flatten.join(' '),
-        chat
-      )
-      expired.each { |t| telepings.add(t[:id], chat) }
+      if fresh.empty?
+        list = tasks(login: login).fetch(limit: 100)
+        telepost(
+          [
+            'Let me remind you that there are some tasks still required to be completed.',
+            task_list(list),
+            "\n\nWhen done with a task, say /done and I will remove it from the agenda."
+          ].flatten.join(' '),
+          chat
+        )
+      else
+        telepost(
+          [
+            fresh.count > 1 ? "There are #{fresh.count} new tasks for you:" : 'There is a new task for you:',
+            task_list(fresh)
+          ].flatten.join(' '),
+          chat
+        )
+        fresh.each { |t| telepings.add(t[:id], chat) }
+      end
     end
   end
 end

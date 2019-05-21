@@ -40,25 +40,27 @@ require_relative '../objects/telepings'
 # License:: MIT
 class Rsk::TelepingsTest < Minitest::Test
   def test_fetches
-    login = 'jeff309'
-    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(9999)}")
-    cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
-    rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
-    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
-    triples = Rsk::Triples.new(test_pgsql, project)
-    triples.add(cid, rid, eid)
-    plans = Rsk::Plans.new(test_pgsql, project)
-    pid = plans.add(rid, 'solve it!')
-    plans.get(pid, rid).schedule = (Time.now - 5 * 24 * 60 * 60).strftime('%d-%m-%Y')
-    tasks = Rsk::Tasks.new(test_pgsql, login)
-    tasks.create
-    assert(tasks.fetch.any? { |t| t[:plan] == pid })
+    login = "judy#{rand(999)}"
+    test_tasks(login)
     telepings = Rsk::Telepings.new(test_pgsql)
-    assert(!telepings.expired(login).empty?)
+    assert(!telepings.fresh(login).empty?)
   end
 
   def test_adds
-    login = 'jeff3933'
+    login = "judy#{rand(999)}"
+    tasks = test_tasks(login)
+    telechats = Rsk::Telechats.new(test_pgsql)
+    chat = rand(999)
+    telechats.add(chat, login)
+    telepings = Rsk::Telepings.new(test_pgsql)
+    assert(!telepings.fresh(login).empty?)
+    tasks.fetch.each { |t| telepings.add(t[:id], chat) }
+    assert(telepings.fresh(login).empty?)
+  end
+
+  private
+
+  def test_tasks(login)
     project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(9999)}")
     cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
     rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
@@ -71,9 +73,6 @@ class Rsk::TelepingsTest < Minitest::Test
     tasks = Rsk::Tasks.new(test_pgsql, login)
     tasks.create
     assert(tasks.fetch.any? { |t| t[:plan] == pid })
-    telechats = Rsk::Telechats.new(test_pgsql)
-    telechats.add(1, login)
-    telepings = Rsk::Telepings.new(test_pgsql)
-    telepings.add(tasks.fetch.first[:id], 1)
+    tasks
   end
 end

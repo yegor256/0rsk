@@ -38,19 +38,18 @@ class Rsk::Telepings
     )
   end
 
-  # Returns a list of task IDs, which need to be pinged ASAP.
-  def expired(login, hours: 4)
+  # Returns a list of task IDs, which were not notified yet.
+  def fresh(login)
     @pgsql.exec(
       [
-        'SELECT id FROM',
-        '(SELECT task.id AS id, MAX(teleping.created) AS latest FROM task',
+        'SELECT task.id FROM task',
+        'LEFT JOIN teleping ON teleping.task = task.id',
         'JOIN plan ON task.plan = plan.id',
         'JOIN part ON plan.part = part.id',
         'JOIN project ON project.id = part.project',
-        'LEFT JOIN teleping ON teleping.task = task.id',
         'WHERE project.login = $1',
-        'GROUP BY task.id) t',
-        "WHERE latest IS NULL or latest < NOW() - INTERVAL \'#{hours.to_i} HOURS\'"
+        'AND teleping.id IS NULL',
+        'GROUP BY task.id'
       ],
       [login]
     ).map { |r| r['id'].to_i }
