@@ -153,15 +153,17 @@ if settings.config['telegram']
         .sort_by { |t| t[:rank] }
         .reverse
       if fresh.empty?
-        list = tasks(login: login).fetch(limit: 100)
-        telepost(
-          [
-            'Let me remind you that there are some tasks still required to be completed.',
-            task_list(list),
-            "\n\nWhen done with a task, say /done and I will remove it from the agenda."
-          ].flatten.join(' '),
-          chat
-        )
+        if telepings.required(login)
+          list = tasks(login: login).fetch(limit: 100)
+          telepost(
+            [
+              'Let me remind you that there are some tasks still required to be completed.',
+              task_list(list),
+              "\n\nWhen done with a task, say /done and I will remove it from the agenda."
+            ].flatten.join(' '),
+            chat
+          )
+        end
       else
         telepost(
           [

@@ -38,6 +38,23 @@ class Rsk::Telepings
     )
   end
 
+  # Ping required for this user?
+  def required(login, hours: 4)
+    max = @pgsql.exec(
+      [
+        'SELECT MAX(teleping.updated) FROM teleping',
+        'JOIN task ON teleping.task = task.id',
+        'JOIN plan ON task.plan = plan.id',
+        'JOIN part ON plan.part = part.id',
+        'JOIN project ON project.id = part.project',
+        'WHERE project.login = $1'
+      ],
+      [login]
+    )[0]['max']
+    return true if max.nil?
+    Time.parse(max) < Time.now - hours * 60 * 60
+  end
+
   # Returns a list of task IDs, which were not notified yet.
   def fresh(login)
     @pgsql.exec(

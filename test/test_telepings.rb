@@ -44,6 +44,7 @@ class Rsk::TelepingsTest < Minitest::Test
     test_tasks(login)
     telepings = Rsk::Telepings.new(test_pgsql)
     assert(!telepings.fresh(login).empty?)
+    assert(telepings.required(login))
   end
 
   def test_adds
@@ -54,8 +55,10 @@ class Rsk::TelepingsTest < Minitest::Test
     telechats.add(chat, login)
     telepings = Rsk::Telepings.new(test_pgsql)
     assert(!telepings.fresh(login).empty?)
+    assert(telepings.required(login))
     tasks.fetch.each { |t| telepings.add(t[:id], chat) }
     assert(telepings.fresh(login).empty?)
+    assert(!telepings.required(login))
   end
 
   private
