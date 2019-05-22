@@ -56,7 +56,10 @@ class Rsk::TelepingsTest < Minitest::Test
     telepings = Rsk::Telepings.new(test_pgsql)
     assert(!telepings.fresh(login).empty?)
     assert(telepings.required(login))
-    tasks.fetch.each { |t| telepings.add(t[:id], chat) }
+    tasks.fetch.each do |t|
+      telepings.add(t[:id], chat)
+      telepings.add(t[:id], chat)
+    end
     assert(telepings.fresh(login).empty?)
     assert(!telepings.required(login))
   end

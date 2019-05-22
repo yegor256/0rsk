@@ -33,7 +33,11 @@ class Rsk::Telepings
 
   def add(task, chat)
     @pgsql.exec(
-      'INSERT INTO teleping (task, telechat) VALUES ($1, $2)',
+      [
+        'INSERT INTO teleping (task, telechat)',
+        'VALUES ($1, $2)',
+        'ON CONFLICT (task, telechat) DO UPDATE SET updated = NOW()'
+      ],
       [task, chat]
     )
   end
