@@ -163,7 +163,7 @@ if settings.config['telegram']
             ].flatten.join(' '),
             chat
           )
-          telepings.add(list.first[:id], chat)
+          list.each { |t| telepings.add(t[:id], chat) }
         end
       else
         telepost(
