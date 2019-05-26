@@ -42,7 +42,7 @@
           %td
             = part('C', r[:id])
           %td
-            %a{href: iri.over(q: r[:emoji])}<
+            %a{href: iri.cut('/causes').add(q: r[:emoji])}<
               &= r[:emoji]
           %td
             &= r[:text]
