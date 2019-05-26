@@ -7,7 +7,7 @@
 
 %p{style: 'font-size: 1.4em;'}
   - emojis.each do |e|
-    %a{href: iri.over(q: e)}= e
+    %a{href: iri.cut('/causes').add(q: e)}= e
 
 - if causes.empty?
   - if query.empty?
