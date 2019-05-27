@@ -67,9 +67,9 @@
 
 - plans.each do |p|
   %p
-    %code= "P#{p[:id]}"
+    = part('P', p[:id])
     ➜
-    %code= "#{p[:prefix]}#{p[:part]}"
+    = part(p[:prefix], p[:part])
     %br
     &= p[:text]
     %br
