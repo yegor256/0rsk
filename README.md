@@ -11,7 +11,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/51006993d98c150f21fc/maintainability)](https://codeclimate.com/github/yegor256/0rsk/maintainability)
 [![Hits-of-Code](https://hitsofcode.com/github/yegor256/0rsk)](https://hitsofcode.com/view/github/yegor256/0rsk)
 
-[![Availability at SixNines](http://www.sixnines.io/b/6ea3)](http://www.sixnines.io/h/6ea3)
+[![Availability at SixNines](https://www.sixnines.io/b/6ea3)](https://www.sixnines.io/h/6ea3)
 
 This is an online risk manager, where you register
 all know risks in your project, assign probabilities
