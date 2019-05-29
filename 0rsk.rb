@@ -143,18 +143,19 @@ post '/projects/create' do
   flash("/projects/select?id=#{pid}", "A new project ##{pid} selected")
 end
 
-get '/projects/{id}' do
-  pid = params[:id]
-  haml :project, layout: :layout, locals: merged(
-    title: "##{pid}",
-    pid: pid
-  )
-end
-
 get '/projects/delete' do
   pid = params[:id]
   projects.delete(pid)
   flash('/projects', "The project ##{pid} has been deleted")
+end
+
+get '/project/{id}' do
+  pid = params[:id]
+  raise Rsk::Urror, "Project ##{pid} not found" unless projects.exists?(pid)
+  haml :project, layout: :layout, locals: merged(
+    title: "##{pid}",
+    pid: pid
+  )
 end
 
 get '/responses' do
