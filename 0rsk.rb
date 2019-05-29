@@ -151,6 +151,12 @@ get '/projects/{id}' do
   )
 end
 
+get '/projects/delete' do
+  pid = params[:id]
+  projects.delete(pid)
+  flash('/projects', "The project ##{pid} has been deleted")
+end
+
 get '/responses' do
   id = params[:id].to_i
   triple = triples.fetch(id: id, limit: 1)[0]

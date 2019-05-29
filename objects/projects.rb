@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 require_relative 'rsk'
+require_relative 'urror'
 
 # Projects.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -37,6 +38,14 @@ class Rsk::Projects
       'INSERT INTO project (login, title) VALUES ($1, $2) RETURNING id',
       [@login, title]
     )[0]['id'].to_i
+  end
+
+  def delete(id)
+    raise Rsk::Urror, "Project ##{id} doesn't exist" unless exists?(id)
+    @pgsql.exec(
+      'DELETE FROM project WHERE id = $1 AND login = $2',
+      [id, @login]
+    )
   end
 
   def fetch

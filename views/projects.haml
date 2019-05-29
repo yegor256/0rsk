@@ -18,3 +18,6 @@
       = "##{p[:id]}:"
       %a{href: iri.cut('/projects/select').add(id: p[:id]), title: 'Click to pick this project'}<
         &= p[:title]
+      %br
+      %span.small
+        %a.item{href: iri.cut('/projects/delete').add(id: p[:id]), onclick: "if(!confirm('Are sure you want to delete it?')) return;"} Delete

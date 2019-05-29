@@ -36,5 +36,8 @@ class Rsk::ProjectsTest < Minitest::Test
     projects = Rsk::Projects.new(test_pgsql, 'jeff11')
     pid = projects.add('test')
     assert(pid.positive?)
+    assert(projects.exists?(pid))
+    projects.delete(pid)
+    assert(!projects.exists?(pid))
   end
 end
