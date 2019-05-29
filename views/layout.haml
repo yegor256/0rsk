@@ -4,9 +4,9 @@
     %title= title
     %meta{charset:'UTF-8'}
     %meta{name: 'viewport', content: 'width=device-width, initial-scale=1.0'}
-    %meta{name: 'keywords', content: 'risks'}
-    %meta{name: 'description', content: 'Online risk manager'}
-    %link{href: 'https://cdn.jsdelivr.net/gh/yegor256/tacit@gh-pages/tacit-css-1.5.0.min.css', rel: 'stylesheet'}
+    %meta{name: 'keywords', content: 'risks, risk management, risk quality, risk quantity'}
+    %meta{name: 'description', content: 'Online Risk Manager: identify your risks in Cause+Risk+Effect format and let us manage them'}
+    %link{href: 'https://cdn.jsdelivr.net/gh/yegor256/tacit@gh-pages/tacit-css.min.css', rel: 'stylesheet'}
     %link{href: 'https://www.yegor256.com/css/icons.css', rel: 'stylesheet'}
     %link{rel: 'shortcut icon', href: iri.cut('/logo-64.png')}
     %script{src: 'https://code.jquery.com/jquery-3.3.1.min.js'}
@@ -88,7 +88,7 @@
         %nav
           %ul
             %li
-              = "v#{ver}"
+              = "#{ENV['HEROKU_RELEASE_VERSION']}/#{ver}"
             %li
               = "pg:#{settings.pgsql.version}"
             %li
