@@ -55,7 +55,7 @@ class Rsk::Causes
       ],
       [@project]
     ).map { |r| r['emoji'] }
-    (found + ['💰', '💾', '🏢', '🤵']).uniq
+    (found + ['💰', '💾', '🏢', '🤵', '📚', '📦']).uniq
   end
 
   def get(id)

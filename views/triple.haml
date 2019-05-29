@@ -26,6 +26,11 @@
     Add to the project
     = "##{project}"
 
+%p
+  Need inspiration? Read this
+  = succeed '.' do
+    %a{href: 'https://github.com/yegor256/awesome-risks'} curated list
+
 %form{method: 'POST', action: iri.cut('/triple/save')}
   %label
     Cause:
