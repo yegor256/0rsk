@@ -51,8 +51,9 @@
                   - elsif tasks_count == 1
                     One task
                   - else
-                    = tasks_count
-                    tasks
+                    %span{class: tasks_count >= Rsk::Tasks::THRESHOLD ? 'red' : ''}
+                      = tasks_count
+                      tasks
               %li
                 %a{href: iri.cut('/logout')}
                   Logout
