@@ -50,7 +50,8 @@ class Rsk::AppTest < Minitest::Test
       '/robots.txt',
       '/',
       '/js/triple.js',
-      '/js/responses.js'
+      '/js/responses.js',
+      '/terms'
     ]
     pages.each do |p|
       get(p)

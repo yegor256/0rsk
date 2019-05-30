@@ -242,6 +242,12 @@ get '/plans' do
   )
 end
 
+get '/terms' do
+  haml :terms, layout: :layout, locals: merged(
+    title: '/terms'
+  )
+end
+
 def current_user
   redirect '/' unless @locals[:user]
   @locals[:user][:login].downcase
