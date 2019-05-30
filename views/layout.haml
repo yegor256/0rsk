@@ -89,14 +89,14 @@
               %a{href: iri.cut('/terms')} Terms of Use
         %nav
           %ul
-            %li
+            %li{title: 'Heroku release version and currently deployed version'}
               = "#{ENV['HEROKU_RELEASE_VERSION']}/#{ver}"
-            %li
+            %li{title: 'PostgreSQL version'}
               = "pg:#{settings.pgsql.version}"
-            %li
+            %li{title: 'Your IP address visible to the server'}
               %a{href: 'https://iplocation.com/?ip=' + request_ip}
                 = request_ip
-            %li
+            %li{title: 'This request processing time'}
               = "#{((Time.now - http_start) * 1000).round}ms"
         %nav
           %ul
