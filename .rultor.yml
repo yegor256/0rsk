@@ -10,7 +10,7 @@ install: |-
   sudo apt-get -y install libpq-dev
   sudo rvm install ruby-2.6.0
   rvm use 2.6.0
-  sudo gem install pdd
+  sudo gem install pdd -v 0.20.5
   git config --global user.email "server@0rsk.com"
   git config --global user.name "0rsk.com"
 release:
