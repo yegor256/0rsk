@@ -48,6 +48,7 @@ end
 
 def telepost(msg, chat = telechats.chat_of(current_user), reply_markup: nil)
   return unless settings.config['telegram']
+  telechats.posted(msg, chat)
   telebot.send_message(
     chat_id: chat,
     parse_mode: 'Markdown',
@@ -143,39 +144,41 @@ if settings.config['telegram']
   end
 end
 
+def notify_all
+  users.fetch.each do |login|
+    next unless telechats.wired?(login)
+    chat = telechats.chat_of(login)
+    fresh = telepings.fresh(login)
+      .map { |tid| tasks(login: login).fetch(query: tid)[0] }
+      .sort_by { |t| t[:rank] }
+      .reverse
+    if fresh.empty?
+      list = tasks(login: login).fetch(limit: 100)
+      next unless telepings.required(login)
+      next if list.empty?
+      msg = [
+        'Let me remind you that there are some tasks still required to be completed.',
+        task_list(list),
+        "\n\nWhen done with a task, say /done and I will remove it from the agenda."
+      ].flatten.join(' ')
+      telepost(msg, chat) if telechats.diff?(msg, chat)
+      list.each { |t| telepings.add(t[:id], chat) }
+    else
+      telepost(
+        [
+          fresh.count > 1 ? 'There are some new tasks for you.' : 'There is a new task for you.',
+          task_list(fresh)
+        ].flatten.join(' '),
+        chat
+      )
+      fresh.each { |t| telepings.add(t[:id], chat) }
+    end
+  end
+end
+
 if settings.config['telegram']
   Rsk::Daemon.new(10).start do
-    users.fetch.each do |login|
-      next unless telechats.wired?(login)
-      chat = telechats.chat_of(login)
-      fresh = telepings.fresh(login)
-        .map { |tid| tasks(login: login).fetch(query: tid)[0] }
-        .sort_by { |t| t[:rank] }
-        .reverse
-      if fresh.empty?
-        list = tasks(login: login).fetch(limit: 100)
-        if telepings.required(login) && !list.empty?
-          telepost(
-            [
-              'Let me remind you that there are some tasks still required to be completed.',
-              task_list(list),
-              "\n\nWhen done with a task, say /done and I will remove it from the agenda."
-            ].flatten.join(' '),
-            chat
-          )
-          list.each { |t| telepings.add(t[:id], chat) }
-        end
-      else
-        telepost(
-          [
-            fresh.count > 1 ? 'There are some new tasks for you.' : 'There is a new task for you.',
-            task_list(fresh)
-          ].flatten.join(' '),
-          chat
-        )
-        fresh.each { |t| telepings.add(t[:id], chat) }
-      end
-    end
+    notify_all
   end
 end
 
