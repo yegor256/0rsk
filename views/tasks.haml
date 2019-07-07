@@ -25,6 +25,9 @@
       = succeed ':' do
         %strong.red WARNING
       Since you have too many tasks, new tasks are not being created.
+      There are
+      %strong.red= pipeline
+      plans in the pipeline.
   %p
     There are
     %strong{class: total > 8 ? 'red' : ''}

@@ -26,6 +26,7 @@ require 'glogin'
 require 'glogin/codec'
 require 'haml'
 require 'iri'
+require 'loog'
 require 'json'
 require 'pgtk'
 require 'pgtk/pool'
@@ -66,6 +67,7 @@ configure do
   set :dump_errors, false
   set :config, config
   set :logging, true
+  set :log, Loog::REGULAR
   set :server_settings, timeout: 25
   set :glogin, GLogin::Auth.new(
     config['github']['client_id'],
@@ -73,24 +75,14 @@ configure do
     'https://www.0rsk.com/github-callback'
   )
   if File.exist?('target/pgsql-config.yml')
-    cfg = YAML.load_file('target/pgsql-config.yml')
     set :pgsql, Pgtk::Pool.new(
-      host: cfg['pgsql']['host'],
-      port: cfg['pgsql']['port'],
-      dbname: cfg['pgsql']['dbname'],
-      user: cfg['pgsql']['user'],
-      password: cfg['pgsql']['password'],
-      log: nil
+      Pgtk::Wire::Yaml.new(File.join(__dir__, 'target/pgsql-config.yml')),
+      log: settings.log
     )
   else
-    uri = URI(ENV['DATABASE_URL'])
     set :pgsql, Pgtk::Pool.new(
-      host: uri.host,
-      port: uri.port,
-      dbname: uri.path[1..-1],
-      user: uri.userinfo.split(':')[0],
-      password: uri.userinfo.split(':')[1],
-      log: nil
+      Pgtk::Wire::Env.new('DATABASE_URL'),
+      log: settings.log
     )
   end
   settings.pgsql.start(4)

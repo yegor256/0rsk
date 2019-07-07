@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 require_relative '../objects/tasks'
+require_relative '../objects/pipeline'
 require_relative '../objects/daemon'
 
 Rsk::Daemon.new(10).start do
@@ -39,6 +40,7 @@ get '/tasks' do
     offset: offset,
     limit: limit,
     query: query,
+    pipeline: pipeline.fetch.count,
     total: tasks.count(query: query),
     tasks: tasks.fetch(query: query, offset: offset, limit: limit),
     wired: telechats.wired?(current_user),
@@ -59,4 +61,8 @@ end
 
 def tasks(login: current_user)
   Rsk::Tasks.new(settings.pgsql, login)
+end
+
+def pipeline(login: current_user)
+  Rsk::Pipeline.new(settings.pgsql, login)
 end

@@ -23,6 +23,7 @@
 require_relative 'rsk'
 require_relative 'plans'
 require_relative 'query'
+require_relative 'pipeline'
 
 # Tasks.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -39,21 +40,9 @@ class Rsk::Tasks
 
   # Promote plans into tasks, if their schedules requre.
   def create
-    plans = @pgsql.exec(
-      [
-        'SELECT plan.* FROM plan',
-        'JOIN part ON part.id = plan.part',
-        'JOIN project ON part.project = project.id',
-        'LEFT JOIN task ON task.plan = plan.id',
-        'WHERE project.login = $1 AND task.id IS NULL'
-      ],
-      [@login]
-    )
-    plans.each do |p|
-      completed = Time.parse(p['completed'])
-      deadline = deadline(completed, p['schedule'].strip.downcase)
+    Rsk::Pipeline.new(@pgsql, @login).fetch.each do |p|
       next if count >= THRESHOLD
-      @pgsql.exec('INSERT INTO task (plan) VALUES ($1)', [p['id'].to_i]) if deadline < Time.now
+      @pgsql.exec('INSERT INTO task (plan) VALUES ($1)', [p])
     end
   end
 
@@ -150,25 +139,5 @@ class Rsk::Tasks
       ],
       [@login, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip}%"]
     )
-  end
-
-  def deadline(completed, schedule)
-    if schedule == 'daily'
-      completed + 24 * 60 * 60
-    elsif schedule == 'weekly'
-      completed + 7 * 24 * 60 * 60
-    elsif schedule == 'biweekly'
-      completed + 14 * 24 * 60 * 60
-    elsif schedule == 'monthly'
-      completed + 30 * 24 * 60 * 60
-    elsif schedule == 'quarterly'
-      completed + 3 * 30 * 24 * 60 * 60
-    elsif schedule == 'annually'
-      completed + 12 * 30 * 24 * 60 * 60
-    elsif /^[0-9]{2}-[0-9]{2}-[0-9]{4}$/.match?(schedule)
-      Time.parse(schedule)
-    else
-      completed
-    end
   end
 end
