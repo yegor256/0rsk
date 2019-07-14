@@ -35,7 +35,7 @@ before '/*' do
         settings.config['github']['encryption_secret'],
         context
       ).to_user
-    rescue OpenSSL::Cipher::CipherError => _
+    rescue GLogin::Codec::DecodingError
       cookies.delete(:glogin)
     end
   end
