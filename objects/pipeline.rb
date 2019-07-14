@@ -36,11 +36,17 @@ class Rsk::Pipeline
   def fetch
     plans = @pgsql.exec(
       [
-        'SELECT plan.* FROM plan',
+        'SELECT plan.id, plan.completed, plan.schedule,',
+        'SUM(risk.probability * effect.impact) / COUNT(triple.id) AS rank',
+        'FROM plan',
         'JOIN part ON part.id = plan.part',
         'JOIN project ON part.project = project.id',
+        'JOIN triple ON cause = plan.part OR risk = plan.part OR effect = plan.part',
+        'JOIN risk ON triple.risk = risk.id',
+        'JOIN effect ON triple.effect = effect.id',
         'LEFT JOIN task ON task.plan = plan.id',
-        'WHERE project.login = $1 AND task.id IS NULL'
+        'WHERE project.login = $1 AND task.id IS NULL',
+        'GROUP BY plan.id, plan.completed, plan.schedule'
       ],
       [@login]
     )
