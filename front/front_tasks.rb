@@ -54,6 +54,16 @@ get '/tasks/done' do
   flash('/tasks', "Thanks, task ##{id} was completed!")
 end
 
+get '/tasks/later' do
+  id = params[:id].to_i
+  seconds = 1
+  seconds *= 7 * 24 * 60 * 60 if params[:period] == 'week'
+  seconds *= 30 * 24 * 60 * 60 if params[:period] == 'month'
+  seconds *= 3 * 30 * 24 * 60 * 60 if params[:period] == 'quarter'
+  tasks.postpone(id, seconds)
+  flash('/tasks', "Thanks, the task ##{id} was postponed")
+end
+
 get '/tasks/create' do
   tasks.create
   flash('/tasks', 'All necessary tasks were created, thanks!')

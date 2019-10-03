@@ -55,11 +55,17 @@
       %strong
         &= t[:text]
       %br
-      %a.item.small{href: iri.cut('/projects').append(t[:pid])}<
-        &= t[:title]
-      %span.item.small<
-        &= t[:schedule]
-      %a.item.small{href: iri.cut('/tasks/done').add(id: t[:id])} Done
+      %span.small
+        %a.item{href: iri.cut('/projects').append(t[:pid])}<
+          &= t[:title]
+        %span.item<
+          &= t[:schedule]
+        %a.item{href: iri.cut('/tasks/done').add(id: t[:id])} Done
+        %span.item
+          Later:
+          %a.item{href: iri.cut('/tasks/later').add(id: t[:id], period: 'week')} week
+          %a.item{href: iri.cut('/tasks/later').add(id: t[:id], period: 'month')} month
+          %a.item{href: iri.cut('/tasks/later').add(id: t[:id], period: 'quarter')} quarter
   = Haml::Engine.new(File.read('views/_paging.haml')).render(self, locals.merge(count: tasks.count))
 
 %p

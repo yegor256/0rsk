@@ -60,4 +60,21 @@ class Rsk::TasksTest < Minitest::Test
     assert_equal(1, tasks.count)
     assert(tasks.fetch.any? { |t| t[:plan] == pid })
   end
+
+  def test_postpones_tasks
+    login = "bobby#{rand(999)}"
+    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(999)}")
+    cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
+    rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
+    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
+    triples = Rsk::Triples.new(test_pgsql, project)
+    triples.add(cid, rid, eid)
+    plans = Rsk::Plans.new(test_pgsql, project)
+    pid = plans.add(eid, 'solve it!')
+    plans.get(pid, eid).schedule = (Time.now - 5 * 24 * 60 * 60).strftime('%d-%m-%Y')
+    tasks = Rsk::Tasks.new(test_pgsql, login)
+    tasks.create
+    task = tasks.fetch[0]
+    tasks.postpone(task[:id], 60 * 60)
+  end
 end

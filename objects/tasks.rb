@@ -49,23 +49,20 @@ class Rsk::Tasks
   # Close this task, remove it from the list and destroy the plan
   # it was attached to, if it was a one-time plan.
   def done(id)
-    project = @pgsql.exec(
-      [
-        'SELECT project.* FROM project',
-        'JOIN part ON part.project = project.id',
-        'JOIN plan ON plan.id = part.id',
-        'JOIN task ON task.plan = plan.id',
-        'WHERE task.id = $1'
-      ],
-      [id]
-    )[0]
-    raise Rsk::Urror, "Task ##{id} not found in projects of #{@login}" if project.nil?
-    raise Rsk::Urror, "Task ##{id} doesn't belong to #{@login}" if project['login'] != @login
-    row = @pgsql.exec('SELECT plan.* FROM plan JOIN task ON task.plan = plan.id WHERE task.id = $1', [id])[0]
-    raise Rsk::Urror, "Plan for task ##{id} not found" if row.nil?
+    row = plan_of(id)
     @pgsql.transaction do |t|
       t.exec('DELETE FROM task WHERE id = $1', [id])
-      Rsk::Plans.new(@pgsql, project['id'].to_i).get(row['id'].to_i, row['part'].to_i).complete
+      Rsk::Plans.new(@pgsql, row['project'].to_i).get(row['id'].to_i, row['part'].to_i).complete
+    end
+  end
+
+  # Postpone this task for some time.
+  def postpone(id, seconds)
+    row = plan_of(id)
+    @pgsql.transaction do |t|
+      t.exec('DELETE FROM task WHERE id = $1', [id])
+      s = (Time.now + seconds).strftime('%d-%m-%Y')
+      Rsk::Plans.new(@pgsql, row['project'].to_i).get(row['id'].to_i, row['part'].to_i).schedule = s
     end
   end
 
@@ -139,5 +136,24 @@ class Rsk::Tasks
       ],
       [@login, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip}%"]
     )
+  end
+
+  # The plan of the task, the row.
+  def plan_of(id)
+    project = @pgsql.exec(
+      [
+        'SELECT project.* FROM project',
+        'JOIN part ON part.project = project.id',
+        'JOIN plan ON plan.id = part.id',
+        'JOIN task ON task.plan = plan.id',
+        'WHERE task.id = $1'
+      ],
+      [id]
+    )[0]
+    raise Rsk::Urror, "Task ##{id} not found in projects of #{@login}" if project.nil?
+    raise Rsk::Urror, "Task ##{id} doesn't belong to #{@login}" if project['login'] != @login
+    row = @pgsql.exec('SELECT plan.* FROM plan JOIN task ON task.plan = plan.id WHERE task.id = $1', [id])[0]
+    raise Rsk::Urror, "Plan for task ##{id} not found" if row.nil?
+    row
   end
 end
