@@ -1,1 +1,1 @@
-web: LC_ALL=UTF-8 bundle exec rackup config.ru -p $PORT
+web: LC_ALL=UTF-8 bundle exec ruby 0rsk.rb -p $PORT
