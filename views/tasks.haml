@@ -61,11 +61,14 @@
         %span.item<
           &= t[:schedule]
         %a.item{href: iri.cut('/tasks/done').add(id: t[:id])} Done
-        %span.item
-          Later:
-          %a.item{href: iri.cut('/tasks/later').add(id: t[:id], period: 'week')} week
-          %a.item{href: iri.cut('/tasks/later').add(id: t[:id], period: 'month')} month
-          %a.item{href: iri.cut('/tasks/later').add(id: t[:id], period: 'quarter')} quarter
+        - unless /^[a-z]+$/.match?(t[:schedule])
+          %span.item
+            Later:
+            %a{href: iri.cut('/tasks/later').add(id: t[:id], period: 'week')} week
+            = '|'
+            %a{href: iri.cut('/tasks/later').add(id: t[:id], period: 'month')} month
+            = '|'
+            %a{href: iri.cut('/tasks/later').add(id: t[:id], period: 'quarter')} quarter
   = Haml::Engine.new(File.read('views/_paging.haml')).render(self, locals.merge(count: tasks.count))
 
 %p
