@@ -62,7 +62,9 @@ class Rsk::Tasks
     @pgsql.transaction do |t|
       t.exec('DELETE FROM task WHERE id = $1', [id])
       s = (Time.now + seconds).strftime('%d-%m-%Y')
-      Rsk::Plans.new(@pgsql, row['project'].to_i).get(row['id'].to_i, row['part'].to_i).schedule = s
+      plan = Rsk::Plans.new(@pgsql, row['project'].to_i).get(row['id'].to_i, row['part'].to_i)
+      raise Rsk::Urror, "Can't postpone plan ##{row['id']}" if /^[a-z]+$/.match?(plan.schedule)
+      plan.schedule = s
     end
   end
 
