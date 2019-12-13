@@ -141,6 +141,8 @@ if settings.config['telegram']
         telepost("[Click here](https://www.0rsk.com/telegram?id=#{chat}) to identify yourself.", chat)
       end
     end
+  rescue Net::ReadTimeout => e
+    settings.log.error(e.message)
   end
 end
 
