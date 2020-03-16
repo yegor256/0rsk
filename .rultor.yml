@@ -10,13 +10,13 @@ install: |-
   sudo apt-get -y install libpq-dev
   git config --global user.email "server@0rsk.com"
   git config --global user.name "0rsk.com"
+  pdd -f /dev/null
+  sudo bundle install --no-color "--gemfile=$(pwd)/Gemfile"
 release:
   sensitive:
     - config.yml
   script: |-
     sudo wget -qO- https://toolbelt.heroku.com/install-ubuntu.sh | sh
-    pdd -f /dev/null
-    sudo bundle install --no-color "--gemfile=$(pwd)/Gemfile"
     bundle exec rake
     git remote add dokku dokku@www.0rsk.com:zerorsk
     rm -rf ~/.ssh
@@ -44,7 +44,5 @@ architect:
 merge:
   commanders: []
   script: |-
-    pdd -f /dev/null
-    bundle install
     bundle exec rake
 deploy: {}
