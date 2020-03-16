@@ -8,9 +8,6 @@ install: |-
   export PATH=$PATH:/usr/lib/postgresql/10/bin
   sudo apt-get -y update
   sudo apt-get -y install libpq-dev
-  sudo rvm install ruby-2.6.0
-  rvm use 2.6.0
-  sudo gem install pdd -v 0.20.5
   git config --global user.email "server@0rsk.com"
   git config --global user.name "0rsk.com"
 release:
@@ -19,18 +16,14 @@ release:
   script: |-
     sudo wget -qO- https://toolbelt.heroku.com/install-ubuntu.sh | sh
     pdd -f /dev/null
-    export GEM_HOME=~/.ruby
-    export GEM_PATH=$GEM_HOME:$GEM_PATH
-    bundle install --no-color
-    ruby -v
-    LC_ALL=en_US.UTF-8 bundle exec rake
+    sudo bundle install --no-color "--gemfile=$(pwd)/Gemfile"
+    bundle exec rake
     git remote add dokku dokku@www.0rsk.com:zerorsk
     rm -rf ~/.ssh
     mkdir ~/.ssh
     mv ../id_rsa ../id_rsa.pub ~/.ssh
     chmod -R 600 ~/.ssh/*
     echo -e "Host *\n  StrictHostKeyChecking no\n  UserKnownHostsFile=/dev/null" > ~/.ssh/config
-    git fetch
     sed -i "s/0\.0\.0/${tag}/g" ./version.rb
     git add ./version.rb
     git commit -m 'build number set'
