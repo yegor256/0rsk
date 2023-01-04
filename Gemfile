@@ -36,7 +36,7 @@ gem 'rack-ssl', '1.4.1'
 gem 'rack-test', '1.1.0'
 gem 'rake', '12.3.3', require: false
 gem 'relative_time', '1.1.0'
-gem 'rerun', '0.13.0', require: false
+gem 'rerun', '0.14.0', require: false
 gem 'rspec-rails', '3.8.1', require: false
 gem 'rubocop', '0.62.0', require: false
 gem 'rubocop-rspec', '1.30.1', require: false
