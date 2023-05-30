@@ -24,7 +24,7 @@ ruby '2.6.0'
 
 gem 'codecov', '0.1.14'
 gem 'eslintrb', '2.1.0'
-gem 'glogin', '0.6.0'
+gem 'glogin', '0.11.0'
 gem 'haml', '5.0.4'
 gem 'iri', '0.4.1'
 gem 'loog', '0.2.1'
