@@ -1,3 +1,5 @@
+docker:
+  image: yegor256/rultor-image:1.21.0
 readers:
   - "urn:github:526301"
 assets:
@@ -37,12 +39,6 @@ release:
     bundle exec rake liquibase
     rm -rf config.yml
     curl -f --connect-timeout 15 --retry 5 --retry-delay 30 https://www.0rsk.com > /dev/null
-  commanders:
-  - yegor256
-architect:
-- yegor256
 merge:
-  commanders: []
   script: |-
     bundle exec rake
-deploy: {}
