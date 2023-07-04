@@ -62,7 +62,7 @@ class Rsk::TasksTest < Minitest::Test
   end
 
   def test_postpones_tasks
-    login = "bobby#{rand(99_999)}"
+    login = "bobbyX#{rand(99_999)}"
     project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(99_999)}")
     cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
     rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')

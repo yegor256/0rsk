@@ -53,7 +53,7 @@ class Rsk::TriplesTest < Minitest::Test
   end
 
   def test_fetches_with_plans
-    login = "sarah#{rand(99_999)}"
+    login = "sarahP#{rand(99_999)}"
     project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(99_999)}")
     cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
     rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')

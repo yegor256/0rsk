@@ -40,7 +40,7 @@ require_relative '../objects/telepings'
 # License:: MIT
 class Rsk::TelepingsTest < Minitest::Test
   def test_fetches
-    login = "judy#{rand(99_999)}"
+    login = "judyT#{rand(99_999)}"
     test_tasks(login)
     telepings = Rsk::Telepings.new(test_pgsql)
     assert(!telepings.fresh(login).empty?)
