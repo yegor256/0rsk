@@ -12,6 +12,7 @@ install: |-
   sudo apt-get -y install libpq-dev
   git config --global user.email "server@0rsk.com"
   git config --global user.name "0rsk.com"
+  sudo gem install openssl -- --with-openssl-dir=/usr/local/rvm/rubies/ruby-3.0.1/lib/ruby/3.0.0/openssl
   pdd -f /dev/null
   sudo bundle install --no-color "--gemfile=$(pwd)/Gemfile"
 release:
