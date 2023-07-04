@@ -56,7 +56,7 @@ class Rsk::Telepings
       [login]
     )[0]['max']
     return true if max.nil?
-    Time.parse(max) < Time.now - hours * 60 * 60
+    Time.parse(max) < Time.now - (hours * 60 * 60)
   end
 
   # Returns a list of task IDs, which were not notified yet.

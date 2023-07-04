@@ -91,7 +91,7 @@ class Rsk::AppTest < Minitest::Test
   end
 
   def test_add
-    name = 'jeff09'
+    name = "jeff09#{rand(99_999)}"
     login(name)
     post(
       '/triple/save',
@@ -115,7 +115,7 @@ class Rsk::AppTest < Minitest::Test
   private
 
   def login(name)
-    set_cookie('glogin=' + name)
+    set_cookie("glogin=#{name}")
     projects = Rsk::Projects.new(test_pgsql, name)
     pid = projects.add('test')
     set_cookie("0rsk-project=#{pid}")

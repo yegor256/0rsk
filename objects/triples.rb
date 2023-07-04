@@ -98,12 +98,12 @@ class Rsk::Triples
     where = []
     words = []
     unless id.positive?
-      query.strip.downcase.split(' ').each do |w|
+      query.strip.downcase.split.each do |w|
         if w.start_with?('+')
           if w == '+alone'
             where << 'plan.id IS NULL'
           elsif /^\+[0-9]+$/.match?(w)
-            p = w[1..-1].to_i
+            p = w[1..].to_i
             where << "t.cause = #{p} OR t.risk = #{p} OR t.effect = #{p}"
           else
             raise Rsk::Urror, "Can't understand query operator #{w.inspect}"
@@ -143,7 +143,7 @@ class Rsk::Triples
             '  OR LOWER(epart.text) LIKE $2',
             '  OR LOWER(ppart.text) LIKE $2)'
           ].join(' '),
-        where.empty? ? '' : 'AND (' + where.join(') AND (') + ')',
+        where.empty? ? '' : "AND (#{where.join(') AND (')})",
         'ORDER BY rank DESC, t.created DESC'
       ],
       [@project, id.positive? ? id : "%#{words.join(' ')}%"]

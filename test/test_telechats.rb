@@ -30,9 +30,9 @@ require_relative '../objects/telechats'
 # License:: MIT
 class Rsk::TelechatsTest < Minitest::Test
   def test_checks
-    login = "judy#{rand(999)}"
+    login = "judy#{rand(99_999)}"
     telechats = Rsk::Telechats.new(test_pgsql)
-    chat = rand(999)
+    chat = rand(99_999)
     telechats.add(chat, login)
     msg = 'hey, you!'
     telechats.posted(msg, chat)

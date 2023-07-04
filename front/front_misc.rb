@@ -21,10 +21,10 @@
 # SOFTWARE.
 
 get '/js/*.js' do
-  file = File.join('js', params[:splat].first) + '.js'
+  file = "#{File.join('js', params[:splat].first)}.js"
   error(404, "File not found: #{file}") unless File.exist?(file)
   content_type 'application/javascript'
-  IO.read(file)
+  File.read(file)
 end
 
 get '/robots.txt' do

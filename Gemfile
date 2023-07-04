@@ -20,31 +20,30 @@
 # SOFTWARE.
 
 source 'https://rubygems.org'
-ruby '2.6.0'
 
-gem 'codecov', '0.1.14'
 gem 'eslintrb', '2.1.0'
-gem 'glogin', '0.6.0'
+gem 'glogin', '0.11.0'
 gem 'haml', '5.0.4'
-gem 'iri', '0.4.1'
-gem 'loog', '0.2.1'
-gem 'minitest', '5.11.3', require: false
-gem 'minitest-reporters', '1.3.6', require: false
-gem 'pgtk', '0.7.5'
-gem 'rack', '2.1.4'
+gem 'iri', '0.6.0'
+gem 'loog', '0.3.1'
+gem 'minitest', '5.18.1', require: false
+gem 'minitest-reporters', '1.6.0', require: false
+gem 'pgtk', '0.8.0'
+gem 'rack', '2.2.4'
 gem 'rack-ssl', '1.4.1'
-gem 'rack-test', '1.1.0'
-gem 'rake', '12.3.3', require: false
+gem 'rack-test', '2.1.0'
+gem 'rake', '13.0.6', require: false
 gem 'relative_time', '1.1.0'
-gem 'rerun', '0.13.0', require: false
-gem 'rspec-rails', '3.8.1', require: false
-gem 'rubocop', '0.62.0', require: false
-gem 'rubocop-rspec', '1.30.1', require: false
-gem 'sass', '3.7.2'
-gem 'sentry-raven', '2.7.4'
-gem 'sinatra', '2.0.4'
-gem 'sinatra-contrib', '2.0.4'
-gem 'sprockets', '3.7.2'
+gem 'rerun', '0.14.0', require: false
+gem 'rspec-rails', '6.0.3', require: false
+gem 'rubocop', '1.54.1', require: false
+gem 'rubocop-rspec', '2.22.0', require: false
+gem 'sass', '3.7.4'
+gem 'sentry-raven', '3.1.2'
+gem 'simplecov', '0.22.0'
+gem 'sinatra', '3.0.6'
+gem 'sinatra-contrib', '3.0.6'
+gem 'sprockets', '4.2.0'
 gem 'telebot', '0.1.2'
-gem 'thin', '1.7.2'
-gem 'xcop', '0.6'
+gem 'thin', '1.8.2'
+gem 'xcop', '0.7.1'

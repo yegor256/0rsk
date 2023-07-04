@@ -33,7 +33,7 @@ require_relative '../objects/projects'
 # License:: MIT
 class Rsk::CausesTest < Minitest::Test
   def test_adds_and_fetches
-    pid = Rsk::Projects.new(test_pgsql, "tim#{rand(999)}").add("t#{rand(999)}")
+    pid = Rsk::Projects.new(test_pgsql, "tim#{rand(99_999)}").add("t#{rand(99_999)}")
     causes = Rsk::Causes.new(test_pgsql, pid)
     text = 'we use Ruby'
     assert_equal(0, causes.count)
@@ -45,7 +45,7 @@ class Rsk::CausesTest < Minitest::Test
   end
 
   def test_fetch_emojis
-    pid = Rsk::Projects.new(test_pgsql, "tim#{rand(999)}").add("t#{rand(999)}")
+    pid = Rsk::Projects.new(test_pgsql, "tim#{rand(99_999)}").add("t#{rand(99_999)}")
     causes = Rsk::Causes.new(test_pgsql, pid)
     cid = causes.add('some cause')
     causes.get(cid).emoji = '💰'

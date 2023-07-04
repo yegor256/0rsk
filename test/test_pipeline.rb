@@ -38,8 +38,8 @@ require_relative '../objects/plans'
 # License:: MIT
 class Rsk::PipelineTest < Minitest::Test
   def test_adds_and_fetches
-    login = "bobby#{rand(999)}"
-    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(999)}")
+    login = "bobby#{rand(99_999)}"
+    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(99_999)}")
     cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
     rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
     rid2 = Rsk::Risks.new(test_pgsql, project).add('we may lose it again')
@@ -49,7 +49,7 @@ class Rsk::PipelineTest < Minitest::Test
     triples.add(cid, rid2, eid)
     plans = Rsk::Plans.new(test_pgsql, project)
     pid = plans.add(eid, 'solve it!')
-    plans.get(pid, eid).schedule = (Time.now - 5 * 24 * 60 * 60).strftime('%d-%m-%Y')
+    plans.get(pid, eid).schedule = (Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y')
     pipeline = Rsk::Pipeline.new(test_pgsql, login)
     assert_equal(1, pipeline.fetch.count)
     assert(pipeline.fetch.any? { |t| t == pid })

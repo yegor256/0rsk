@@ -33,10 +33,10 @@ require_relative '../objects/users'
 # License:: MIT
 class Rsk::UsersTest < Minitest::Test
   def test_adds_and_fetches
-    login = "bobby#{rand(999)}"
+    login = "bobbydick#{rand(99_999)}"
     projects = Rsk::Projects.new(test_pgsql, login)
-    projects.add("test#{rand(999)}")
-    projects.add("test#{rand(999)}")
+    projects.add("test-i#{rand(99_999)}")
+    projects.add("test-b#{rand(99_999)}")
     users = Rsk::Users.new(test_pgsql)
     assert(users.fetch.count == users.fetch.uniq.count)
     assert(users.fetch.include?(login))

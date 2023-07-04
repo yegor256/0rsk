@@ -53,13 +53,14 @@ def telepost(msg, chat = telechats.chat_of(current_user), reply_markup: nil)
     chat_id: chat,
     parse_mode: 'Markdown',
     disable_web_page_preview: true,
-    text: msg.length > 4000 ? msg[0..4000] + '...' : msg,
+    text: msg.length > 4000 ? "#{msg[0..4000]}..." : msg,
     reply_markup: reply_markup
   )
 end
 
 def reply(msg, login)
-  if %r{^/done$}.match?(msg)
+  case msg
+  when %r{^/done$}
     left = tasks(login: login).fetch(limit: 100)
     if left.empty?
       ['There are no tasks in your agenda, nothing to complete.']
@@ -82,8 +83,8 @@ def reply(msg, login)
         resize_keyboard: true
       }
     end
-  elsif %r{^/done [0-9]+$}.match?(msg)
-    id = msg.split(' ')[1].to_i
+  when %r{^/done [0-9]+$}
+    id = msg.split[1].to_i
     tasks(login: login).done(id)
     left = tasks(login: login).fetch
     [
@@ -92,7 +93,7 @@ def reply(msg, login)
         'Your agenda is empty, good job!' :
         "There are still #{left.count} tasks in your agenda. Say /tasks to see them all."
     ]
-  elsif %r{^/tasks$}.match?(msg)
+  when %r{^/tasks$}
     list = tasks(login: login).fetch(limit: 100)
     if list.empty?
       ['There are no tasks in your agenda, good job!']

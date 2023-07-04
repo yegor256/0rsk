@@ -57,19 +57,20 @@ class Rsk::Pipeline
   private
 
   def deadline(completed, schedule)
-    if schedule == 'daily'
-      completed + 24 * 60 * 60
-    elsif schedule == 'weekly'
-      completed + 7 * 24 * 60 * 60
-    elsif schedule == 'biweekly'
-      completed + 14 * 24 * 60 * 60
-    elsif schedule == 'monthly'
-      completed + 30 * 24 * 60 * 60
-    elsif schedule == 'quarterly'
-      completed + 3 * 30 * 24 * 60 * 60
-    elsif schedule == 'annually'
-      completed + 12 * 30 * 24 * 60 * 60
-    elsif /^[0-9]{2}-[0-9]{2}-[0-9]{4}$/.match?(schedule)
+    case schedule
+    when 'daily'
+      completed + (24 * 60 * 60)
+    when 'weekly'
+      completed + (7 * 24 * 60 * 60)
+    when 'biweekly'
+      completed + (14 * 24 * 60 * 60)
+    when 'monthly'
+      completed + (30 * 24 * 60 * 60)
+    when 'quarterly'
+      completed + (3 * 30 * 24 * 60 * 60)
+    when 'annually'
+      completed + (12 * 30 * 24 * 60 * 60)
+    when /^[0-9]{2}-[0-9]{2}-[0-9]{4}$/
       Time.parse(schedule)
     else
       completed

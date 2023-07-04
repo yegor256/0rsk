@@ -40,7 +40,7 @@ require_relative '../objects/telepings'
 # License:: MIT
 class Rsk::TelepingsTest < Minitest::Test
   def test_fetches
-    login = "judy#{rand(999)}"
+    login = "judy#{rand(99_999)}"
     test_tasks(login)
     telepings = Rsk::Telepings.new(test_pgsql)
     assert(!telepings.fresh(login).empty?)
@@ -48,10 +48,10 @@ class Rsk::TelepingsTest < Minitest::Test
   end
 
   def test_adds
-    login = "judy#{rand(999)}"
+    login = "judy#{rand(99_999)}"
     tasks = test_tasks(login)
     telechats = Rsk::Telechats.new(test_pgsql)
-    chat = rand(999)
+    chat = rand(99_999)
     telechats.add(chat, login)
     telepings = Rsk::Telepings.new(test_pgsql)
     assert(!telepings.fresh(login).empty?)
@@ -75,7 +75,7 @@ class Rsk::TelepingsTest < Minitest::Test
     triples.add(cid, rid, eid)
     plans = Rsk::Plans.new(test_pgsql, project)
     pid = plans.add(rid, 'solve it!')
-    plans.get(pid, rid).schedule = (Time.now - 5 * 24 * 60 * 60).strftime('%d-%m-%Y')
+    plans.get(pid, rid).schedule = (Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y')
     tasks = Rsk::Tasks.new(test_pgsql, login)
     tasks.create
     assert(tasks.fetch.any? { |t| t[:plan] == pid })

@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-STDOUT.sync = true
+$stdout.sync = true
 
 require 'glogin'
 require 'glogin/codec'
@@ -244,7 +244,7 @@ end
 
 def current_user
   redirect '/' unless @locals[:user]
-  @locals[:user][:login].downcase
+  @locals[:user][:id].downcase
 end
 
 def current_project
@@ -296,9 +296,9 @@ def iri
   Iri.new(request.url)
 end
 
-require_relative 'front/front_tasks.rb'
-require_relative 'front/front_telegram.rb'
-require_relative 'front/front_triple.rb'
-require_relative 'front/front_misc.rb'
-require_relative 'front/front_login.rb'
-require_relative 'front/front_helpers.rb'
+require_relative 'front/front_tasks'
+require_relative 'front/front_telegram'
+require_relative 'front/front_triple'
+require_relative 'front/front_misc'
+require_relative 'front/front_login'
+require_relative 'front/front_helpers'
