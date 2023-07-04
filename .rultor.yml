@@ -19,7 +19,6 @@ release:
   sensitive:
     - config.yml
   script: |-
-    sudo wget -qO- https://toolbelt.heroku.com/install-ubuntu.sh | sh
     bundle exec rake
     git remote add dokku dokku@www.0rsk.com:zerorsk
     rm -rf ~/.ssh
