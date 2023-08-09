@@ -37,7 +37,7 @@ gem 'relative_time', '1.1.0'
 gem 'rerun', '0.14.0', require: false
 gem 'rspec-rails', '6.0.3', require: false
 gem 'rubocop', '1.54.2', require: false
-gem 'rubocop-rspec', '2.23.0', require: false
+gem 'rubocop-rspec', '2.23.2', require: false
 gem 'sass', '3.7.4'
 gem 'sentry-raven', '3.1.2'
 gem 'simplecov', '0.22.0'
