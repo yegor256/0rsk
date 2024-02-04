@@ -6,7 +6,7 @@ on:
       - master
 jobs:
   codecov:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - run: |
@@ -14,12 +14,12 @@ jobs:
           sudo apt-get install -y postgresql-14
           sudo ln -s /usr/lib/postgresql/14/bin/initdb /bin/initdb
           sudo ln -s /usr/lib/postgresql/14/bin/postgres /bin/postgres
-      - uses: actions/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.0
       - run: bundle update
       - run: bundle exec rake
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         with:
-          file: coverage/.resultset.json
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true

@@ -1,7 +1,7 @@
 #
 # frozen_string_literal: true
 
-# Copyright (c) 2019-2023 Yegor Bugayenko
+# Copyright (c) 2019-2024 Yegor Bugayenko
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the 'Software'), to deal
@@ -32,5 +32,7 @@ SimpleCov.formatter = if Gem.win_platform?
                       end
 SimpleCov.start do
   add_filter '/test/'
-  add_filter '/features/'
+  add_filter '/liquibase/'
+  add_filter '/views/' # haml is not supported
+  minimum_coverage 30 if ENV['RACK_ENV'] == 'test'
 end

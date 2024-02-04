@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright (c) 2019-2023 Yegor Bugayenko
+# Copyright (c) 2019-2024 Yegor Bugayenko
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the 'Software'), to deal
@@ -35,7 +35,7 @@ Rake::TestTask.new(test: %i[pgsql liquibase]) do |test|
   test.libs << 'lib' << 'test'
   test.pattern = 'test/**/test_*.rb'
   test.verbose = true
-  test.warning = false
+  test.warning = true
 end
 
 require 'rubocop/rake_task'

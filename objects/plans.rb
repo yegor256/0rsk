@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright (c) 2019-2023 Yegor Bugayenko
+# Copyright (c) 2019-2024 Yegor Bugayenko
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the 'Software'), to deal
@@ -22,13 +22,11 @@
 
 require_relative 'rsk'
 require_relative 'plan'
-require_relative 'tasks'
-require_relative 'project'
 require_relative 'query'
 
 # Plans.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2023 Yegor Bugayenko
+# Copyright:: Copyright (c) 2019-2024 Yegor Bugayenko
 # License:: MIT
 class Rsk::Plans
   def initialize(pgsql, project)
