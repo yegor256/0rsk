@@ -87,8 +87,9 @@ GEM
     glogin (0.14.2)
       base58 (>= 0.2)
       openssl (>= 2.0)
-    haml (5.2.0)
-      temple (>= 0.8.0)
+    haml (6.3.0)
+      temple (>= 0.8.2)
+      thor
       tilt
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
@@ -290,7 +291,7 @@ PLATFORMS
 DEPENDENCIES
   eslintrb (= 2.1.0)
   glogin (= 0.14.2)
-  haml (= 5.2.0)
+  haml (= 6.3.0)
   iri (= 0.8.0)
   loog (= 0.5.1)
   minitest (= 5.21.2)
