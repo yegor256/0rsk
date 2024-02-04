@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright (c) 2019-2023 Yegor Bugayenko
+# Copyright (c) 2019-2024 Yegor Bugayenko
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the 'Software'), to deal
@@ -22,28 +22,29 @@
 source 'https://rubygems.org'
 
 gem 'eslintrb', '2.1.0'
-gem 'glogin', '0.13.0'
-gem 'haml', '5.0.4'
-gem 'iri', '0.7.0'
-gem 'loog', '0.3.1'
-gem 'minitest', '5.18.1', require: false
+gem 'glogin', '0.14.2'
+gem 'haml', '5.2.0'
+gem 'iri', '0.8.0'
+gem 'loog', '0.5.1'
+gem 'minitest', '5.21.2', require: false
 gem 'minitest-reporters', '1.6.0', require: false
-gem 'pgtk', '0.8.1'
+gem 'pgtk', '0.9.2'
 gem 'rack', '2.2.4'
 gem 'rack-ssl', '1.4.1'
 gem 'rack-test', '2.1.0'
-gem 'rake', '13.0.6', require: false
+gem 'rake', '13.1.0', require: false
 gem 'relative_time', '1.1.0'
 gem 'rerun', '0.14.0', require: false
-gem 'rspec-rails', '6.0.3', require: false
-gem 'rubocop', '1.56.0', require: false
-gem 'rubocop-rspec', '2.23.2', require: false
+gem 'rspec-rails', '6.1.1', require: false
+gem 'rubocop', '1.60.2', require: false
+gem 'rubocop-rspec', '2.26.1', require: false
 gem 'sass', '3.7.4'
 gem 'sentry-raven', '3.1.2'
 gem 'simplecov', '0.22.0'
-gem 'sinatra', '3.0.6'
-gem 'sinatra-contrib', '3.0.6'
-gem 'sprockets', '4.2.0'
+gem 'simplecov-cobertura', '~> 2.1'
+gem 'sinatra', '3.2.0'
+gem 'sinatra-contrib', '3.2.0'
+gem 'sprockets', '4.2.1'
 gem 'telebot', '0.1.2'
 gem 'thin', '1.8.2'
 gem 'xcop', '0.7.1'
