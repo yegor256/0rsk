@@ -186,7 +186,8 @@ GEM
       io-console (~> 0.5)
     rerun (0.14.0)
       listen (~> 3.0)
-    rexml (3.2.6)
+    rexml (3.2.8)
+      strscan (>= 3.0.9)
     rspec-core (3.13.0)
       rspec-support (~> 3.13.0)
     rspec-expectations (3.13.0)
@@ -259,6 +260,7 @@ GEM
       concurrent-ruby (~> 1.0)
       rack (>= 2.2.4, < 4)
     stringio (3.1.0)
+    strscan (3.1.0)
     telebot (0.1.2)
       faraday
       faraday_middleware
