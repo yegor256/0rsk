@@ -47,4 +47,3 @@
           %td.right
             = r[:risks]
   = Haml::Engine.new(File.read('views/_paging.haml')).render(self, locals.merge(count: effects.count))
-
