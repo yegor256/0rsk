@@ -40,7 +40,7 @@ gem 'rubocop', '1.61.0', require: false
 gem 'rubocop-minitest', '>0', require: false
 gem 'rubocop-performance', '>0', require: false
 gem 'rubocop-rake', '>0', require: false
-gem 'rubocop-rspec', '2.27.1', require: false
+gem 'rubocop-rspec', '2.31.0', require: false
 gem 'sass', '3.7.4'
 gem 'sentry-raven', '3.1.2'
 gem 'simplecov', '0.22.0'
