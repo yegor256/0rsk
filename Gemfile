@@ -28,7 +28,7 @@ gem 'iri', '0.8.0'
 gem 'loog', '0.5.1'
 gem 'minitest', '5.21.2', require: false
 gem 'minitest-reporters', '1.6.1', require: false
-gem 'pgtk', '0.9.2'
+gem 'pgtk', '0.13.1'
 gem 'rack', '2.2.8.1'
 gem 'rack-ssl', '1.4.1'
 gem 'rack-test', '2.1.0'
