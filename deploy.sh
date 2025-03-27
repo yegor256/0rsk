@@ -1,4 +1,7 @@
 #!/bin/bash
+# SPDX-FileCopyrightText: Copyright (c) 2019-2025 Yegor Bugayenko
+# SPDX-License-Identifier: MIT
+
 set -e
 
 cd "$(dirname "$0")"
