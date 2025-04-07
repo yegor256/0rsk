@@ -1,11 +1,11 @@
 <img src="https://www.0rsk.com/logo.svg" width="92px" height="92px"/>
 
 [![EO principles respected here](https://www.elegantobjects.org/badge.svg)](https://www.elegantobjects.org)
-[![DevOps By Rultor.com](http://www.rultor.com/b/yegor256/0rsk)](http://www.rultor.com/p/yegor256/0rsk)
+[![DevOps By Rultor.com](https://www.rultor.com/b/yegor256/0rsk)](https://www.rultor.com/p/yegor256/0rsk)
 [![We recommend RubyMine](https://www.elegantobjects.org/rubymine.svg)](https://www.jetbrains.com/ruby/)
 
 [![rake](https://github.com/yegor256/0rsk/actions/workflows/rake.yml/badge.svg)](https://github.com/yegor256/0rsk/actions/workflows/rake.yml)
-[![PDD status](http://www.0pdd.com/svg?name=yegor256/0rsk)](http://www.0pdd.com/p?name=yegor256/0rsk)
+[![PDD status](https://www.0pdd.com/svg?name=yegor256/0rsk)](https://www.0pdd.com/p?name=yegor256/0rsk)
 [![Test Coverage](https://img.shields.io/codecov/c/github/yegor256/0rsk.svg)](https://codecov.io/github/yegor256/0rsk?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/51006993d98c150f21fc/maintainability)](https://codeclimate.com/github/yegor256/0rsk/maintainability)
 [![Hits-of-Code](https://hitsofcode.com/github/yegor256/0rsk)](https://hitsofcode.com/view/github/yegor256/0rsk)
