@@ -35,7 +35,7 @@ Java 8+, Maven 3.2+, PostgreSQL 10+, and
 [Bundler](https://bundler.io/) installed. Then:
 
 ```bash
-$ bundle update
+$ bundle install
 $ bundle exec rake
 ```
 
