@@ -227,7 +227,7 @@ end
 
 def current_user
   redirect '/' unless @locals[:user]
-  @locals[:user][:id].downcase
+  @locals[:user]['id'].downcase
 end
 
 def current_project
