@@ -34,6 +34,7 @@ end
 
 require 'pgtk/pgsql_task'
 Pgtk::PgsqlTask.new(:pgsql) do |t|
+  t.quiet = true
   t.dir = 'target/pgsql'
   t.fresh_start = true
   t.user = 'test'
@@ -44,13 +45,13 @@ end
 
 require 'pgtk/liquibase_task'
 Pgtk::LiquibaseTask.new(:liquibase) do |t|
+  t.quiet = true
   t.master = 'liquibase/master.xml'
   t.yaml = ['target/pgsql-config.yml', 'config.yml']
 end
 
 require 'xcop/rake_task'
 Xcop::RakeTask.new(:xcop) do |task|
-  task.license = 'LICENSE.txt'
   task.includes = ['**/*.xml', '**/*.xsl', '**/*.xsd', '**/*.html']
   task.excludes = ['target/**/*', 'coverage/**/*']
 end
