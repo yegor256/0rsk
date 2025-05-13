@@ -29,7 +29,7 @@ class Rsk::Plan
     end
   end
 
-  # Set it as complete, with the completion time slighly in the past. This
+  # Set it as complete, with the completion time slightly in the past. This
   # is done in order to let the task be generated again at the same time
   # next day if it was completed "daily".
   def complete(time: Time.now - (4 * 60 * 60))

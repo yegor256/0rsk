@@ -21,7 +21,7 @@ class Rsk::Tasks
     @login = login
   end
 
-  # Promote plans into tasks, if their schedules requre.
+  # Promote plans into tasks, if their schedules require.
   def create
     Rsk::Pipeline.new(@pgsql, @login).fetch.each do |p|
       next if count >= THRESHOLD
