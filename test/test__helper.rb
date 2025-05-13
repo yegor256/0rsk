@@ -21,8 +21,9 @@ unless SimpleCov.running || ENV['PICKS']
     add_filter 'test/'
     add_filter 'vendor/'
     add_filter 'target/'
-    track_files 'lib/**/*.rb'
-    track_files '*.rb'
+    track_files 'front/**.rb'
+    track_files 'objects/**.rb'
+    track_files '0rsk.rb'
   end
 end
 
