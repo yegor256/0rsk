@@ -20,7 +20,7 @@ class Rsk::EffectsTest < Minitest::Test
     effects = Rsk::Effects.new(test_pgsql, pid)
     text = 'the business will halt'
     eid = effects.add(text)
-    assert(eid.positive?)
+    assert_predicate(eid, :positive?)
     assert_equal(1, effects.count)
     assert(effects.fetch.any? { |c| c[:text] == text })
   end

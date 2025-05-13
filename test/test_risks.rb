@@ -20,9 +20,9 @@ class Rsk::RisksTest < Minitest::Test
     risks = Rsk::Risks.new(test_pgsql, pid)
     text = 'we may lose data'
     rid = risks.add(text)
-    assert(rid.positive?)
+    assert_predicate(rid, :positive?)
     assert_equal(1, risks.count)
-    assert(!risks.fetch(query: 'Data').empty?)
+    refute_empty(risks.fetch(query: 'Data'))
     assert(risks.fetch.any? { |r| r[:id] == rid })
     assert(risks.fetch.any? { |r| r[:text] == text })
   end

@@ -19,7 +19,7 @@ class Rsk::TelechatsTest < Minitest::Test
     telechats.add(chat, login)
     msg = 'hey, you!'
     telechats.posted(msg, chat)
-    assert(!telechats.diff?(msg, chat))
+    refute(telechats.diff?(msg, chat))
     assert(telechats.diff?('something else', chat))
   end
 end

@@ -18,10 +18,10 @@ class Rsk::ProjectsTest < Minitest::Test
   def test_adds_and_fetches
     projects = Rsk::Projects.new(test_pgsql, 'jeff11')
     pid = projects.add('test')
-    assert(pid.positive?)
+    assert_predicate(pid, :positive?)
     assert(projects.exists?(pid))
     projects.delete(pid)
-    assert(!projects.exists?(pid))
+    refute(projects.exists?(pid))
   end
 
   def test_deletes_with_triple

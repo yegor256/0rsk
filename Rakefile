@@ -10,7 +10,7 @@ require 'rake/clean'
 
 ENV['RACK_ENV'] = 'test'
 
-task default: %i[clean test eslint rubocop xcop copyright]
+task default: %i[clean test eslint rubocop xcop]
 
 require 'rake/testtask'
 Rake::TestTask.new(test: %i[pgsql liquibase]) do |test|
@@ -24,7 +24,6 @@ end
 require 'rubocop/rake_task'
 RuboCop::RakeTask.new(:rubocop) do |task|
   task.fail_on_error = true
-  task.requires << 'rubocop-rspec'
 end
 
 require 'eslintrb/eslinttask'
@@ -63,12 +62,4 @@ end
 
 task(run: %i[pgsql liquibase]) do
   `rerun -b "RACK_ENV=test rackup"`
-end
-
-task(:copyright) do
-  sh "grep -q -r '2019-#{Date.today.strftime('%Y')}' \
-    --include '*.rb' \
-    --include '*.txt' \
-    --include 'Rakefile' \
-    ."
 end

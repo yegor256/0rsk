@@ -21,7 +21,7 @@ class Rsk::CausesTest < Minitest::Test
     text = 'we use Ruby'
     assert_equal(0, causes.count)
     cid = causes.add(text)
-    assert(cid.positive?)
+    assert_predicate(cid, :positive?)
     assert_equal(1, causes.count)
     assert(causes.fetch.any? { |c| c[:id] == cid })
     assert(causes.fetch.any? { |c| c[:text] == text })
@@ -32,6 +32,6 @@ class Rsk::CausesTest < Minitest::Test
     causes = Rsk::Causes.new(test_pgsql, pid)
     cid = causes.add('some cause')
     causes.get(cid).emoji = '💰'
-    assert(causes.emojis.count > 1)
+    assert_operator(causes.emojis.count, :>, 1)
   end
 end

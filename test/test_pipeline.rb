@@ -35,6 +35,6 @@ class Rsk::PipelineTest < Minitest::Test
     plans.get(pid, eid).schedule = (Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y')
     pipeline = Rsk::Pipeline.new(test_pgsql, login)
     assert_equal(1, pipeline.fetch.count)
-    assert(pipeline.fetch.any? { |t| t == pid })
+    assert(pipeline.fetch.any?(pid))
   end
 end

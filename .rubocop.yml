@@ -10,6 +10,10 @@ AllCops:
   TargetRubyVersion: 2.6.0
   NewCops: enable
   SuggestExtensions: false
+plugins:
+  - rubocop-rake
+  - rubocop-minitest
+  - rubocop-performance
 Layout/RescueEnsureAlignment:
   Enabled: false
 Metrics/CyclomaticComplexity:
@@ -28,13 +32,17 @@ Metrics/ClassLength:
   Max: 300
 Layout/EndOfLine:
   EnforcedStyle: lf
+Minitest/EmptyLineBeforeAssertionMethods:
+  Enabled: false
+Minitest/MultipleAssertions:
+  Max: 10
 Metrics/ParameterLists:
   Max: 10
 Layout/ParameterAlignment:
   Enabled: false
 Metrics/PerceivedComplexity:
   Max: 25
-Metrics/LineLength:
+Layout/LineLength:
   Max: 120
 Style/MultilineBlockChain:
   Enabled: false
@@ -46,7 +54,3 @@ Layout/EmptyLineAfterGuardClause:
   Enabled: false
 Style/ClassAndModuleChildren:
   Enabled: false
-require:
-  - rubocop-rake
-  - rubocop-minitest
-  - rubocop-performance

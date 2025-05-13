@@ -26,7 +26,7 @@ class Rsk::TelepingsTest < Minitest::Test
     login = "judyT#{rand(99_999)}"
     test_tasks(login)
     telepings = Rsk::Telepings.new(test_pgsql)
-    assert(!telepings.fresh(login).empty?)
+    refute_empty(telepings.fresh(login))
     assert(telepings.required(login))
   end
 
@@ -37,14 +37,14 @@ class Rsk::TelepingsTest < Minitest::Test
     chat = rand(99_999)
     telechats.add(chat, login)
     telepings = Rsk::Telepings.new(test_pgsql)
-    assert(!telepings.fresh(login).empty?)
+    refute_empty(telepings.fresh(login))
     assert(telepings.required(login))
     tasks.fetch.each do |t|
       telepings.add(t[:id], chat)
       telepings.add(t[:id], chat)
     end
-    assert(telepings.fresh(login).empty?)
-    assert(!telepings.required(login))
+    assert_empty(telepings.fresh(login))
+    refute(telepings.required(login))
   end
 
   private

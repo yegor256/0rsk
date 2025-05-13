@@ -24,9 +24,9 @@ class Rsk::PlansTest < Minitest::Test
     text = 'we make backups'
     id = plans.add(rid, text)
     plans.get(id, rid).schedule = '01-01-2001'
-    assert(id.positive?)
+    assert_predicate(id, :positive?)
     assert_equal(1, plans.count)
-    assert(!plans.fetch.empty?)
+    refute_empty(plans.fetch)
     assert(plans.fetch.any? { |p| p[:text] == text })
     plans.get(id, rid).complete
   end

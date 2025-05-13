@@ -24,7 +24,6 @@ gem 'rubocop', '~>1.61', require: false
 gem 'rubocop-minitest', '>0', require: false
 gem 'rubocop-performance', '>0', require: false
 gem 'rubocop-rake', '>0', require: false
-gem 'rubocop-rspec', '~>2.27', require: false
 gem 'sass', '~>3.7'
 gem 'sentry-raven', '~>3.1'
 gem 'simplecov', '~>0.22'

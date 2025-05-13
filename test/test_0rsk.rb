@@ -38,7 +38,7 @@ class Rsk::AppTest < Minitest::Test
     ]
     pages.each do |p|
       get(p)
-      assert(last_response.ok?, last_response.body)
+      assert_predicate(last_response, :ok?, last_response.body)
     end
   end
 

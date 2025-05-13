@@ -21,7 +21,7 @@ class Rsk::UsersTest < Minitest::Test
     projects.add("test-i#{rand(99_999)}")
     projects.add("test-b#{rand(99_999)}")
     users = Rsk::Users.new(test_pgsql)
-    assert(users.fetch.count == users.fetch.uniq.count)
-    assert(users.fetch.include?(login))
+    assert_equal(users.fetch.count, users.fetch.uniq.count)
+    assert_includes(users.fetch, login)
   end
 end

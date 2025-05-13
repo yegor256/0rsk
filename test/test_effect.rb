@@ -21,8 +21,8 @@ class Rsk::EffectTest < Minitest::Test
     text = 'the business will halt'
     eid = effects.add(text)
     effect = effects.get(eid)
-    assert(!effect.positive?)
+    refute_predicate(effect, :positive?)
     effect.positive = true
-    assert(effect.positive?)
+    assert_predicate(effect, :positive?)
   end
 end
