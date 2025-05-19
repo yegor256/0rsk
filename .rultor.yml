@@ -3,7 +3,7 @@
 ---
 # yamllint disable rule:line-length
 docker:
-  image: yegor256/rultor-image:1.24.0
+  image: yegor256/ruby
 readers:
   - "urn:github:526301"
 assets:
@@ -11,37 +11,11 @@ assets:
   id_rsa: yegor256/home#assets/heroku-key
   id_rsa.pub: yegor256/home#assets/heroku-key.pub
 install: |-
-  export PATH=$PATH:/usr/lib/postgresql/10/bin
-  sudo apt-get -y update
-  sudo apt-get install --yes libpq-dev
   git config --global user.email "server@0rsk.com"
   git config --global user.name "0rsk.com"
   pdd -f /dev/null
+  dockers/extras/install-postgres.sh
   bundle install --no-color
-release:
-  sensitive:
-    - config.yml
-  script: |-
-    bundle exec rake
-    git remote add dokku dokku@www.0rsk.com:zerorsk
-    rm -rf ~/.ssh
-    mkdir ~/.ssh
-    mv ../id_rsa ../id_rsa.pub ~/.ssh
-    chmod -R 600 ~/.ssh/*
-    echo -e "Host *\n  StrictHostKeyChecking no\n  UserKnownHostsFile=/dev/null" > ~/.ssh/config
-    sed -i "s/0\.0\.0/${tag}/g" ./version.rb
-    git add ./version.rb
-    git commit -m 'build number set'
-    cp ../config.yml config.yml
-    bundle exec rake config
-    git add config.yml
-    git commit -m 'config.yml'
-    git push -f dokku $(git symbolic-ref --short HEAD):master
-    git reset HEAD~1
-    rm -f target/pgsql-config.yml
-    bundle exec rake liquibase
-    rm -rf config.yml
-    curl -f --connect-timeout 15 --retry 5 --retry-delay 30 https://www.0rsk.com > /dev/null
 merge:
   script: |-
     bundle exec rake
