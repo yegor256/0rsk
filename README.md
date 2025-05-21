@@ -34,7 +34,7 @@ You will need to have [Ruby] 2.3+, Java 8+, Maven 3.2+, PostgreSQL 10+,
 Then:
 
 ```bash
-bundle update
+bundle install
 bundle exec rake
 ```
 
