@@ -23,7 +23,7 @@ require 'yaml'
 require_relative 'objects/urror'
 require_relative 'version'
 
-if ENV['RACK_ENV'] != 'test'
+if ENV['APP_ENV'] != 'test'
   require 'rack/ssl'
   use Rack::SSL
 end
@@ -38,8 +38,8 @@ configure do
     },
     'sentry' => ''
   }
-  config = YAML.safe_load(File.open(File.join(File.dirname(__FILE__), 'config.yml'))) unless ENV['RACK_ENV'] == 'test'
-  if ENV['RACK_ENV'] != 'test'
+  config = YAML.safe_load(File.open(File.join(File.dirname(__FILE__), 'config.yml'))) unless ENV['APP_ENV'] == 'test'
+  if ENV['APP_ENV'] != 'test'
     Raven.configure do |c|
       c.dsn = config['sentry']
       c.release = Rsk::VERSION
