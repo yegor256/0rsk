@@ -34,13 +34,8 @@ You will need to have [Ruby] 2.3+, Java 8+, Maven 3.2+, PostgreSQL 10+,
 Then:
 
 ```bash
-<<<<<<< HEAD
-bundle update
-bundle exec rake
-=======
 $ bundle install
 $ bundle exec rake
->>>>>>> 5886f3c (Update readme)
 ```
 
 If it's clean and you don't see any error messages, submit your pull request.
