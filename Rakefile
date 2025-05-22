@@ -13,7 +13,10 @@ ENV['RACK_ENV'] = 'test'
 task default: %i[clean test eslint rubocop xcop]
 
 require 'rake/testtask'
-Rake::TestTask.new(test: %i[pgsql liquibase]) do |test|
+# https://github.com/yegor256/0rsk/issues/171
+psql_configured = File.exist?('../target/pgsql-config.yml')
+deps = psql_configured ? %i[pgsql liquibase] : []
+Rake::TestTask.new(test: deps) do |test|
   Rake::Cleaner.cleanup_files(['coverage'])
   test.libs << 'lib' << 'test'
   test.pattern = 'test/**/test_*.rb'
