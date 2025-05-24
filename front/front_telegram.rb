@@ -97,7 +97,7 @@ def process_request(chat, message)
   response = begin
     reply(message.text, login)
   rescue StandardError => e
-    Raven.capture_exception(e) unless e.is_a?(Rsk::Urror)
+    Sentry.capture_exception(e) unless e.is_a?(Rsk::Urror)
     [
       "Oops, there was a problem with your request, [#{login}](https://github.com/#{login}):\n\n",
       "```\n#{e.message}\n```\n\nMost probably",

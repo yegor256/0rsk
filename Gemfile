@@ -25,7 +25,7 @@ gem 'rubocop-minitest', '>0', require: false
 gem 'rubocop-performance', '>0', require: false
 gem 'rubocop-rake', '>0', require: false
 gem 'sass', '~>3.7'
-gem 'sentry-raven', '~>3.1'
+gem 'sentry-ruby'
 gem 'simplecov', '~>0.22'
 gem 'simplecov-cobertura', '~> 2.1'
 gem 'sinatra', '~>3.2'

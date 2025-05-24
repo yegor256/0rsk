@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2019-2025 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
-require 'raven'
+require 'sentry-ruby'
 require_relative 'rsk'
 
 # Daemon.
@@ -22,7 +22,7 @@ class Rsk::Daemon
         begin
           yield
         rescue StandardError => e
-          Raven.capture_exception(e)
+          Sentry.capture_exception(e)
         end
         sleep(@minutes * 60)
       end
