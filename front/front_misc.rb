@@ -53,17 +53,18 @@ end
 def merged(hash)
   out = @locals.merge(hash)
   out[:local_assigns] = out
-  if cookies[:flash_msg]
-    out[:flash_msg] = cookies[:flash_msg]
-    cookies.delete(:flash_msg)
+
+  if request.cookies['flash_msg']
+    out[:flash_msg] = request.cookies['flash_msg']
+    response.delete_cookie('flash_msg')
   end
-  out[:flash_color] = cookies[:flash_color] || 'darkgreen'
-  cookies.delete(:flash_color)
+  out[:flash_color] = request.cookies['flash_color'] || 'darkgreen'
+  response.delete_cookie('flash_color')
   out
 end
 
 def flash(uri, msg = '', color: 'darkgreen')
-  cookies[:flash_msg] = msg
-  cookies[:flash_color] = color
+  response.set_cookie('flash_msg', msg)
+  response.set_cookie('flash_color', color)
   redirect(uri)
 end
