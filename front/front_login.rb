@@ -37,6 +37,6 @@ get '/github-callback' do
 end
 
 get '/logout' do
-  cookies.delete(:glogin)
+  response.delete_cookie('glogin')
   flash('/', 'You have been logged out')
 end
