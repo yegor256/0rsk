@@ -14,7 +14,7 @@ install: |-
   git config --global user.email "server@0rsk.com"
   git config --global user.name "0rsk.com"
   pdd -f /dev/null
-  dockers/extras/install-postgres.sh
+  /usr/bin/install-postgres.sh
   bundle install --no-color
 merge:
   script: |-

@@ -6,8 +6,8 @@ version = 1
 path = [
     ".DS_Store",
     ".gitattributes",
-    ".gitmodules",
     ".gitignore",
+    ".gitmodules",
     ".pdd",
     "**.json",
     "**.md",
@@ -17,6 +17,7 @@ path = [
     "**.txt",
     "**/.DS_Store",
     "**/.gitignore",
+    "**/.gitmodules",
     "**/.pdd",
     "**/*.csv",
     "**/*.jpg",
