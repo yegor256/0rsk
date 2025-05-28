@@ -34,7 +34,7 @@ error do
   if e.is_a?(Rsk::Urror)
     flash(@locals[:user] ? '/ranked' : '/', e.message, color: 'darkred')
   else
-    Raven.capture_exception(e)
+    Sentry.capture_exception(e)
     haml(
       :error,
       layout: :layout,

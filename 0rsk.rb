@@ -13,7 +13,7 @@ require 'loog'
 require 'json'
 require 'pgtk'
 require 'pgtk/pool'
-require 'raven'
+require 'sentry-ruby'
 require 'relative_time'
 require 'sinatra'
 require 'sinatra/cookies'
@@ -40,7 +40,7 @@ configure do
   }
   config = YAML.safe_load(File.open(File.join(File.dirname(__FILE__), 'config.yml'))) unless ENV['RACK_ENV'] == 'test'
   if ENV['RACK_ENV'] != 'test'
-    Raven.configure do |c|
+    Sentry.init do |c|
       c.dsn = config['sentry']
       c.release = Rsk::VERSION
     end
