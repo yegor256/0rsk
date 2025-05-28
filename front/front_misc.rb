@@ -21,7 +21,7 @@ get '/version' do
 end
 
 not_found do
-  status 404
+  status :not_found
   content_type 'text/html', charset: 'utf-8'
   haml :not_found, layout: :layout, locals: merged(
     title: request.url
@@ -29,7 +29,7 @@ not_found do
 end
 
 error do
-  status 503
+  status :service_unavailable
   e = env['sinatra.error']
   if e.is_a?(Rsk::Urror)
     flash(@locals[:user] ? '/ranked' : '/', e.message, color: 'darkred')
