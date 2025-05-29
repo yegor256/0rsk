@@ -37,7 +37,7 @@
             %li
               - if defined?(user)
                 %a{href: '/projects'}= "@#{user[:login]}"
-                - if @cookies['0rsk-project']
+                - if request.cookies['0rsk-project']
                   = '/'
                   %a{href: iri.cut('/project').append(current_project)}= "##{current_project}"
               - else
@@ -72,7 +72,7 @@
               %li
                 %a{href: iri.cut('/projects')}
                   Projects
-              - if @cookies['0rsk-project']
+              - if request.cookies['0rsk-project']
                 %li
                   %a{href: iri.cut('/causes')} Causes
                 %li
