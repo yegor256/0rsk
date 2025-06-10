@@ -38,12 +38,10 @@ configure do
     'sentry' => ''
   }
   config = YAML.safe_load(File.open(File.join(File.dirname(__FILE__), 'config.yml'))) unless ENV['RACK_ENV'] == 'test'
-
   Sentry.init do |c|
     c.dsn = config['sentry']
     c.release = Rsk::VERSION
   end
-
   set :bind, '0.0.0.0'
   set :server, :thin
   set :show_exceptions, false
