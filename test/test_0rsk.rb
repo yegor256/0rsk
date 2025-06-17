@@ -36,7 +36,7 @@ class Rsk::AppTest < Minitest::Test
     ]
     pages.each do |p|
       get(p)
-      assert_predicate(last_response, :ok?, last_response.body)
+      assert_page_response_status url: p, reason_keyword: :ok
     end
   end
 
@@ -100,5 +100,15 @@ class Rsk::AppTest < Minitest::Test
     projects = Rsk::Projects.new(test_pgsql, name)
     pid = projects.add('test')
     set_cookie("0rsk-project=#{pid}")
+  end
+
+  def assert_page_response_status(url:, reason_keyword:)
+    expected_code = Rack::Utils.status_code(reason_keyword)
+    msg = <<~TEXT.delete("\n")
+      Response status code of #{url} expected to be #{expected_code}
+       #{reason_keyword.capitalize},
+       but was #{last_response.status} #{Rack::Utils::HTTP_STATUS_CODES[last_response.status]}
+    TEXT
+    assert_equal expected_code, last_response.status, msg
   end
 end
