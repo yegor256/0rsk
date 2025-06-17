@@ -101,4 +101,5 @@ class Rsk::AppTest < Minitest::Test
     pid = projects.add('test')
     set_cookie("0rsk-project=#{pid}")
   end
+  alias login_with_project login
 end
