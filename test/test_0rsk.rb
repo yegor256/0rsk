@@ -95,10 +95,11 @@ class Rsk::AppTest < Minitest::Test
 
   private
 
-  def login(name)
+  def login(name = 'any')
     set_cookie("glogin=#{name}")
     projects = Rsk::Projects.new(test_pgsql, name)
     pid = projects.add('test')
     set_cookie("0rsk-project=#{pid}")
   end
+  alias login_with_project login
 end
