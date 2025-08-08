@@ -38,10 +38,18 @@ require 'yaml'
 class Minitest::Test
   def test_pgsql
     # rubocop:disable Style/ClassVars
-    @@test_pgsql ||= Pgtk::Pool.new(
-      Pgtk::Wire::Yaml.new(File.join(__dir__, '../target/pgsql-config.yml')),
+    # https://github.com/yegor256/0rsk/issues/171
+    @@test_pgsql ||= if File.exist?('../target/pgsql-config.yml')
+                       Pgtk::Pool.new(
+                         Pgtk::Wire::Yaml.new('../target/pgsql-config.yml'),
+                         log: Loog::NULL
+                       )
+                     else
+                       Pgtk::Pool.new(
+                         Pgtk::Wire::Env.new('TEST_DATABASE_URL'),
       log: Loog::NULL
-    ).start
+                       )
+                     end.start
     # rubocop:enable Style/ClassVars
   end
 end
