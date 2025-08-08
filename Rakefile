@@ -8,7 +8,7 @@ require 'rake'
 require 'rdoc'
 require 'rake/clean'
 
-ENV['RACK_ENV'] = 'test'
+ENV['APP_ENV'] = 'test'
 
 task default: %i[clean test eslint rubocop xcop]
 
@@ -62,5 +62,5 @@ task(:config) do
 end
 
 task(run: %i[pgsql liquibase]) do
-  `rerun -b "RACK_ENV=test rackup"`
+  `rerun -b "APP_ENV=test rackup"`
 end
