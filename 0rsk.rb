@@ -72,6 +72,11 @@ configure do
   settings.pgsql.start(4)
 end
 
+configure :development do
+  set :show_exceptions, true
+  set :dump_errors, true
+end
+
 get '/' do
   flash('/ranked') if @locals[:user]
   haml :index, layout: :layout, locals: merged(
