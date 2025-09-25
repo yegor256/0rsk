@@ -7,7 +7,7 @@ source 'https://rubygems.org'
 
 gem 'eslintrb', '~>2.1'
 gem 'glogin', '~>0.14'
-gem 'haml', '~>5.2'
+gem 'haml', '~>6.0'
 gem 'iri', '~>0.8'
 gem 'loog', '~>0.5'
 gem 'minitest', '~>5.21', require: false
