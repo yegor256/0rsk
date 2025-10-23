@@ -9,3 +9,4 @@ node_modules/
 rdoc/
 target/
 vendor/
+config.yml
