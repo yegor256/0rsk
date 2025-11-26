@@ -27,8 +27,10 @@ It's free for everybody.
 
 ## How to contribute
 
-Read these [guidelines].
-Make sure your build is green before you contribute your pull request.
+- Read these [guidelines].
+- Use Devcontainer to setup your environment quickly or do it manually as suggested below.
+- Make sure your build is green before you contribute your pull request.
+
 You will need to have [Ruby] 2.3+, Java 8+, Maven 3.2+, PostgreSQL 10+,
   and [Bundler] installed.
 Then:
