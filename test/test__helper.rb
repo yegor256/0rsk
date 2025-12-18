@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2019-2025 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
-ENV['RACK_ENV'] = 'test'
+ENV['APP_ENV'] = 'test'
 
 require 'simplecov'
 require 'simplecov-cobertura'
