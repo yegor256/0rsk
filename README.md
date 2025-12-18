@@ -25,6 +25,10 @@ Here you can find some inspiration: [yegor256/awesome-risks].
 
 It's free for everybody.
 
+## Running
+
+- Make a copy of `config.yml.sample`, rename it to `config.yml` and fill it with the actual values for your environment.
+
 ## How to contribute
 
 Read these [guidelines].
