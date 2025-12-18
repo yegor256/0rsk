@@ -71,6 +71,10 @@ configure do
   end
   settings.pgsql.start(4)
 end
+configure :development do
+  Sinatra::Application.reset!
+  use Rack::Reloader
+end
 
 get '/' do
   flash('/ranked') if @locals[:user]
