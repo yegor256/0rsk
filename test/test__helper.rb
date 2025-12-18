@@ -35,6 +35,11 @@ Minitest.load :minitest_reporter
 require 'loog'
 require 'pgtk/pool'
 require 'yaml'
+require 'sentry-ruby'
+
+Sentry.init do |config|
+  config.logger.level = Logger::WARN
+end
 
 class Minitest::Test
   def test_pgsql
