@@ -37,6 +37,10 @@ require 'pgtk/pool'
 require 'yaml'
 
 class Minitest::Test
+  def teardown
+    truncate_all_db_tables
+  end
+
   def test_pgsql
     # rubocop:disable Style/ClassVars
     @@test_pgsql ||= Pgtk::Pool.new(
@@ -44,5 +48,26 @@ class Minitest::Test
       log: Loog::NULL
     ).start
     # rubocop:enable Style/ClassVars
+  end
+
+  private
+
+  def truncate_all_db_tables
+    test_pgsql.exec <<-SQL
+      -- Disable "truncate cascades to table" notice
+      set client_min_messages = warning;
+
+      DO $$
+      DECLARE
+          table_name TEXT;
+      BEGIN
+          FOR table_name IN SELECT tablename FROM pg_tables WHERE schemaname = 'public' LOOP
+              EXECUTE 'TRUNCATE TABLE ' || table_name || ' RESTART IDENTITY CASCADE';
+          END LOOP;
+      END $$;
+
+      -- Reset
+      set client_min_messages = notice;
+    SQL
   end
 end
