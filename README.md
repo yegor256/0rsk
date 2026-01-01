@@ -11,11 +11,11 @@
 [![Hits-of-Code](https://hitsofcode.com/github/yegor256/0rsk)](https://hitsofcode.com/view/github/yegor256/0rsk)
 [![Availability at SixNines](https://www.sixnines.io/b/6ea3)](https://www.sixnines.io/h/6ea3)
 
-This is an online risk manager, where you register all know risks
+This is an online risk manager, where you register all known risks
   in your project, assign probabilities
   and impacts, and then create mitigation and avoidance
   plans for them.
-Using this information the system generates an agenda of
+Using this information, the system generates an agenda of
   the most critical tasks for you.
 
 Read this blog post, it explains it all in details:
