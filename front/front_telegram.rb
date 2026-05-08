@@ -134,10 +134,7 @@ def notify_all
   users.fetch.each do |login|
     next unless telechats.wired?(login)
     chat = telechats.chat_of(login)
-    fresh = telepings.fresh(login)
-      .map { |tid| tasks(login: login).fetch(query: tid)[0] }
-      .sort_by { |t| t[:rank] }
-      .reverse
+    fresh = telepings.fresh_tasks(login, tasks(login: login))
     if fresh.empty?
       list = tasks(login: login).fetch(limit: 100)
       next unless telepings.required(login)
@@ -159,6 +156,9 @@ def notify_all
       )
       fresh.each { |t| telepings.add(t[:id], chat) }
     end
+  rescue StandardError => e
+    settings.log.error(e.message)
+    next
   end
 end
 
