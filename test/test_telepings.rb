@@ -45,6 +45,24 @@ class Rsk::TelepingsTest < Minitest::Test
     refute(telepings.required(login))
   end
 
+  # See https://github.com/yegor256/0rsk/issues/264
+  def test_fresh_tasks_skips_orphan_ids
+    login = "judyTO#{rand(99_999)}"
+    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(9999)}")
+    cid = Rsk::Causes.new(test_pgsql, project).add('orphan cause')
+    plans = Rsk::Plans.new(test_pgsql, project)
+    pid = plans.add(cid, 'orphan plan')
+    plans.get(pid, cid).schedule = (Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y')
+    tid = test_pgsql.exec('INSERT INTO task (plan) VALUES ($1) RETURNING id', [pid])[0]['id'].to_i
+    tasks = Rsk::Tasks.new(test_pgsql, login)
+    telepings = Rsk::Telepings.new(test_pgsql)
+    assert_includes(telepings.fresh(login), tid)
+    assert_empty(tasks.fetch(query: tid))
+    fresh = telepings.fresh_tasks(login, tasks)
+    assert_kind_of(Array, fresh)
+    assert(fresh.none?(&:nil?))
+  end
+
   private
 
   def test_tasks(login)
