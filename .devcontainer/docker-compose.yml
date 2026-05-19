@@ -1,0 +1,32 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../:/workspace:cached
+    command: sleep infinity
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    environment:
+      POSTGRES_PASSWORD: postgres
+  liquibase:
+    image: liquibase/liquibase
+    volumes:
+      - ../liquibase:/liquibase/changelog
+    depends_on:
+      - db
+    environment:
+      LIQUIBASE_SEARCH_PATH: /liquibase/changelog
+      LIQUIBASE_COMMAND_CHANGELOG_FILE: master.xml
+      LIQUIBASE_COMMAND_USERNAME: postgres
+      LIQUIBASE_COMMAND_PASSWORD: postgres
+    command: >
+       bash -c "liquibase --url=jdbc:postgresql://db/postgres update
+       && liquibase --url=jdbc:postgresql://db/test update"
+volumes:
+  postgres-data:
