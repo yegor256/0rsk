@@ -10,7 +10,7 @@ gem 'glogin', '~>0.14'
 gem 'haml', '~>5.2'
 gem 'iri', '~>0.8'
 gem 'loog', '~>0.5'
-gem 'minitest', '~>5.21', require: false
+gem 'minitest', '~>6.0', require: false
 gem 'minitest-reporters', '~>1.6', require: false
 gem 'pgtk', '~>0.9'
 gem 'rack', '~>2.2'
