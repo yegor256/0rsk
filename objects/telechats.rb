@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: MIT
 
 require_relative 'rsk'
+require_relative 'urror'
 
 # Telechats.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -30,11 +31,15 @@ class Rsk::Telechats
   end
 
   def login_of(id)
-    @pgsql.exec('SELECT login FROM telechat WHERE id = $1', [id])[0]['login']
+    row = @pgsql.exec('SELECT login FROM telechat WHERE id = $1', [id])[0]
+    raise Rsk::Urror, "Telegram chat ##{id} not found" if row.nil?
+    row['login']
   end
 
   def chat_of(login)
-    @pgsql.exec('SELECT id FROM telechat WHERE login = $1', [login])[0]['id'].to_i
+    row = @pgsql.exec('SELECT id FROM telechat WHERE login = $1', [login])[0]
+    raise Rsk::Urror, "Telegram login #{login.inspect} not found" if row.nil?
+    row['id'].to_i
   end
 
   # This message was just posted.
@@ -44,6 +49,8 @@ class Rsk::Telechats
 
   # This message is different from the last posted?
   def diff?(msg, chat)
-    @pgsql.exec('SELECT recent FROM telechat WHERE id = $1', [chat])[0]['recent'] != msg
+    row = @pgsql.exec('SELECT recent FROM telechat WHERE id = $1', [chat])[0]
+    raise Rsk::Urror, "Telegram chat ##{chat} not found" if row.nil?
+    row['recent'] != msg
   end
 end
