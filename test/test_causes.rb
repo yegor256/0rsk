@@ -32,4 +32,11 @@ class Rsk::CausesTest < Minitest::Test
     causes.get(cid).emoji = '💰'
     assert_operator(causes.emojis.count, :>, 1)
   end
+
+  def test_rejects_cause_from_another_project
+    mine = Rsk::Projects.new(test_pgsql, "my#{rand(99_999)}").add("t#{rand(99_999)}")
+    other = Rsk::Projects.new(test_pgsql, "you#{rand(99_999)}").add("t#{rand(99_999)}")
+    cid = Rsk::Causes.new(test_pgsql, other).add('other cause')
+    assert_raises(Rsk::Urror) { Rsk::Causes.new(test_pgsql, mine).get(cid) }
+  end
 end

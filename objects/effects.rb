@@ -6,6 +6,7 @@
 require_relative 'rsk'
 require_relative 'effect'
 require_relative 'query'
+require_relative 'urror'
 
 # Effects.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -30,6 +31,15 @@ class Rsk::Effects
 
   def get(id)
     require_relative 'effect'
+    found = @pgsql.exec(
+      [
+        'SELECT effect.id FROM effect',
+        'JOIN part ON part.id = effect.id',
+        'WHERE effect.id = $1 AND part.project = $2'
+      ],
+      [id, @project]
+    )
+    raise Rsk::Urror, "Effect ##{id} not found in project ##{@project}" if found.empty?
     Rsk::Effect.new(@pgsql, id)
   end
 

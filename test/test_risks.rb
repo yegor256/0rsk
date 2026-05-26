@@ -24,4 +24,11 @@ class Rsk::RisksTest < Minitest::Test
     assert(risks.fetch.any? { |r| r[:id] == rid })
     assert(risks.fetch.any? { |r| r[:text] == text })
   end
+
+  def test_rejects_risk_from_another_project
+    mine = Rsk::Projects.new(test_pgsql, "my#{rand(99_999)}").add("t#{rand(99_999)}")
+    other = Rsk::Projects.new(test_pgsql, "you#{rand(99_999)}").add("t#{rand(99_999)}")
+    rid = Rsk::Risks.new(test_pgsql, other).add('other risk')
+    assert_raises(Rsk::Urror) { Rsk::Risks.new(test_pgsql, mine).get(rid) }
+  end
 end

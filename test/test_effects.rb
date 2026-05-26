@@ -22,4 +22,11 @@ class Rsk::EffectsTest < Minitest::Test
     assert_equal(1, effects.count)
     assert(effects.fetch.any? { |c| c[:text] == text })
   end
+
+  def test_rejects_effect_from_another_project
+    mine = Rsk::Projects.new(test_pgsql, "my#{rand(99_999)}").add("t#{rand(99_999)}")
+    other = Rsk::Projects.new(test_pgsql, "you#{rand(99_999)}").add("t#{rand(99_999)}")
+    eid = Rsk::Effects.new(test_pgsql, other).add('other effect')
+    assert_raises(Rsk::Urror) { Rsk::Effects.new(test_pgsql, mine).get(eid) }
+  end
 end
