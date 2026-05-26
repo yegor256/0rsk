@@ -78,7 +78,11 @@
     %br
     %span.item.small
       &= p[:schedule]
-    %a.item.small{href: iri.cut('/responses/detach').add(tid: triple[:id], id: p[:id], part: p[:part]), onclick: "return confirm('Are sure you want to detach plan ##{p[:id]}');"} Detach
+    %form{method: 'POST', action: iri.cut('/responses/detach'), onsubmit: "return confirm('Are sure you want to detach plan ##{p[:id]}');", style: 'display: inline;'}
+      %input{type: 'hidden', name: 'tid', value: triple[:id]}
+      %input{type: 'hidden', name: 'id', value: p[:id]}
+      %input{type: 'hidden', name: 'part', value: p[:part]}
+      %input.item.small{type: 'submit', value: 'Detach'}
 
 %p
   If you are in doubt and need to learn more about

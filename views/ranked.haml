@@ -45,7 +45,9 @@
         - else
           = "#{r[:plans].count} plan#{r[:plans].count == 1 ? '' : 's'}"
           = '&darr;'
-      %a.item.small{href: iri.cut('/ranked/delete').add(id: r[:id]), onclick: "return confirm('Are sure you want to delete triple ##{r[:id]}');"} Delete
+      %form{method: 'POST', action: iri.cut('/ranked/delete'), onsubmit: "return confirm('Are sure you want to delete triple ##{r[:id]}');", style: 'display: inline;'}
+        %input{type: 'hidden', name: 'id', value: r[:id]}
+        %input.item.small{type: 'submit', value: 'Delete'}
       - unless r[:plans].empty?
         - r[:plans].each do |p|
           %br

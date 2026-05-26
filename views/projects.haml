@@ -23,4 +23,6 @@
         &= p[:title]
       %br
       %span.small
-        %a.item{href: iri.cut('/projects/delete').add(id: p[:id]), onclick: "return confirm('Are sure you want to delete it?');"} Delete
+        %form{method: 'POST', action: iri.cut('/projects/delete'), onsubmit: "return confirm('Are sure you want to delete it?');", style: 'display: inline;'}
+          %input{type: 'hidden', name: 'id', value: p[:id]}
+          %input.item{type: 'submit', value: 'Delete'}

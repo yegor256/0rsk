@@ -94,7 +94,7 @@ get '/ranked' do
   )
 end
 
-get '/ranked/delete' do
+post '/ranked/delete' do
   id = params[:id]
   triples.delete(id)
   flash('/ranked', "The ranked triple ##{id} deleted")
@@ -119,7 +119,7 @@ post '/projects/create' do
   flash("/projects/select?id=#{pid}", "A new project ##{pid} selected")
 end
 
-get '/projects/delete' do
+post '/projects/delete' do
   pid = params[:id]
   projects.delete(pid)
   flash('/projects', "The project ##{pid} has been deleted")
@@ -153,7 +153,7 @@ post '/responses/add' do
   flash("/responses?id=#{id}", "Thanks, plan ##{pid}/#{part} added to the triple ##{id}")
 end
 
-get '/responses/detach' do
+post '/responses/detach' do
   tid = params[:tid].to_i
   id = params[:id].to_i
   part = params[:part].to_i
