@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: MIT
 
 require_relative 'test__helper'
+require 'securerandom'
 require_relative '../objects/rsk'
 require_relative '../objects/risks'
 require_relative '../objects/projects'
@@ -26,8 +27,8 @@ class Rsk::RisksTest < Minitest::Test
   end
 
   def test_rejects_risk_from_another_project
-    mine = Rsk::Projects.new(test_pgsql, "my#{rand(99_999)}").add("t#{rand(99_999)}")
-    other = Rsk::Projects.new(test_pgsql, "you#{rand(99_999)}").add("t#{rand(99_999)}")
+    mine = Rsk::Projects.new(test_pgsql, "my#{SecureRandom.hex(8)}").add("t#{SecureRandom.hex(8)}")
+    other = Rsk::Projects.new(test_pgsql, "you#{SecureRandom.hex(8)}").add("t#{SecureRandom.hex(8)}")
     rid = Rsk::Risks.new(test_pgsql, other).add('other risk')
     assert_raises(Rsk::Urror) { Rsk::Risks.new(test_pgsql, mine).get(rid) }
   end
