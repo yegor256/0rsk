@@ -3,8 +3,13 @@
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
-get '/causes.json' do
+def json_endpoint
+  halt 403 unless @locals[:user]
   content_type('application/json')
+end
+
+get '/causes.json' do
+  json_endpoint
   JSON.pretty_generate(
     causes.fetch(query: params[:query] || '').map do |r|
       {
@@ -20,7 +25,7 @@ get '/causes.json' do
 end
 
 get '/risks.json' do
-  content_type('application/json')
+  json_endpoint
   JSON.pretty_generate(
     risks.fetch(query: params[:query] || '').map do |r|
       {
@@ -36,7 +41,7 @@ get '/risks.json' do
 end
 
 get '/effects.json' do
-  content_type('application/json')
+  json_endpoint
   JSON.pretty_generate(
     effects.fetch(query: params[:query] || '').map do |r|
       {
@@ -53,7 +58,7 @@ get '/effects.json' do
 end
 
 get '/plans.json' do
-  content_type('application/json')
+  json_endpoint
   JSON.pretty_generate(
     plans.fetch(query: params[:query] || '').map do |r|
       {
