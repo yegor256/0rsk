@@ -71,6 +71,16 @@ class Rsk::AppTest < Minitest::Test
     end
   end
 
+  def test_triple_id_fields_use_locked_cursor
+    login("cursor#{rand(99_999)}")
+    get('/triple')
+    assert_equal(200, last_response.status, last_response.body)
+    assert_includes(last_response.body, '.locked-id { cursor: not-allowed; }')
+    %w[cid rid eid].each do |id|
+      assert_includes(last_response.body, "class='dimmed locked-id' id='#{id}'")
+    end
+  end
+
   def test_add
     name = "jeff09#{rand(99_999)}"
     login(name)
