@@ -6,6 +6,7 @@
 require_relative 'rsk'
 require_relative 'cause'
 require_relative 'query'
+require_relative 'urror'
 
 # Causes.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -19,12 +20,15 @@ class Rsk::Causes
 
   def add(text)
     @pgsql.transaction do |t|
-      id = t.exec(
-        'INSERT INTO part (project, text, type) VALUES ($1, $2, $3) RETURNING id',
-        [@project, text, 'Cause']
-      )[0]['id'].to_i
-      t.exec('INSERT INTO cause (id) VALUES ($1)', [id])
-      id
+      found = existing(t, text)
+      unless found
+        found = t.exec(
+          'INSERT INTO part (project, text, type) VALUES ($1, $2, $3) RETURNING id',
+          [@project, text, 'Cause']
+        )[0]['id'].to_i
+        t.exec('INSERT INTO cause (id) VALUES ($1)', [found])
+      end
+      found
     end
   end
 
@@ -62,6 +66,13 @@ class Rsk::Causes
   end
 
   private
+
+  def existing(pgsql, text)
+    row = pgsql.exec('SELECT id, type FROM part WHERE project = $1 AND text = $2', [@project, text])[0]
+    return nil if row.nil?
+    raise Rsk::Urror, "#{text.inspect} already exists as #{row['type'].downcase}" unless row['type'] == 'Cause'
+    row['id'].to_i
+  end
 
   def query(query)
     Rsk::Query.new(
