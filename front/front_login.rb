@@ -10,9 +10,7 @@ before '/*' do
     login_link: settings.glogin.login_uri,
     request_ip: request.ip
   }
-  if params[:glogin] && ENV['RACK_ENV'] != 'production'
-    response.set_cookie('glogin', params[:glogin])
-  end
+  response.set_cookie('glogin', params[:glogin]) if params[:glogin] && ENV['RACK_ENV'] != 'production'
   if request.cookies['glogin']
     begin
       @locals[:user] = GLogin::Cookie::Closed.new(
