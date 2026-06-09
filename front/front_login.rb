@@ -8,9 +8,7 @@ before '/*' do
   settings.rate_limits.reject! { |t| t < now - 60 }
   if request.post?
     settings.rate_limits << now
-    if settings.rate_limits.size > 10
-      halt 429, { 'Content-Type' => 'text/plain' }, 'Too many requests'
-    end
+    halt 429, { 'Content-Type' => 'text/plain' }, 'Too many requests' if settings.rate_limits.size > 10
   end
   @locals = {
     http_start: Time.now,
