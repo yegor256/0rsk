@@ -11,14 +11,14 @@ class Rsk::QueryTest < Minitest::Test
     sql = ['SELECT * FROM project WHERE login = $1']
     query = Rsk::Query.new(test_pgsql, sql, ['test'])
     rows = query.fetch(0, 10)
-    assert rows.is_a?(Array)
+    assert_kind_of(Array, rows)
   end
 
   def test_fetch_second_page
     sql = ['SELECT * FROM project WHERE login = $1']
     query = Rsk::Query.new(test_pgsql, sql, ['test'])
     rows = query.fetch(10, 10)
-    assert rows.is_a?(Array)
+    assert_kind_of(Array, rows)
   end
 
   def test_count
@@ -37,6 +37,6 @@ class Rsk::QueryTest < Minitest::Test
     sql = ['SELECT * FROM project WHERE login = $1']
     query = Rsk::Query.new(test_pgsql, sql, ['nonexistent_login'])
     rows = query.fetch(0, 0)
-    assert rows.is_a?(Array)
+    assert_kind_of(Array, rows)
   end
 end
