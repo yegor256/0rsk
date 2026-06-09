@@ -118,6 +118,6 @@ class Rsk::TelepingsTest < Minitest::Test
     telepings = Rsk::Telepings.new(test_pgsql)
     result = telepings.fresh_tasks(login, tasks)
     refute_empty(result)
-    assert(result[0][:rank].is_a?(Integer))
+    assert_kind_of(Integer, result[0][:rank])
   end
 end
