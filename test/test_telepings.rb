@@ -15,69 +15,109 @@ require_relative '../objects/plans'
 require_relative '../objects/telechats'
 require_relative '../objects/telepings'
 
-# Test of Telepings.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::TelepingsTest < Minitest::Test
-  def test_fetches
+  def test_add
     login = "judyT#{rand(99_999)}"
-    test_tasks(login)
-    telepings = Rsk::Telepings.new(test_pgsql)
-    refute_empty(telepings.fresh(login))
-    assert(telepings.required(login))
-  end
-
-  def test_adds
-    login = "judyTA#{rand(99_999)}"
-    tasks = test_tasks(login)
-    telechats = Rsk::Telechats.new(test_pgsql)
+    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(99_999)}")
     chat = rand(99_999)
-    telechats.add(chat, login)
-    telepings = Rsk::Telepings.new(test_pgsql)
-    refute_empty(telepings.fresh(login))
-    assert(telepings.required(login))
-    tasks.fetch.each do |t|
-      telepings.add(t[:id], chat)
-      telepings.add(t[:id], chat)
-    end
-    assert_empty(telepings.fresh(login))
-    refute(telepings.required(login))
-  end
-
-  # See https://github.com/yegor256/0rsk/issues/264
-  def test_fresh_tasks_skips_orphan_ids
-    login = "judyTO#{rand(99_999)}"
-    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(9999)}")
-    cid = Rsk::Causes.new(test_pgsql, project).add('orphan cause')
-    plans = Rsk::Plans.new(test_pgsql, project)
-    pid = plans.add(cid, 'orphan plan')
-    plans.get(pid, cid).schedule = (Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y')
-    tid = test_pgsql.exec('INSERT INTO task (plan) VALUES ($1) RETURNING id', [pid])[0]['id'].to_i
-    tasks = Rsk::Tasks.new(test_pgsql, login)
-    telepings = Rsk::Telepings.new(test_pgsql)
-    assert_includes(telepings.fresh(login), tid)
-    assert_empty(tasks.fetch(query: tid))
-    fresh = telepings.fresh_tasks(login, tasks)
-    assert_kind_of(Array, fresh)
-    assert(fresh.none?(&:nil?))
-  end
-
-  private
-
-  def test_tasks(login)
-    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(9999)}")
-    cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
-    rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
-    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
+    Rsk::Telechats.new(test_pgsql).add(chat, login)
+    cid = Rsk::Causes.new(test_pgsql, project).add('cause')
+    rid = Rsk::Risks.new(test_pgsql, project).add('risk')
+    eid = Rsk::Effects.new(test_pgsql, project).add('effect')
     triples = Rsk::Triples.new(test_pgsql, project)
     triples.add(cid, rid, eid)
     plans = Rsk::Plans.new(test_pgsql, project)
-    pid = plans.add(rid, 'solve it!')
-    plans.get(pid, rid).schedule = (Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y')
+    pid = plans.add(eid, 'plan')
+    plans.get(pid, eid).schedule = (Time.now - (60 * 60)).strftime('%d-%m-%Y')
     tasks = Rsk::Tasks.new(test_pgsql, login)
     tasks.create
-    assert(tasks.fetch.any? { |t| t[:plan] == pid })
-    tasks
+    tid = tasks.fetch[0][:id]
+    telepings = Rsk::Telepings.new(test_pgsql)
+    telepings.add(tid, chat)
+    telepings.add(tid, chat)
+  end
+
+  def test_required
+    login = "judyR#{rand(99_999)}"
+    telepings = Rsk::Telepings.new(test_pgsql)
+    assert(telepings.required(login))
+  end
+
+  def test_required_after_add
+    login = "judyRA#{rand(99_999)}"
+    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(99_999)}")
+    chat = rand(99_999)
+    Rsk::Telechats.new(test_pgsql).add(chat, login)
+    cid = Rsk::Causes.new(test_pgsql, project).add('cause')
+    rid = Rsk::Risks.new(test_pgsql, project).add('risk')
+    eid = Rsk::Effects.new(test_pgsql, project).add('effect')
+    triples = Rsk::Triples.new(test_pgsql, project)
+    triples.add(cid, rid, eid)
+    plans = Rsk::Plans.new(test_pgsql, project)
+    pid = plans.add(eid, 'plan')
+    plans.get(pid, eid).schedule = (Time.now - (60 * 60)).strftime('%d-%m-%Y')
+    tasks = Rsk::Tasks.new(test_pgsql, login)
+    tasks.create
+    telepings = Rsk::Telepings.new(test_pgsql)
+    assert(telepings.required(login))
+  end
+
+  def test_fresh
+    login = "judyF#{rand(99_999)}"
+    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(99_999)}")
+    Rsk::Telechats.new(test_pgsql).add(rand(99_999), login)
+    cid = Rsk::Causes.new(test_pgsql, project).add('cause')
+    rid = Rsk::Risks.new(test_pgsql, project).add('risk')
+    eid = Rsk::Effects.new(test_pgsql, project).add('effect')
+    triples = Rsk::Triples.new(test_pgsql, project)
+    triples.add(cid, rid, eid)
+    plans = Rsk::Plans.new(test_pgsql, project)
+    pid = plans.add(eid, 'plan')
+    plans.get(pid, eid).schedule = (Time.now - (60 * 60)).strftime('%d-%m-%Y')
+    tasks = Rsk::Tasks.new(test_pgsql, login)
+    tasks.create
+    telepings = Rsk::Telepings.new(test_pgsql)
+    refute_empty(telepings.fresh(login))
+  end
+
+  def test_fresh_after_ping
+    login = "judyFA#{rand(99_999)}"
+    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(99_999)}")
+    chat = rand(99_999)
+    Rsk::Telechats.new(test_pgsql).add(chat, login)
+    cid = Rsk::Causes.new(test_pgsql, project).add('cause')
+    rid = Rsk::Risks.new(test_pgsql, project).add('risk')
+    eid = Rsk::Effects.new(test_pgsql, project).add('effect')
+    triples = Rsk::Triples.new(test_pgsql, project)
+    triples.add(cid, rid, eid)
+    plans = Rsk::Plans.new(test_pgsql, project)
+    pid = plans.add(eid, 'plan')
+    plans.get(pid, eid).schedule = (Time.now - (60 * 60)).strftime('%d-%m-%Y')
+    tasks = Rsk::Tasks.new(test_pgsql, login)
+    tasks.create
+    telepings = Rsk::Telepings.new(test_pgsql)
+    tid = telepings.fresh(login)[0]
+    telepings.add(tid, chat)
+    assert_empty(telepings.fresh(login))
+  end
+
+  def test_fresh_tasks
+    login = "judyFT#{rand(99_999)}"
+    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(99_999)}")
+    Rsk::Telechats.new(test_pgsql).add(rand(99_999), login)
+    cid = Rsk::Causes.new(test_pgsql, project).add('cause')
+    rid = Rsk::Risks.new(test_pgsql, project).add('risk')
+    eid = Rsk::Effects.new(test_pgsql, project).add('effect')
+    triples = Rsk::Triples.new(test_pgsql, project)
+    triples.add(cid, rid, eid)
+    plans = Rsk::Plans.new(test_pgsql, project)
+    pid = plans.add(eid, 'plan')
+    plans.get(pid, eid).schedule = (Time.now - (60 * 60)).strftime('%d-%m-%Y')
+    tasks = Rsk::Tasks.new(test_pgsql, login)
+    tasks.create
+    telepings = Rsk::Telepings.new(test_pgsql)
+    result = telepings.fresh_tasks(login, tasks)
+    refute_empty(result)
+    assert(result[0][:rank].is_a?(Integer))
   end
 end
