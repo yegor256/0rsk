@@ -224,6 +224,12 @@ get '/terms' do
   )
 end
 
+get '/dashboard' do
+  haml :dashboard, layout: :layout, locals: merged(
+    title: '/dashboard'
+  )
+end
+
 get '/dashboard.json' do
   content_type 'application/json'
   pid = request.cookies['0rsk-project']
