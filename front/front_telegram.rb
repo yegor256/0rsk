@@ -162,7 +162,30 @@ def notify_all
   end
 end
 
+def notify_alone
+  users.fetch.each do |login|
+    next unless telechats.wired?(login)
+    chat = telechats.chat_of(login)
+    Rsk::Projects.new(settings.pgsql, login).fetch.each do |project|
+      alone = Rsk::Triples.new(settings.pgsql, project[:id]).count(query: '+alone')
+      next if alone == 0
+      msg = [
+        "You have #{alone} risk#{'s' unless alone == 1} without response",
+        "plan#{'s' unless alone == 1} in project '#{project[:title]}'.",
+        '[View them](https://www.0rsk.com/ranked?q=%2Balone).'
+      ].join(' ')
+      telepost(msg, chat) if telechats.diff?(msg, chat)
+    end
+  rescue StandardError => e
+    settings.log.error(e.message)
+    next
+  end
+end
+
 if settings.config['telegram']
+  Rsk::Daemon.new(1440).start do
+    notify_alone
+  end
   Rsk::Daemon.new(10).start do
     notify_all
   end
