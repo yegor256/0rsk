@@ -168,7 +168,7 @@ def notify_alone
     chat = telechats.chat_of(login)
     Rsk::Projects.new(settings.pgsql, login).fetch.each do |project|
       alone = Rsk::Triples.new(settings.pgsql, project[:id]).count(query: '+alone')
-      next if alone == 0
+      next if alone.zero?
       msg = [
         "You have #{alone} risk#{'s' unless alone == 1} without response",
         "plan#{'s' unless alone == 1} in project '#{project[:title]}'.",
