@@ -6,7 +6,7 @@
 %script{src: '/js/triple.js'}
 
 %div.small.right{style: 'float:right; width:200px;'}
-  %img{src: '/dont-talk.png', style: 'width: 120px;'}
+  %img{src: '/dont-talk.png', alt: "Don't talk", style: 'width: 120px;'}
   %br
   Cause: The data you enter
   %strong is
@@ -84,9 +84,9 @@
     - {'Fantastic' => 9, 'Awesome' => 8, 'Very good' => 6, 'Average' => 5, 'Good to have' => 4, 'Minor' => 2, 'Unnoticeable' => 1}.each do |k, v|
       %option{value: v, selected: defined?(triple) && triple[:impact] == v, type: 'positive', hidden: !defined?(triple) || !triple[:positive]}= "#{k} (#{v})"
   - if defined?(triple) && triple[:positive]
-    %img#marker.up
+    %img#marker.up{alt: 'up'}
   - else
-    %img#marker.down
+    %img#marker.down{alt: 'down'}
   %br
   %input{type: 'submit', value: 'Submit', tabindex: 8, onclick: 'if ($("#cid").val() || $("#rid").val() || $("#eid").val()) { return confirm("You are going to MODIFY existing data, are you sure?"); }'}
 
