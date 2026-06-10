@@ -4,7 +4,7 @@
 - unless wired
   %p
     Talk to our Telegram bot:
-    %a{href: 'https://t.me/zerorsk_bot'}<
+    %a{href: 'https://t.me/zerorsk_bot', title: 'Telegram bot'}<
       %code @zerorsk_bot
 
 %form{method: 'GET', action: ''}
@@ -39,12 +39,12 @@
     %p
       = thumb(t)
       = rank(t)
-      %a{href: iri.over(q: t[:emoji])}<
+      %a{href: iri.over(q: t[:emoji]), title: "Filter by #{t[:emoji]}"}<
         &= t[:emoji]
       %br
       = part('T', t[:id])
       ➜
-      %a{href: iri.cut('/responses').add(id: t[:triple])}<
+      %a{href: iri.cut('/responses'), title: 'View responses'.add(id: t[:triple])}<
         %code= "P#{t[:plan]}"
       ➜
       = part(t[:prefix], t[:part])
@@ -59,25 +59,25 @@
         &= t[:text]
       %br
       %span.small
-        %a.item{href: iri.cut('/projects').append(t[:pid])}<
+        %a.item{href: iri.cut('/projects').append(t[:pid]), title: 'View project'}<
           &= t[:title]
         %span.item<
           &= t[:schedule]
-        %a.item{href: iri.cut('/tasks/done').add(id: t[:id])} Done
+        %a.item{href: iri.cut('/tasks/done').add(id: t[:id]), title: 'Mark as done'} Done
         - unless /^[a-z]+$/.match?(t[:schedule])
           %span.item
             Later:
-            %a{href: iri.cut('/tasks/later').add(id: t[:id], period: 'week')} week
+            %a{href: iri.cut('/tasks/later'), title: 'Postpone'.add(id: t[:id], period: 'week')} week
             = '|'
-            %a{href: iri.cut('/tasks/later').add(id: t[:id], period: 'month')} month
+            %a{href: iri.cut('/tasks/later'), title: 'Postpone'.add(id: t[:id], period: 'month')} month
             = '|'
-            %a{href: iri.cut('/tasks/later').add(id: t[:id], period: 'quarter')} quarter
+            %a{href: iri.cut('/tasks/later'), title: 'Postpone'.add(id: t[:id], period: 'quarter')} quarter
   = Haml::Engine.new(File.read('views/_paging.haml')).render(self, locals.merge(count: tasks.count))
 
 %p
   We're checking all your plans regularly and create tasks
   accordingly, when time comes. You can
-  %a{href: iri.cut('/tasks/create')} click here
+  %a{href: iri.cut('/tasks/create'), title: 'Pull latest plans'} click here
   to pull the latest plans in, right now.
   - if updated
     The last time plans were checked
