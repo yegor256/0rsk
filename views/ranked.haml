@@ -53,4 +53,4 @@
           %span.small{style: 'margin-left: 2em;'}
             %code.small= "P#{p[:id]}"
             &= p[:text]
-  = Haml::Engine.new(File.read('views/_paging.haml')).render(self, locals.merge(count: triples.count))
+  = Tilt::HamlTemplate.new('views/_paging.haml', 1, format: :xhtml).render(self, locals.merge(count: triples.count))
