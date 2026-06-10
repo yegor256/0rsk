@@ -71,7 +71,7 @@
             %a{href: iri.cut('/tasks/later').add(id: t[:id], period: 'month')} month
             = '|'
             %a{href: iri.cut('/tasks/later').add(id: t[:id], period: 'quarter')} quarter
-  = Haml::Engine.new(File.read('views/_paging.haml')).render(self, locals.merge(count: tasks.count))
+  = Tilt::HamlTemplate.new('views/_paging.haml', 1, format: :xhtml).render(self, locals.merge(count: tasks.count))
 
 %p
   We're checking all your plans regularly and create tasks
