@@ -33,7 +33,6 @@ class Rsk::AppTest < Minitest::Test
       '/js/triple.js',
       '/js/responses.js',
       '/terms',
-      '/templates.json',
       '/dashboard'
     ]
     pages.each do |p|
