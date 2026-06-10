@@ -25,8 +25,7 @@
 - else
   - if total >= Rsk::Tasks::THRESHOLD
     %p
-      = succeed ':' do
-        %strong.red WARNING
+      %strong.red WARNING:
       Since you have too many tasks, new
       %strong.red= pipeline
       tasks are not being created.
@@ -81,5 +80,4 @@
   to pull the latest plans in, right now.
   - if updated
     The last time plans were checked
-    = succeed '.' do
-      = RelativeTime.in_words(updated.utc.iso8601)
+    = RelativeTime.in_words(updated.utc.iso8601) + "."
