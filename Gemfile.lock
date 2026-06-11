@@ -152,6 +152,7 @@ GEM
     nokogiri (1.19.3-x86_64-linux-gnu)
       racc (~> 1.4)
     openssl (3.3.3)
+    ostruct (0.6.3)
     parallel (1.27.0)
     parser (3.3.9.0)
       ast (~> 2.4.1)
@@ -346,6 +347,7 @@ DEPENDENCIES
   loog (~> 0.5)
   minitest (~> 6.0)
   minitest-reporters (~> 1.6)
+  ostruct
   pgtk (~> 0.9)
   rack (~> 2.2)
   rack-ssl (~> 1.4)
