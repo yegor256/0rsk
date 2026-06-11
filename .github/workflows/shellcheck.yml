@@ -16,4 +16,4 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
-      - uses: ludeeus/action-shellcheck@master
+      - uses: ludeeus/action-shellcheck@2.0.0
