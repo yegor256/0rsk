@@ -37,7 +37,7 @@ require 'loog'
 require 'pgtk/pool'
 require 'yaml'
 
-class Minitest::Test
+class TestCase < Minitest::Test
   def test_pgsql
     # rubocop:disable Style/ClassVars
     @@test_pgsql ||= Pgtk::Pool.new(

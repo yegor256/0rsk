@@ -19,7 +19,7 @@ require_relative '../objects/telepings'
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
 # License:: MIT
-class Rsk::TelepingsTest < Minitest::Test
+class Rsk::TelepingsTest < TestCase
   def test_fetches
     login = "judyT#{rand(99_999)}"
     test_tasks(login)
