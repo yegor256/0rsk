@@ -32,15 +32,35 @@ Eslintrb::EslintTask.new(:eslint) do |t|
   t.options = :defaults
 end
 
-require 'pgtk/pgsql_task'
-Pgtk::PgsqlTask.new(:pgsql) do |t|
-  t.quiet = true
-  t.dir = 'target/pgsql'
-  t.fresh_start = true
-  t.user = 'test'
-  t.password = 'test'
-  t.dbname = 'test'
-  t.yaml = 'target/pgsql-config.yml'
+if ENV['GITHUB_ACTIONS']
+  directory 'target'
+  desc 'Create pgsql config for service container'
+  task pgsql: :target do
+    File.write(
+      'target/pgsql-config.yml',
+      {
+        'pgsql' => {
+          'host' => 'localhost',
+          'port' => 5432,
+          'dbname' => 'test',
+          'user' => 'test',
+          'password' => 'test',
+          'url' => 'jdbc:postgresql://localhost:5432/test?user=test'
+        }
+      }.to_yaml
+    )
+  end
+else
+  require 'pgtk/pgsql_task'
+  Pgtk::PgsqlTask.new(:pgsql) do |t|
+    t.quiet = true
+    t.dir = 'target/pgsql'
+    t.fresh_start = true
+    t.user = 'test'
+    t.password = 'test'
+    t.dbname = 'test'
+    t.yaml = 'target/pgsql-config.yml'
+  end
 end
 
 require 'pgtk/liquibase_task'
