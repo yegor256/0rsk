@@ -7,6 +7,10 @@ require_relative 'test__helper'
 require_relative '../0rsk'
 require_relative '../objects/rsk'
 require_relative '../objects/projects'
+require_relative '../objects/causes'
+require_relative '../objects/risks'
+require_relative '../objects/effects'
+require_relative '../objects/triples'
 
 module Rack
   module Test
@@ -93,6 +97,21 @@ class Rsk::AppTest < Minitest::Test
     assert_equal(200, last_response.status, last_response.body)
   end
 
+  def test_deletes_ranked
+    name = "deleter#{rand(99_999)}"
+    pid = login(name)
+    cid = Rsk::Causes.new(test_pgsql, pid).add('test cause')
+    rid = Rsk::Risks.new(test_pgsql, pid).add('test risk')
+    eid = Rsk::Effects.new(test_pgsql, pid).add('test effect')
+    triples = Rsk::Triples.new(test_pgsql, pid)
+    tid = triples.add(cid, rid, eid)
+    get("/ranked/delete?id=#{tid}")
+    assert_equal(302, last_response.status, last_response.body)
+    follow_redirect!
+    assert_equal(200, last_response.status, last_response.body)
+    assert_includes(last_response.body, 'deleted')
+  end
+
   private
 
   def login(name)
@@ -100,5 +119,6 @@ class Rsk::AppTest < Minitest::Test
     projects = Rsk::Projects.new(test_pgsql, name)
     pid = projects.add('test')
     set_cookie("0rsk-project=#{pid}")
+    pid
   end
 end
