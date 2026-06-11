@@ -36,7 +36,7 @@ class Rsk::TaskTracker
       ].join("\n")
     }.to_json
     response = http.request(request)
-    raise "GitHub API error: #{response.code}" unless (200..299).include?(response.code.to_i)
+    raise "GitHub API error: #{response.code}" unless (200..299).cover?(response.code.to_i)
     JSON.parse(response.body)['number']
   end
 end
