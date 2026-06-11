@@ -98,7 +98,7 @@ class Rsk::AppTest < Minitest::Test
     pid = login(name)
     get("/projects/delete?id=#{pid}")
     assert_equal(302, last_response.status, last_response.body)
-    follow_redirect!
+    get(last_response['Location'])
     assert_equal(200, last_response.status, last_response.body)
     assert_includes(last_response.body, 'has been deleted')
   end
