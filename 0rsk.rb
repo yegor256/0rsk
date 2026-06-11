@@ -37,8 +37,12 @@ configure do
     },
     'sentry' => ''
   }
-  config = YAML.safe_load(File.open(File.join(File.dirname(__FILE__), 'config.yml'))) unless ENV['RACK_ENV'] == 'test'
-  if ENV['RACK_ENV'] != 'test'
+  config_path = File.join(File.dirname(__FILE__), 'config.yml')
+  if File.exist?(config_path)
+    loaded = YAML.safe_load(File.open(config_path))
+    config.merge!(loaded) if loaded.is_a?(Hash)
+  end
+  if config['sentry'] && !config['sentry'].empty?
     Sentry.init do |c|
       c.dsn = config['sentry']
       c.release = Rsk::VERSION
