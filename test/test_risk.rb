@@ -9,7 +9,7 @@ require_relative '../objects/projects'
 require_relative '../objects/risks'
 require_relative '../objects/rsk'
 
-class Rsk::RiskTest < Minitest::Test
+class Rsk::RiskTest < TestCase
   def test_modifies_text
     before = 'text first'
     after = 'another text to set'

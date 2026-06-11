@@ -8,7 +8,7 @@ require_relative '../objects/causes'
 require_relative '../objects/rsk'
 require_relative 'test__helper'
 
-class Rsk::ProjectsTest < Minitest::Test
+class Rsk::ProjectsTest < TestCase
   def test_adds_and_fetches
     projects = Rsk::Projects.new(test_pgsql, 'jeff11')
     pid = projects.add('test')

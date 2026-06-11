@@ -16,7 +16,7 @@ require_relative '../objects/telechats'
 require_relative '../objects/telepings'
 require_relative '../objects/triples'
 
-class Rsk::TelepingsTest < Minitest::Test
+class Rsk::TelepingsTest < TestCase
   def test_fetches
     login = "judyT#{rand(99_999)}"
     test_tasks(login)

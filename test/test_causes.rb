@@ -9,7 +9,7 @@ require_relative '../objects/causes'
 require_relative '../objects/projects'
 require_relative '../objects/rsk'
 
-class Rsk::CausesTest < Minitest::Test
+class Rsk::CausesTest < TestCase
   def test_adds_and_fetches
     causes = Rsk::Causes.new(test_pgsql, Rsk::Projects.new(test_pgsql, "timm#{rand(99_999)}").add("t#{rand(99_999)}"))
     text = 'we use Ruby'

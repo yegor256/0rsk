@@ -14,7 +14,7 @@ require_relative '../objects/rsk'
 require_relative '../objects/tasks'
 require_relative '../objects/triples'
 
-class Rsk::TasksTest < Minitest::Test
+class Rsk::TasksTest < TestCase
   def test_adds_and_fetches
     login = "bobbyT#{rand(99_999)}"
     project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(99_999)}")
