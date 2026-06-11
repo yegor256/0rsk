@@ -14,8 +14,8 @@ require_relative '../objects/projects'
 # License:: MIT
 class Rsk::EffectTest < Minitest::Test
   def test_adds_and_fetches
-    pid = Rsk::Projects.new(test_pgsql, 'jeff053').add("test#{rand(99_999)}")
-    effects = Rsk::Effects.new(test_pgsql, pid)
+    pid = Rsk::Projects.new(pgsql, 'jeff053').add("test#{rand(99_999)}")
+    effects = Rsk::Effects.new(pgsql, pid)
     text = 'the business will halt'
     eid = effects.add(text)
     effect = effects.get(eid)

@@ -14,10 +14,10 @@ require_relative '../objects/projects'
 # License:: MIT
 class Rsk::RiskTest < Minitest::Test
   def test_modifies_text
-    pid = Rsk::Projects.new(test_pgsql, 'jeff32').add('test')
+    pid = Rsk::Projects.new(pgsql, 'jeff32').add('test')
     before = 'text first'
     after = 'another text to set'
-    risks = Rsk::Risks.new(test_pgsql, pid)
+    risks = Rsk::Risks.new(pgsql, pid)
     risk = risks.get(risks.add(before))
     assert_equal(before, risk.text)
     risk.text = after
@@ -26,9 +26,9 @@ class Rsk::RiskTest < Minitest::Test
   end
 
   def test_modifies_probability
-    pid = Rsk::Projects.new(test_pgsql, 'jeff94').add('test')
+    pid = Rsk::Projects.new(pgsql, 'jeff94').add('test')
     after = 9
-    risks = Rsk::Risks.new(test_pgsql, pid)
+    risks = Rsk::Risks.new(pgsql, pid)
     risk = risks.get(risks.add('some risk'))
     risk.probability = after
     risk.probability = after

@@ -15,10 +15,10 @@ require_relative '../objects/risks'
 # License:: MIT
 class Rsk::PlansTest < Minitest::Test
   def test_adds_and_fetches
-    pid = Rsk::Projects.new(test_pgsql, 'jeff23').add("test#{rand(99_999)}")
-    risks = Rsk::Risks.new(test_pgsql, pid)
+    pid = Rsk::Projects.new(pgsql, 'jeff23').add("test#{rand(99_999)}")
+    risks = Rsk::Risks.new(pgsql, pid)
     rid = risks.add('we may lose data')
-    plans = Rsk::Plans.new(test_pgsql, pid)
+    plans = Rsk::Plans.new(pgsql, pid)
     text = 'we make backups'
     id = plans.add(rid, text)
     plans.get(id, rid).schedule = '01-01-2001'
