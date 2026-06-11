@@ -45,6 +45,7 @@ The build auto-starts a local PostgreSQL instance and applies Liquibase
 migrations. No manual setup is required for development.
 
 For a custom database, set the `DATABASE_URL` environment variable:
+
 ```bash
 export DATABASE_URL=postgres://user:pass@localhost:5432/0rsk
 ```
