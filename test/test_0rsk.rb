@@ -93,6 +93,16 @@ class Rsk::AppTest < Minitest::Test
     assert_equal(200, last_response.status, last_response.body)
   end
 
+  def test_logout
+    login('bob')
+    get('/logout')
+    assert_equal(302, last_response.status, last_response.body)
+    assert_equal('/', last_response.location, last_response.body)
+    cookie = last_response.headers['Set-Cookie']
+    refute_nil(cookie, last_response.body)
+    assert_includes(cookie, 'glogin=', cookie)
+  end
+
   private
 
   def login(name)
