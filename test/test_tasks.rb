@@ -20,18 +20,18 @@ require_relative '../objects/plans'
 class Rsk::TasksTest < Minitest::Test
   def test_adds_and_fetches
     login = "bobbyT#{rand(99_999)}"
-    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(99_999)}")
-    cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
-    rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
-    rid2 = Rsk::Risks.new(test_pgsql, project).add('we may lose it again')
-    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
-    triples = Rsk::Triples.new(test_pgsql, project)
+    project = Rsk::Projects.new(pgsql, login).add("test#{rand(99_999)}")
+    cid = Rsk::Causes.new(pgsql, project).add('we have data')
+    rid = Rsk::Risks.new(pgsql, project).add('we may lose it')
+    rid2 = Rsk::Risks.new(pgsql, project).add('we may lose it again')
+    eid = Rsk::Effects.new(pgsql, project).add('business will stop')
+    triples = Rsk::Triples.new(pgsql, project)
     triples.add(cid, rid, eid)
     triples.add(cid, rid2, eid)
-    plans = Rsk::Plans.new(test_pgsql, project)
+    plans = Rsk::Plans.new(pgsql, project)
     pid = plans.add(eid, 'solve it!')
     plans.get(pid, eid).schedule = (Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y')
-    tasks = Rsk::Tasks.new(test_pgsql, login)
+    tasks = Rsk::Tasks.new(pgsql, login)
     tasks.create
     assert_equal(1, tasks.fetch.count)
     assert_equal(1, tasks.fetch(query: 'solve').count)
@@ -44,16 +44,16 @@ class Rsk::TasksTest < Minitest::Test
 
   def test_postpones_tasks
     login = "bobbyX#{rand(99_999)}"
-    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(99_999)}")
-    cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
-    rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
-    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
-    triples = Rsk::Triples.new(test_pgsql, project)
+    project = Rsk::Projects.new(pgsql, login).add("test#{rand(99_999)}")
+    cid = Rsk::Causes.new(pgsql, project).add('we have data')
+    rid = Rsk::Risks.new(pgsql, project).add('we may lose it')
+    eid = Rsk::Effects.new(pgsql, project).add('business will stop')
+    triples = Rsk::Triples.new(pgsql, project)
     triples.add(cid, rid, eid)
-    plans = Rsk::Plans.new(test_pgsql, project)
+    plans = Rsk::Plans.new(pgsql, project)
     pid = plans.add(eid, 'solve it!')
     plans.get(pid, eid).schedule = (Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y')
-    tasks = Rsk::Tasks.new(test_pgsql, login)
+    tasks = Rsk::Tasks.new(pgsql, login)
     tasks.create
     task = tasks.fetch[0]
     tasks.postpone(task[:id], 60 * 60)
