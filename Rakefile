@@ -34,8 +34,10 @@ end
 
 if ENV['GITHUB_ACTIONS']
   directory 'target'
+  desc 'Create pgsql config for service container'
   task pgsql: :target do
-    File.write('target/pgsql-config.yml',
+    File.write(
+      'target/pgsql-config.yml',
       {
         'pgsql' => {
           'host' => 'localhost',
