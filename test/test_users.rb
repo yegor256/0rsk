@@ -12,7 +12,7 @@ require_relative '../objects/users'
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
 # License:: MIT
-class Rsk::UsersTest < Minitest::Test
+class Rsk::UsersTest < TestCase
   def test_adds_and_fetches
     login = "bobbydick#{rand(99_999)}"
     projects = Rsk::Projects.new(test_pgsql, login)

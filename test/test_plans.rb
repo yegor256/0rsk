@@ -13,7 +13,7 @@ require_relative '../objects/risks'
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
 # License:: MIT
-class Rsk::PlansTest < Minitest::Test
+class Rsk::PlansTest < TestCase
   def test_adds_and_fetches
     pid = Rsk::Projects.new(test_pgsql, 'jeff23').add("test#{rand(99_999)}")
     risks = Rsk::Risks.new(test_pgsql, pid)

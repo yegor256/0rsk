@@ -12,7 +12,7 @@ require_relative '../objects/projects'
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
 # License:: MIT
-class Rsk::CausesTest < Minitest::Test
+class Rsk::CausesTest < TestCase
   def test_adds_and_fetches
     pid = Rsk::Projects.new(test_pgsql, "timm#{rand(99_999)}").add("t#{rand(99_999)}")
     causes = Rsk::Causes.new(test_pgsql, pid)
