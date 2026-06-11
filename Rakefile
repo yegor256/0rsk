@@ -61,6 +61,47 @@ task(:config) do
   YAML.safe_load(File.open('config.yml')).to_yaml
 end
 
+desc 'Load sample data for development/demo'
+task(seed_dummy: %i[pgsql liquibase]) do
+  require 'yaml'
+  require 'loog'
+  require 'pgtk/pool'
+  require_relative 'objects/rsk'
+  require_relative 'objects/projects'
+  require_relative 'objects/causes'
+  require_relative 'objects/risks'
+  require_relative 'objects/effects'
+  require_relative 'objects/triples'
+  require_relative 'objects/plans'
+  pgsql = Pgtk::Pool.new(
+    Pgtk::Wire::Yaml.new('target/pgsql-config.yml'),
+    log: Loog::NULL
+  ).start
+  fixtures = YAML.safe_load(File.read('liquibase/fixtures.yml'))
+  fixtures.each do |key, data|
+    login = "demo_#{key}"
+    pid = Rsk::Projects.new(pgsql, login).add(data['title'])
+    causes = Rsk::Causes.new(pgsql, pid)
+    risks = Rsk::Risks.new(pgsql, pid)
+    effects = Rsk::Effects.new(pgsql, pid)
+    triples = Rsk::Triples.new(pgsql, pid)
+    plans = Rsk::Plans.new(pgsql, pid)
+    cids = data['causes'].map { |c| causes.add(c['text']) }
+    rids = data['risks'].map { |r| risks.add(r['text']) }
+    eids = data['effects'].map { |e| effects.add(e['text']) }
+    data['plans'].each do |p|
+      ci = cids[data['causes'].index { |c| c['text'] == p['cause'] }]
+      ri = rids[data['risks'].index { |r| r['text'] == p['risk'] }]
+      ei = eids[data['effects'].index { |e| e['text'] == p['effect'] }]
+      next unless ci && ri && ei
+      tid = triples.add(ci, ri, ei)
+      plans.add(tid, p['text'])
+    end
+    puts "Seeded: #{data['title']}"
+  end
+  puts 'Done. Login with ?glogin=demo_mobile or ?glogin=demo_cloud'
+end
+
 task(run: %i[pgsql liquibase]) do
   `rerun -b "RACK_ENV=test rackup"`
 end
