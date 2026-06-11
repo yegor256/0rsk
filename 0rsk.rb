@@ -125,6 +125,7 @@ end
 get '/project/{id}' do
   pid = params[:id]
   raise Rsk::Urror, "Project ##{pid} not found" unless projects.exists?(pid)
+<<<<<<< HEAD
   haml :project, layout: :layout, locals: merged(title: "##{pid}", pid: pid, trackers: trackers(pid: pid).fetch)
 end
 
@@ -138,6 +139,28 @@ end
 post '/project/{id}/tracker/delete' do
   pid = params[:id]
   tid = Integer(params[:tid], 10)
+  raise Rsk::Urror, "Project ##{pid} not found" unless projects.exists?(pid)
+  trackers(pid: pid).delete(tid)
+  flash("/project/#{pid}", 'Tracker removed')
+=======
+  haml :project, layout: :layout, locals: merged(
+    title: "##{pid}",
+    pid: pid,
+    trackers: trackers(pid: pid).fetch
+  )
+>>>>>>> 62b5c98 (#21: add tracker table, model, and UI for GitHub integration)
+end
+
+post '/project/{id}/tracker/add' do
+  pid = params[:id]
+  raise Rsk::Urror, "Project ##{pid} not found" unless projects.exists?(pid)
+  trackers(pid: pid).add(params[:repo], params[:token])
+  flash("/project/#{pid}", 'Tracker added')
+end
+
+post '/project/{id}/tracker/delete' do
+  pid = params[:id]
+  tid = params[:tid].to_i
   raise Rsk::Urror, "Project ##{pid} not found" unless projects.exists?(pid)
   trackers(pid: pid).delete(tid)
   flash("/project/#{pid}", 'Tracker removed')
@@ -252,10 +275,22 @@ module Rsk::App
     @users ||= Rsk::Users.new(settings.pgsql)
   end
 
+<<<<<<< HEAD
   def projects(login: identity)
     require_relative('objects/projects')
     Rsk::Projects.new(settings.pgsql, login)
   end
+=======
+def trackers(pid:)
+  require_relative 'objects/trackers'
+  Rsk::Trackers.new(settings.pgsql, pid)
+end
+
+def triples(project: current_project)
+  require_relative 'objects/triples'
+  Rsk::Triples.new(settings.pgsql, project)
+end
+>>>>>>> 62b5c98 (#21: add tracker table, model, and UI for GitHub integration)
 
   def triples(project: pid)
     require_relative('objects/triples')
