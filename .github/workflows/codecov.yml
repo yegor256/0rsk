@@ -22,7 +22,7 @@ jobs:
           bundler-cache: true
       - run: bundle config set --global path "$(pwd)/vendor/bundle"
       - run: bundle install --no-color
-      - run: bundle exec rake
+      - run: CODE_COVERAGE=true bundle exec rake
       - uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
