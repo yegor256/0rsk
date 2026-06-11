@@ -98,9 +98,10 @@ class Rsk::AppTest < Minitest::Test
     pid = login(name)
     get("/projects/delete?id=#{pid}")
     assert_equal(302, last_response.status, last_response.body)
-    get('/projects')
-    assert_equal(200, last_response.status, last_response.body)
-    assert_includes(last_response.body, 'has been deleted')
+    assert(last_response.location.end_with?('/projects'))
+    cookie = last_response.headers['Set-Cookie']
+    refute_nil(cookie, last_response.body)
+    assert_includes(cookie.to_s, 'deleted')
   end
 
   private
