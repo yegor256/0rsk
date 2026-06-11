@@ -100,7 +100,7 @@ class Rsk::AppTest < Minitest::Test
     assert(last_response.location.end_with?('/'), last_response.body)
     cookie = last_response.headers['Set-Cookie']
     refute_nil(cookie, last_response.body)
-    assert_includes(cookie, 'glogin=', cookie)
+    assert_includes(cookie.to_s, 'glogin=', last_response.body)
   end
 
   private
