@@ -7,6 +7,7 @@ require_relative 'rsk'
 require_relative 'plans'
 require_relative 'query'
 require_relative 'pipeline'
+require 'json'
 
 # Tasks.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -56,6 +57,14 @@ class Rsk::Tasks
     query(query).count
   end
 
+  # Store tracker reference for a task.
+  def track(id, repo, issue)
+    @pgsql.exec(
+      'UPDATE task SET tracker_data = $1 WHERE id = $2',
+      [JSON.generate({ repo: repo, issue: issue }), id]
+    )
+  end
+
   # Fetch them all and return an array of hashes.
   def fetch(query: '', limit: 10, offset: 0)
     query(query).fetch(offset, limit).map do |r|
@@ -75,7 +84,8 @@ class Rsk::Tasks
         rtext: r['rtext'],
         etext: r['etext'],
         ptext: r['ptext'],
-        schedule: r['schedule']
+        schedule: r['schedule'],
+        tracker_data: r['tracker_data']
       }
     end
   end
@@ -86,7 +96,7 @@ class Rsk::Tasks
     Rsk::Query.new(
       @pgsql,
       [
-        'SELECT * FROM (SELECT DISTINCT ON (task.id) task.id, task.plan,',
+        'SELECT * FROM (SELECT DISTINCT ON (task.id) task.id, task.plan, task.tracker_data,',
         '  plan.schedule AS schedule, plan.part AS part,',
         '  emoji,',
         '  part.text AS text, t.text AS ptext,',
