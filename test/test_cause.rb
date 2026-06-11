@@ -4,17 +4,10 @@
 # SPDX-License-Identifier: MIT
 
 require_relative 'test__helper'
-require_relative '../objects/rsk'
-require_relative '../objects/causes'
-require_relative '../objects/projects'
 
-# Test of Cause.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::CauseTest < Minitest::Test
   def test_modifies_text
-    pid = Rsk::Projects.new(test_pgsql, "will#{rand(99_999)}").add("test#{rand(99_999)}")
+    _login, pid = make_project(test_pgsql)
     before = 'text first'
     after = 'another text to set'
     causes = Rsk::Causes.new(test_pgsql, pid)
@@ -25,11 +18,11 @@ class Rsk::CauseTest < Minitest::Test
   end
 
   def test_modifies_emoji
-    pid = Rsk::Projects.new(test_pgsql, "bill#{rand(99_999)}").add("test#{rand(99_999)}")
+    _login, pid = make_project(test_pgsql)
     causes = Rsk::Causes.new(test_pgsql, pid)
     cause = causes.get(causes.add('test me'))
-    assert_equal('💾', cause.emoji)
-    cause.emoji = '📚'
-    assert_equal('📚', cause.emoji)
+    assert_equal("\u{1F4BE}", cause.emoji)
+    cause.emoji = "\u{1F4DA}"
+    assert_equal("\u{1F4DA}", cause.emoji)
   end
 end

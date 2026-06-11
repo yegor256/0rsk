@@ -4,17 +4,10 @@
 # SPDX-License-Identifier: MIT
 
 require_relative 'test__helper'
-require_relative '../objects/rsk'
-require_relative '../objects/effects'
-require_relative '../objects/projects'
 
-# Test of Effect.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::EffectTest < Minitest::Test
   def test_adds_and_fetches
-    pid = Rsk::Projects.new(test_pgsql, 'jeff053').add("test#{rand(99_999)}")
+    _login, pid = make_project(test_pgsql)
     effects = Rsk::Effects.new(test_pgsql, pid)
     text = 'the business will halt'
     eid = effects.add(text)
