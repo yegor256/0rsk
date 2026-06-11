@@ -6,8 +6,8 @@ require_relative '../objects/pipeline'
 # SPDX-License-Identifier: MIT
 
 require_relative '../objects/tasks'
-require_relative '../objects/trackers'
 require_relative '../objects/tasktracker'
+require_relative '../objects/trackers'
 
 Rsk::Daemon.new(10).start do
   users.fetch.each do |login|

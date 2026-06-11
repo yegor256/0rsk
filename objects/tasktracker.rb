@@ -4,14 +4,10 @@
 # SPDX-License-Identifier: MIT
 
 require_relative 'rsk'
-require 'net/http'
 require 'json'
+require 'net/http'
 require 'uri'
 
-# TaskTracker.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::TaskTracker
   def initialize(repo, token)
     @repo = repo
@@ -36,7 +32,7 @@ class Rsk::TaskTracker
       ].join("\n")
     }.to_json
     response = http.request(request)
-    raise "GitHub API error: #{response.code}" unless (200..299).include?(response.code.to_i)
+    raise(Rsk::Urror, "GitHub API error: #{response.code}") unless (200..299).cover?(Integer(response.code, 10))
     JSON.parse(response.body)['number']
   end
 end
