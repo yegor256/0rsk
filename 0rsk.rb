@@ -224,6 +224,62 @@ get '/terms' do
   )
 end
 
+get '/dashboard.json' do
+  content_type 'application/json'
+  pid = request.cookies['0rsk-project']
+  unless pid && projects.exists?(pid)
+    halt 200, { 'Content-Type' => 'application/json' },
+         JSON.generate(heatmap: [], distribution: [], coverage: { total: 0, with_plans: 0, without_plans: 0 })
+  end
+  p = settings.pgsql
+  heatmap = p.exec(
+    [
+      'SELECT risk.probability, effect.impact, COUNT(t.id) AS cnt',
+      'FROM triple t',
+      'JOIN part AS cpart ON t.cause = cpart.id',
+      'JOIN risk ON t.risk = risk.id',
+      'JOIN effect ON t.effect = effect.id',
+      'WHERE cpart.project = $1',
+      'GROUP BY risk.probability, effect.impact',
+      'ORDER BY risk.probability, effect.impact'
+    ],
+    [pid]
+  ).map { |r| { probability: r['probability'].to_i, impact: r['impact'].to_i, count: r['cnt'].to_i } }
+  distribution = p.exec(
+    [
+      'SELECT (risk.probability * effect.impact) / 10 * 10 AS bucket, COUNT(*) AS cnt',
+      'FROM triple t',
+      'JOIN part AS cpart ON t.cause = cpart.id',
+      'JOIN risk ON t.risk = risk.id',
+      'JOIN effect ON t.effect = effect.id',
+      'WHERE cpart.project = $1',
+      'GROUP BY bucket',
+      'ORDER BY bucket'
+    ],
+    [pid]
+  ).map { |r| { rank: r['bucket'].to_i, count: r['cnt'].to_i } }
+  coverage = p.exec(
+    [
+      'SELECT COUNT(t.id) AS total,',
+      '  COUNT(plan.id) FILTER (WHERE plan.id IS NOT NULL) AS with_plans',
+      'FROM triple t',
+      'JOIN part AS cpart ON t.cause = cpart.id',
+      'LEFT JOIN plan ON plan.part IN (t.cause, t.risk, t.effect)',
+      'WHERE cpart.project = $1'
+    ],
+    [pid]
+  ).map do |r|
+    total = r['total'].to_i
+    wp = r['with_plans'].to_i
+    { total: total, with_plans: wp, without_plans: total - wp }
+  end[0]
+  JSON.generate(
+    heatmap: heatmap,
+    distribution: distribution,
+    coverage: coverage
+  )
+end
+
 def current_user
   redirect '/' unless @locals[:user]
   @locals[:user]['id'].downcase
