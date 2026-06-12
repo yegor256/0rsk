@@ -224,6 +224,11 @@ get '/terms' do
   )
 end
 
+get '/templates.json' do
+  content_type 'application/json'
+  YAML.safe_load(File.read(File.join(__dir__, 'seeds/risks.yml'))).to_json
+end
+
 def current_user
   redirect '/' unless @locals[:user]
   @locals[:user]['id'].downcase
