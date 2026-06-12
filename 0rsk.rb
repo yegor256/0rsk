@@ -125,6 +125,12 @@ get '/projects/delete' do
   flash('/projects', "The project ##{pid} has been deleted")
 end
 
+post '/projects/delete' do
+  pid = params[:id]
+  projects.delete(pid)
+  flash('/projects', "The project ##{pid} has been deleted")
+end
+
 get '/project/{id}' do
   pid = params[:id]
   raise Rsk::Urror, "Project ##{pid} not found" unless projects.exists?(pid)
