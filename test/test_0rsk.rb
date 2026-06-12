@@ -32,7 +32,8 @@ class Rsk::AppTest < Minitest::Test
       '/',
       '/js/triple.js',
       '/js/responses.js',
-      '/terms'
+      '/terms',
+      '/templates.json'
     ]
     pages.each do |p|
       get(p)
@@ -91,6 +92,32 @@ class Rsk::AppTest < Minitest::Test
     assert_equal(302, last_response.status, last_response.body)
     get('/ranked')
     assert_equal(200, last_response.status, last_response.body)
+  end
+
+  def test_templates_import
+    name = "bob_import#{rand(99_999)}"
+    login(name)
+    post('/templates/import', 'category=security&indices=0')
+    assert_equal(302, last_response.status, last_response.body)
+    get('/ranked')
+    assert_equal(200, last_response.status, last_response.body)
+    assert_includes(last_response.body, 'weak passwords')
+    assert_includes(last_response.body, 'account compromised')
+    assert_includes(last_response.body, 'data breach')
+  end
+
+  def test_templates_import_invalid_category
+    name = "bob_badcat#{rand(99_999)}"
+    login(name)
+    post('/templates/import', 'category=nonexistent&indices=0')
+    assert_equal(302, last_response.status, last_response.body)
+  end
+
+  def test_templates_import_empty_indices
+    name = "bob_empty#{rand(99_999)}"
+    login(name)
+    post('/templates/import', 'category=security&indices=')
+    assert_equal(302, last_response.status, last_response.body)
   end
 
   private
