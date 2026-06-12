@@ -11,3 +11,44 @@
 %p
   See
   %a{href: iri.cut('/projects')} all projects
+
+%h3 Trackers
+
+- if trackers.empty?
+  %p No trackers configured yet.
+- else
+  %p The following trackers are connected:
+  %table
+    %tr
+      %th Type
+      %th Repo
+      %th Created
+      %th
+    - trackers.each do |t|
+      %tr
+        %td= t[:type]
+        %td= t[:repo]
+        %td= t[:created].strftime('%Y-%m-%d')
+        %td
+          %form{method: 'POST', action: "/project/#{pid}/tracker/delete"}
+            %input{type: 'hidden', name: 'tid', value: t[:id]}
+            %input{type: 'submit', value: 'Delete'}
+
+%form{method: 'POST', action: "/project/#{pid}/tracker/add"}
+  %fieldset
+    %legend Add a new tracker
+    %p
+      %label
+        Type:
+        %select{name: 'type'}
+          %option{value: 'github'} GitHub
+    %p
+      %label
+        Repository (owner/name):
+        %input{type: 'text', name: 'repo', size: 40, placeholder: 'e.g. myorg/myproject'}
+    %p
+      %label
+        Access token:
+        %input{type: 'password', name: 'token', size: 40}
+    %p
+      %input{type: 'submit', value: 'Add Tracker'}
