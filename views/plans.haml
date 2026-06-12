@@ -50,7 +50,7 @@
           %td
             = r[:schedule]
           %td
-            = RelativeTime.in_words(r[:completed].utc.iso8601)
+            = RelativeTime.in_words(r[:completed].utc)
           %td.right
             = thumb(r)
             = rank(r)
