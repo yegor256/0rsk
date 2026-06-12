@@ -6,7 +6,7 @@
 
 %h2
   Responses to
-  %a{href: iri.cut('/triple').add(id: triple[:id])}
+  %a{href: iri.cut('/triple'), title: 'New risk triple'.add(id: triple[:id])}
     = "##{triple[:id]}"
 
 %p
@@ -41,31 +41,31 @@
     %label<
       %span> Schedule (
       = succeed ',' do
-        %a{href: '#', id: 'daily'}<
+        %a{href: '#', id: 'daily', title: 'Daily schedule'}<
           daily
       = succeed ',' do
-        %a{href: '#', id: 'weekly'}<
+        %a{href: '#', id: 'weekly', title: 'Weekly schedule'}<
           weekly
       = succeed ',' do
-        %a{href: '#', id: 'biweekly'}<
+        %a{href: '#', id: 'biweekly', title: 'Biweekly schedule'}<
           biweekly
       = succeed ',' do
-        %a{href: '#', id: 'monthly'}<
+        %a{href: '#', id: 'monthly', title: 'Monthly schedule'}<
           monthly
       = succeed ',' do
-        %a{href: '#', id: 'quarterly'}<
+        %a{href: '#', id: 'quarterly', title: 'Quarterly schedule'}<
           quarterly
       or
       = succeed '):' do
-        %a{href: '#', id: 'annually'}<
+        %a{href: '#', id: 'annually', title: 'Annual schedule'}<
           annually
     %input{id: 'schedule', type: 'text', name: 'schedule', size: 22, maxlength: 20, autocomplete: 'off', tabindex: 3, required: true}
     %label
       %span.item.small Or just once:
-      %a.item.small{href: '#', id: 'schedule_asap'} ASAP
-      %a.item.small{href: '#', id: 'schedule_week'} This week
-      %a.item.small{href: '#', id: 'schedule_month'} This month
-      %a.item.small{href: '#', id: 'schedule_later'} Later
+      %a.item.small{href: '#', id: 'schedule_asap', title: 'Schedule for today'} ASAP
+      %a.item.small{href: '#', id: 'schedule_week', title: 'Schedule for this week'} This week
+      %a.item.small{href: '#', id: 'schedule_month', title: 'Schedule for this month'} This month
+      %a.item.small{href: '#', id: 'schedule_later', title: 'Schedule for later'} Later
     %input{type: 'submit', value: 'Add', tabindex: 4}
 
 - plans.each do |p|
@@ -78,10 +78,10 @@
     %br
     %span.item.small
       &= p[:schedule]
-    %a.item.small{href: iri.cut('/responses/detach').add(tid: triple[:id], id: p[:id], part: p[:part]), onclick: "return confirm('Are sure you want to detach plan ##{p[:id]}');"} Detach
+    %a.item.small{href: iri.cut('/responses/detach').add(tid: triple[:id], id: p[:id], part: p[:part]), title: 'Detach plan', onclick: "return confirm('Are sure you want to detach plan ##{p[:id]}');"} Detach
 
 %p
   If you are in doubt and need to learn more about
   the cause+risk+effect model of risk management, read
   = succeed '.' do
-    %a{href: 'https://www.yegor256.com/2019/05/14/cause-risk-effect.html'} this blog post
+    %a{href: 'https://www.yegor256.com/2019/05/14/cause-risk-effect.html', title: 'Learn about C+R+E model'} this blog post
