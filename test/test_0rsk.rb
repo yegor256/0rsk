@@ -93,6 +93,17 @@ class Rsk::AppTest < Minitest::Test
     assert_equal(200, last_response.status, last_response.body)
   end
 
+  def test_deletes_project
+    name = "deleter#{rand(99_999)}"
+    pid = login(name)
+    get("/projects/delete?id=#{pid}")
+    assert_equal(302, last_response.status, last_response.body)
+    assert(last_response.location.end_with?('/projects'))
+    cookie = last_response.headers['Set-Cookie']
+    refute_nil(cookie, last_response.body)
+    assert_includes(cookie.to_s, 'deleted')
+  end
+
   private
 
   def login(name)
@@ -100,5 +111,6 @@ class Rsk::AppTest < Minitest::Test
     projects = Rsk::Projects.new(test_pgsql, name)
     pid = projects.add('test')
     set_cookie("0rsk-project=#{pid}")
+    pid
   end
 end
