@@ -130,8 +130,24 @@ get '/project/{id}' do
   raise Rsk::Urror, "Project ##{pid} not found" unless projects.exists?(pid)
   haml :project, layout: :layout, locals: merged(
     title: "##{pid}",
-    pid: pid
+    pid: pid,
+    trackers: trackers(pid: pid).fetch
   )
+end
+
+post '/project/{id}/tracker/add' do
+  pid = params[:id]
+  raise Rsk::Urror, "Project ##{pid} not found" unless projects.exists?(pid)
+  trackers(pid: pid).add(params[:repo], params[:token])
+  flash("/project/#{pid}", 'Tracker added')
+end
+
+post '/project/{id}/tracker/delete' do
+  pid = params[:id]
+  tid = params[:tid].to_i
+  raise Rsk::Urror, "Project ##{pid} not found" unless projects.exists?(pid)
+  trackers(pid: pid).delete(tid)
+  flash("/project/#{pid}", 'Tracker removed')
 end
 
 get '/responses' do
@@ -247,6 +263,11 @@ end
 def projects(login: current_user)
   require_relative 'objects/projects'
   Rsk::Projects.new(settings.pgsql, login)
+end
+
+def trackers(pid:)
+  require_relative 'objects/trackers'
+  Rsk::Trackers.new(settings.pgsql, pid)
 end
 
 def triples(project: current_project)
