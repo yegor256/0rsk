@@ -28,7 +28,7 @@ if ENV['RACK_ENV'] != 'test'
 end
 
 configure do
-  Haml::Options.defaults[:format] = :xhtml
+  set :haml, format: :xhtml
   config = {
     'github' => {
       'client_id' => '?',
