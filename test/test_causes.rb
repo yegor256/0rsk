@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: MIT
 
 require_relative 'test__helper'
+require 'securerandom'
 require_relative '../objects/rsk'
 require_relative '../objects/causes'
 require_relative '../objects/projects'
@@ -31,5 +32,12 @@ class Rsk::CausesTest < Minitest::Test
     cid = causes.add('some cause')
     causes.get(cid).emoji = '💰'
     assert_operator(causes.emojis.count, :>, 1)
+  end
+
+  def test_rejects_cause_from_another_project
+    mine = Rsk::Projects.new(test_pgsql, "my#{SecureRandom.hex(8)}").add("t#{SecureRandom.hex(8)}")
+    other = Rsk::Projects.new(test_pgsql, "you#{SecureRandom.hex(8)}").add("t#{SecureRandom.hex(8)}")
+    cid = Rsk::Causes.new(test_pgsql, other).add('other cause')
+    assert_raises(Rsk::Urror) { Rsk::Causes.new(test_pgsql, mine).get(cid) }
   end
 end

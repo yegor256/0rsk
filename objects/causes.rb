@@ -6,6 +6,7 @@
 require_relative 'rsk'
 require_relative 'cause'
 require_relative 'query'
+require_relative 'urror'
 
 # Causes.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -42,6 +43,15 @@ class Rsk::Causes
 
   def get(id)
     require_relative 'cause'
+    found = @pgsql.exec(
+      [
+        'SELECT cause.id FROM cause',
+        'JOIN part ON part.id = cause.id',
+        'WHERE cause.id = $1 AND part.project = $2'
+      ],
+      [id, @project]
+    )
+    raise Rsk::Urror, "Cause ##{id} not found in project ##{@project}" if found.empty?
     Rsk::Cause.new(@pgsql, id)
   end
 
