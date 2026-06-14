@@ -13,7 +13,7 @@ require_relative '../objects/telechats'
 class Rsk::TelechatsTest < Minitest::Test
   def test_checks
     login = "judy#{rand(99_999)}"
-    telechats = Rsk::Telechats.new(test_pgsql)
+    telechats = Rsk::Telechats.new(pgsql)
     chat = rand(99_999)
     telechats.add(chat, login)
     msg = 'hey, you!'

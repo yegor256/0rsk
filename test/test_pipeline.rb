@@ -20,18 +20,18 @@ require_relative '../objects/plans'
 class Rsk::PipelineTest < Minitest::Test
   def test_adds_and_fetches
     login = "bobby#{rand(99_999)}"
-    project = Rsk::Projects.new(test_pgsql, login).add("testuu#{rand(99_999)}")
-    cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
-    rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
-    rid2 = Rsk::Risks.new(test_pgsql, project).add('we may lose it again')
-    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
-    triples = Rsk::Triples.new(test_pgsql, project)
+    project = Rsk::Projects.new(pgsql, login).add("testuu#{rand(99_999)}")
+    cid = Rsk::Causes.new(pgsql, project).add('we have data')
+    rid = Rsk::Risks.new(pgsql, project).add('we may lose it')
+    rid2 = Rsk::Risks.new(pgsql, project).add('we may lose it again')
+    eid = Rsk::Effects.new(pgsql, project).add('business will stop')
+    triples = Rsk::Triples.new(pgsql, project)
     triples.add(cid, rid, eid)
     triples.add(cid, rid2, eid)
-    plans = Rsk::Plans.new(test_pgsql, project)
+    plans = Rsk::Plans.new(pgsql, project)
     pid = plans.add(eid, 'solve it!')
     plans.get(pid, eid).schedule = (Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y')
-    pipeline = Rsk::Pipeline.new(test_pgsql, login)
+    pipeline = Rsk::Pipeline.new(pgsql, login)
     assert_equal(1, pipeline.fetch.count)
     assert(pipeline.fetch.any?(pid))
   end

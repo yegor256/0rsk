@@ -38,9 +38,9 @@ require 'pgtk/pool'
 require 'yaml'
 
 class Minitest::Test
-  def test_pgsql
+  def pgsql
     # rubocop:disable Style/ClassVars
-    @@test_pgsql ||= Pgtk::Pool.new(
+    @@pgsql ||= Pgtk::Pool.new(
       Pgtk::Wire::Yaml.new(File.join(__dir__, '../target/pgsql-config.yml')),
       log: Loog::NULL
     ).start

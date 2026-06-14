@@ -97,7 +97,7 @@ class Rsk::AppTest < Minitest::Test
 
   def login(name)
     set_cookie("glogin=#{name}")
-    projects = Rsk::Projects.new(test_pgsql, name)
+    projects = Rsk::Projects.new(pgsql, name)
     pid = projects.add('test')
     set_cookie("0rsk-project=#{pid}")
   end
