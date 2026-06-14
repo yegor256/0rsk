@@ -1,0 +1,7 @@
+sentry:
+github:
+  client_id: test
+  client_secret: test
+  # Must be an empty string in dev or test environments.
+  # https://github.com/yegor256/glogin/blob/0.16.5/lib/glogin/cookie.rb#L60
+  encryption_secret: ""
