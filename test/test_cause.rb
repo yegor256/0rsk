@@ -12,7 +12,7 @@ require_relative '../objects/projects'
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
 # License:: MIT
-class Rsk::CauseTest < Minitest::Test
+class Rsk::CauseTest < TestCase
   def test_modifies_text
     pid = Rsk::Projects.new(test_pgsql, "will#{rand(99_999)}").add("test#{rand(99_999)}")
     before = 'text first'

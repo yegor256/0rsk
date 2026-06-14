@@ -12,7 +12,7 @@ require_relative '../objects/projects'
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
 # License:: MIT
-class Rsk::EffectTest < Minitest::Test
+class Rsk::EffectTest < TestCase
   def test_adds_and_fetches
     pid = Rsk::Projects.new(test_pgsql, 'jeff053').add("test#{rand(99_999)}")
     effects = Rsk::Effects.new(test_pgsql, pid)
