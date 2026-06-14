@@ -13,6 +13,7 @@ gem 'loog', '~>0.5'
 gem 'minitest', '~>6.0', require: false
 gem 'minitest-reporters', '~>1.6', require: false
 gem 'pgtk', '~>0.9'
+gem 'puma', '~>6.0'
 gem 'rack', '~>2.2'
 gem 'rack-ssl', '~>1.4'
 gem 'rack-test', '~>2.1'
@@ -30,5 +31,4 @@ gem 'simplecov-cobertura', '~> 3.0'
 gem 'sinatra', '~>3.2'
 gem 'sprockets', '~>4.2'
 gem 'telebot', '~>0.1'
-gem 'thin', '~>2.0'
 gem 'xcop', '~>0.7'
