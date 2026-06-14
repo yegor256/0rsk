@@ -66,8 +66,7 @@ class Rsk::Telepings
   # deleted between calls. The result is sorted by rank, descending.
   def fresh_tasks(login, tasks)
     fresh(login)
-      .map { |tid| tasks.fetch(query: tid)[0] }
-      .compact
+      .filter_map { |tid| tasks.fetch(query: tid)[0] }
       .sort_by { |t| t[:rank] }
       .reverse
   end
