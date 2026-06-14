@@ -28,4 +28,51 @@ class Rsk::PlansTest < Minitest::Test
     assert(plans.fetch.any? { |p| p[:text] == text })
     plans.get(id, rid).complete
   end
+
+  def test_reports_missing_plan_part
+    err = assert_raises(Rsk::Urror) do
+      Rsk::Plan.new(fake_pool({ 'SELECT project FROM part WHERE id = $1 FOR UPDATE' => [] }), 17, 23).detach
+    end
+    assert_equal('Plan part #17 not found', err.message)
+  end
+
+  def test_finds_project_inside_transaction
+    calls = []
+    Rsk::Plan.new(
+      fake_pool(
+        {
+          'SELECT project FROM part WHERE id = $1 FOR UPDATE' => [{ 'project' => '42' }],
+          'SELECT * FROM part WHERE id = $1 AND project = $2' => [{}],
+          'DELETE FROM plan WHERE id = $1 AND part = $2' => [],
+          'SELECT * FROM plan WHERE id = $1' => [{}]
+        },
+        calls: calls
+      ),
+      17,
+      23
+    ).detach
+    assert_includes(
+      calls,
+      ['SELECT project FROM part WHERE id = $1 FOR UPDATE', [17]]
+    )
+    assert_includes(
+      calls,
+      ['SELECT * FROM part WHERE id = $1 AND project = $2', [23, 42]]
+    )
+  end
+
+  private
+
+  def fake_pool(responses, calls: [])
+    tx = Object.new
+    tx.define_singleton_method(:exec) do |sql, args|
+      calls << [sql, args]
+      raise "Unexpected SQL: #{sql}" unless responses.key?(sql)
+      responses[sql]
+    end
+    pool = Object.new
+    pool.define_singleton_method(:transaction) { |&block| block.call(tx) }
+    pool.define_singleton_method(:exec) { |_sql, _args| raise 'Query escaped the transaction' }
+    pool
+  end
 end
