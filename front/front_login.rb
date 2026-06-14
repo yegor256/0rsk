@@ -4,6 +4,16 @@
 # SPDX-License-Identifier: MIT
 
 before '/*' do
+  response.headers['Content-Security-Policy'] = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' code.jquery.com cdnjs.cloudflare.com",
+    "style-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdnjs.cloudflare.com www.yegor256.com",
+    "img-src 'self' img.shields.io www.sixnines.io",
+    "font-src 'self'",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'"
+  ].join('; ')
   @locals = {
     http_start: Time.now,
     ver: Rsk::VERSION,
