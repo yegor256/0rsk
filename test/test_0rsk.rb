@@ -32,7 +32,8 @@ class Rsk::AppTest < Minitest::Test
       '/',
       '/js/triple.js',
       '/js/responses.js',
-      '/terms'
+      '/terms',
+      '/dashboard'
     ]
     pages.each do |p|
       get(p)
@@ -63,7 +64,8 @@ class Rsk::AppTest < Minitest::Test
       '/causes.json',
       '/risks.json',
       '/effects.json',
-      '/plans.json'
+      '/plans.json',
+      '/dashboard.json'
     ]
     pages.each do |p|
       get(p)
