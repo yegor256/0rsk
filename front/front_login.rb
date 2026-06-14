@@ -4,6 +4,12 @@
 # SPDX-License-Identifier: MIT
 
 before '/*' do
+  now = Time.now.to_i
+  settings.rate_limits.reject! { |t| t < now - 60 }
+  if request.post?
+    settings.rate_limits << now
+    halt 429, { 'Content-Type' => 'text/plain' }, 'Too many requests' if settings.rate_limits.size > 10
+  end
   @locals = {
     http_start: Time.now,
     ver: Rsk::VERSION,

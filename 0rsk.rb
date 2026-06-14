@@ -52,6 +52,7 @@ configure do
   set :config, config
   set :logging, true
   set :log, Loog::REGULAR
+  set :rate_limits, []
   set :server_settings, timeout: 25
   set :glogin, GLogin::Auth.new(
     config['github']['client_id'],
