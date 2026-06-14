@@ -40,25 +40,19 @@
     %input{id: 'plan', type: 'text', name: 'plan', size: 60, maxlength: 160, autocomplete: 'off', tabindex: 2, required: true}
     %label<
       %span> Schedule (
-      = succeed ',' do
-        %a{href: '#', id: 'daily'}<
-          daily
-      = succeed ',' do
-        %a{href: '#', id: 'weekly'}<
-          weekly
-      = succeed ',' do
-        %a{href: '#', id: 'biweekly'}<
-          biweekly
-      = succeed ',' do
-        %a{href: '#', id: 'monthly'}<
-          monthly
-      = succeed ',' do
-        %a{href: '#', id: 'quarterly'}<
-          quarterly
+      %a{href: '#', id: 'daily'}<
+        daily,
+      %a{href: '#', id: 'weekly'}<
+        weekly,
+      %a{href: '#', id: 'biweekly'}<
+        biweekly,
+      %a{href: '#', id: 'monthly'}<
+        monthly,
+      %a{href: '#', id: 'quarterly'}<
+        quarterly,
       or
-      = succeed '):' do
-        %a{href: '#', id: 'annually'}<
-          annually
+      %a{href: '#', id: 'annually'}<
+        annually):
     %input{id: 'schedule', type: 'text', name: 'schedule', size: 22, maxlength: 20, autocomplete: 'off', tabindex: 3, required: true}
     %label
       %span.item.small Or just once:
@@ -83,5 +77,4 @@
 %p
   If you are in doubt and need to learn more about
   the cause+risk+effect model of risk management, read
-  = succeed '.' do
-    %a{href: 'https://www.yegor256.com/2019/05/14/cause-risk-effect.html'} this blog post
+  %a{href: 'https://www.yegor256.com/2019/05/14/cause-risk-effect.html'} this blog post.

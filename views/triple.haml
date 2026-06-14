@@ -31,8 +31,7 @@
 
 %p
   Need inspiration? Read this
-  = succeed '.' do
-    %a{href: 'https://github.com/yegor256/awesome-risks'} curated list
+  %a{href: 'https://github.com/yegor256/awesome-risks'} curated list.
 
 %form{method: 'POST', action: iri.cut('/triple/save')}
   %label
@@ -42,8 +41,7 @@
   %input.dimmed#cid{type: 'text', name: 'cid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:cid] : '', title: 'The ID of an existing cause'}
   %a#ctext_detach.small.item{href: '#', style: defined?(triple) ? '' : 'display: none;', title: 'Click to detach it from the existing cause'} Detach
   %br
-  = succeed ':' do
-    %a{href: 'https://unicode.org/emoji/charts/full-emoji-list.html'} Emoji
+  %a{href: 'https://unicode.org/emoji/charts/full-emoji-list.html'} Emoji:
   %input#emoji{type: 'text', name: 'emoji', size: 2, maxlength: 2, autocomplete: 'off', tabindex: 2, value: defined?(triple) ? triple[:emoji] : '💰', required: true}
   - unless emojis.empty?
     - emojis.each do |e|
@@ -93,5 +91,4 @@
 %p
   If you are in doubt and need to learn more about
   the cause+risk+effect model of risk management, read
-  = succeed '.' do
-    %a{href: 'https://www.yegor256.com/2019/05/14/cause-risk-effect.html'} this blog post
+  %a{href: 'https://www.yegor256.com/2019/05/14/cause-risk-effect.html'} this blog post.

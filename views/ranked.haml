@@ -7,8 +7,7 @@
 
 - unless alone.empty?
   %p
-    = succeed ':' do
-      %strong.red ATTENTION
+    %strong.red ATTENTION:
     There are
     %a{href: iri.cut('/ranked').add(q: '+alone')} a few risks
     without any plans!
@@ -52,4 +51,4 @@
           %span.small{style: 'margin-left: 2em;'}
             %code.small= "P#{p[:id]}"
             &= p[:text]
-  = Haml::Engine.new(File.read('views/_paging.haml')).render(self, locals.merge(count: triples.count))
+  = Tilt::HamlTemplate.new('views/_paging.haml', 1, format: :xhtml).render(self, locals.merge(count: triples.count))
