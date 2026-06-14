@@ -4,20 +4,11 @@
 # SPDX-License-Identifier: MIT
 
 require_relative 'test__helper'
-require_relative '../objects/rsk'
-require_relative '../objects/plans'
-require_relative '../objects/projects'
-require_relative '../objects/risks'
 
-# Test of Plans.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::PlansTest < Minitest::Test
   def test_adds_and_fetches
-    pid = Rsk::Projects.new(test_pgsql, 'jeff23').add("test#{rand(99_999)}")
-    risks = Rsk::Risks.new(test_pgsql, pid)
-    rid = risks.add('we may lose data')
+    _login, pid = make_project(test_pgsql)
+    rid = make_risk(test_pgsql, pid)
     plans = Rsk::Plans.new(test_pgsql, pid)
     text = 'we make backups'
     id = plans.add(rid, text)

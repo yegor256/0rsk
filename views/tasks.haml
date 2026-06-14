@@ -63,6 +63,10 @@
           &= t[:title]
         %span.item<
           &= t[:schedule]
+        - if t[:tracker_data]
+          - td = JSON.parse(t[:tracker_data])
+          %a.item{href: "https://github.com/#{td['repo']}/issues/#{td['issue']}", target: '_blank'}<
+            = "##{td['issue']}"
         %a.item{href: iri.cut('/tasks/done').add(id: t[:id])} Done
         - unless /^[a-z]+$/.match?(t[:schedule])
           %span.item

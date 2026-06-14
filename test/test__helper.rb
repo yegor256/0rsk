@@ -36,6 +36,19 @@ Minitest.load :minitest_reporter
 require 'loog'
 require 'pgtk/pool'
 require 'yaml'
+require 'securerandom'
+
+require_relative '../objects/rsk'
+require_relative '../objects/causes'
+require_relative '../objects/risks'
+require_relative '../objects/effects'
+require_relative '../objects/projects'
+require_relative '../objects/triples'
+require_relative '../objects/plans'
+require_relative '../objects/tasks'
+require_relative '../objects/pipeline'
+require_relative '../objects/users'
+require_relative '../objects/trackers'
 
 class Minitest::Test
   def test_pgsql
@@ -45,5 +58,47 @@ class Minitest::Test
       log: Loog::NULL
     ).start
     # rubocop:enable Style/ClassVars
+  end
+
+  def make_project(pgsql, name: 'test')
+    login = "#{name}#{SecureRandom.hex(6)}"
+    pid = Rsk::Projects.new(pgsql, login).add("p#{SecureRandom.hex(6)}")
+    [login, pid]
+  end
+
+  def make_cause(pgsql, project, text: 'we have data')
+    Rsk::Causes.new(pgsql, project).add(text)
+  end
+
+  def make_risk(pgsql, project, text: 'we may lose it')
+    Rsk::Risks.new(pgsql, project).add(text)
+  end
+
+  def make_effect(pgsql, project, text: 'business will stop')
+    Rsk::Effects.new(pgsql, project).add(text)
+  end
+
+  def make_triple(pgsql, project, cause: 'we have data', risk: 'we may lose it', effect: 'business will stop')
+    cid = make_cause(pgsql, project, text: cause)
+    rid = make_risk(pgsql, project, text: risk)
+    eid = make_effect(pgsql, project, text: effect)
+    tid = Rsk::Triples.new(pgsql, project).add(cid, rid, eid)
+    { cause: cid, risk: rid, effect: eid, triple: tid }
+  end
+
+  def make_plan(pgsql, project, part, text: 'solve it!')
+    plans = Rsk::Plans.new(pgsql, project)
+    pid = plans.add(part, text)
+    plans.get(pid, part).schedule = (Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y')
+    pid
+  end
+
+  def make_task(pgsql)
+    login, pid = make_project(pgsql)
+    t = make_triple(pgsql, pid)
+    plan_id = make_plan(pgsql, pid, t[:effect])
+    tasks = Rsk::Tasks.new(pgsql, login)
+    tasks.create
+    { login: login, project: pid, **t, plan: plan_id, task: tasks.fetch[0] }
   end
 end
