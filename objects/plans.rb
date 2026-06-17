@@ -71,7 +71,7 @@ class Rsk::Plans
         '  LEFT JOIN effect ON effect.id = triple.effect',
         '  WHERE part.project = $1',
         '  AND',
-        '  ' + (query.is_a?(Integer) ? 'triple.id = $2' : 'LOWER(part.text) LIKE $2'),
+        (query.is_a?(Integer) ? '  triple.id = $2' : '  LOWER(part.text) LIKE $2'),
         '  ORDER BY plan.id, rank DESC',
         ') sub',
         'ORDER BY rank DESC'
