@@ -56,7 +56,7 @@ configure do
   else
     set :pgsql, Pgtk::Pool.new(Pgtk::Wire::Env.new('DATABASE_URL'), log: settings.log)
   end
-  settings.pgsql.start(4)
+  settings.pgsql.start!
 end
 
 get '/' do

@@ -21,7 +21,7 @@ class Rsk::Telepings
     )
   end
 
-  def required(login, hours: 4)
+  def required?(login, hours: 4)
     max = @pgsql.exec(
       [
         'SELECT MAX(teleping.updated) FROM teleping',

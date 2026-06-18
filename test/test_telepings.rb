@@ -22,7 +22,7 @@ class Rsk::TelepingsTest < Minitest::Test
     test_tasks(login)
     telepings = Rsk::Telepings.new(test_pgsql)
     refute_empty(telepings.fresh(login))
-    assert(telepings.required(login))
+    assert(telepings.required?(login))
   end
 
   def test_adds
@@ -32,13 +32,13 @@ class Rsk::TelepingsTest < Minitest::Test
     Rsk::Telechats.new(test_pgsql).add(chat, login)
     telepings = Rsk::Telepings.new(test_pgsql)
     refute_empty(telepings.fresh(login))
-    assert(telepings.required(login))
+    assert(telepings.required?(login))
     tasks.fetch.each do |t|
       telepings.add(t[:id], chat)
       telepings.add(t[:id], chat)
     end
     assert_empty(telepings.fresh(login))
-    refute(telepings.required(login))
+    refute(telepings.required?(login))
   end
 
   def test_fresh_tasks_skips_orphan_ids

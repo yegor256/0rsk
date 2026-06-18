@@ -36,7 +36,7 @@ require 'pgtk/pgsql_task'
 Pgtk::PgsqlTask.new(:pgsql) do |t|
   t.quiet = true
   t.dir = 'target/pgsql'
-  t.fresh_start = true
+  t.fresh = true
   t.user = 'test'
   t.password = 'test'
   t.dbname = 'test'

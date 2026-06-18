@@ -124,7 +124,7 @@ module Rsk::Telegram
       fresh = telepings.pending(login, tasks(login: login))
       if fresh.empty?
         list = tasks(login: login).fetch(limit: 100)
-        next unless telepings.required(login)
+        next unless telepings.required?(login)
         next if list.empty?
         msg = [
           'Let me remind you that there are some tasks still required to be completed.',
