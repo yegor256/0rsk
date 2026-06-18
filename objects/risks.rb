@@ -6,6 +6,7 @@
 require_relative 'rsk'
 require_relative 'risk'
 require_relative 'query'
+require_relative 'urror'
 
 # Risks.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -30,6 +31,15 @@ class Rsk::Risks
 
   def get(id)
     require_relative 'risk'
+    found = @pgsql.exec(
+      [
+        'SELECT risk.id FROM risk',
+        'JOIN part ON part.id = risk.id',
+        'WHERE risk.id = $1 AND part.project = $2'
+      ],
+      [id, @project]
+    )
+    raise Rsk::Urror, "Risk ##{id} not found in project ##{@project}" if found.empty?
     Rsk::Risk.new(@pgsql, id)
   end
 

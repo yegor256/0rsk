@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: MIT
 
 require_relative 'test__helper'
+require 'securerandom'
 require_relative '../objects/rsk'
 require_relative '../objects/effects'
 require_relative '../objects/projects'
@@ -21,5 +22,12 @@ class Rsk::EffectsTest < Minitest::Test
     assert_predicate(eid, :positive?)
     assert_equal(1, effects.count)
     assert(effects.fetch.any? { |c| c[:text] == text })
+  end
+
+  def test_rejects_effect_from_another_project
+    mine = Rsk::Projects.new(test_pgsql, "my#{SecureRandom.hex(8)}").add("t#{SecureRandom.hex(8)}")
+    other = Rsk::Projects.new(test_pgsql, "you#{SecureRandom.hex(8)}").add("t#{SecureRandom.hex(8)}")
+    eid = Rsk::Effects.new(test_pgsql, other).add('other effect')
+    assert_raises(Rsk::Urror) { Rsk::Effects.new(test_pgsql, mine).get(eid) }
   end
 end
