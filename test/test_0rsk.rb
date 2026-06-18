@@ -6,7 +6,10 @@
 require_relative 'test__helper'
 require_relative '../0rsk'
 require_relative '../objects/rsk'
+require_relative '../objects/causes'
+require_relative '../objects/effects'
 require_relative '../objects/projects'
+require_relative '../objects/risks'
 
 module Rack
   module Test
@@ -93,6 +96,33 @@ class Rsk::AppTest < Minitest::Test
     assert_equal(200, last_response.status, last_response.body)
   end
 
+  def test_add_with_duplicate_part_texts
+    name = "jeff10#{rand(99_999)}"
+    pid = login(name)
+    cause = 'duplicate cause'
+    risk = 'duplicate risk'
+    effect = 'duplicate effect'
+    Rsk::Causes.new(test_pgsql, pid).add(cause)
+    Rsk::Risks.new(test_pgsql, pid).add(risk)
+    Rsk::Effects.new(test_pgsql, pid).add(effect)
+    post(
+      '/triple/save',
+      [
+        "ctext=#{cause}",
+        "rtext=#{risk}",
+        'probability=5',
+        'emoji=A',
+        "etext=#{effect}",
+        'impact=5',
+        'cid=',
+        'rid=',
+        'eid='
+      ].join('&')
+    )
+    assert_equal(302, last_response.status, last_response.body)
+    assert_includes(last_response['Location'], '/responses?id=')
+  end
+
   private
 
   def login(name)
@@ -100,5 +130,6 @@ class Rsk::AppTest < Minitest::Test
     projects = Rsk::Projects.new(test_pgsql, name)
     pid = projects.add('test')
     set_cookie("0rsk-project=#{pid}")
+    pid
   end
 end
