@@ -18,15 +18,25 @@ class Rsk::Triples
   end
 
   def add(cid, rid, eid)
-    @pgsql.exec(
-      [
-        'INSERT INTO triple (cause, risk, effect)',
-        'VALUES ($1, $2, $3)',
-        'ON CONFLICT(cause, risk, effect) DO UPDATE SET cause = $1',
-        'RETURNING id'
-      ],
-      [cid, rid, eid]
-    )[0]['id'].to_i
+    @pgsql.transaction do |t|
+      cnt = t.exec(
+        'SELECT COUNT(*) FROM part WHERE id IN ($1, $2, $3) AND project = $4',
+        [cid, rid, eid, @project]
+      )[0]['count'].to_i
+      if cnt < 3
+        raise Rsk::Urror,
+              "Parts ##{cid}, ##{rid}, ##{eid} must all belong to project ##{@project}"
+      end
+      t.exec(
+        [
+          'INSERT INTO triple (cause, risk, effect)',
+          'VALUES ($1, $2, $3)',
+          'ON CONFLICT(cause, risk, effect) DO UPDATE SET cause = $1',
+          'RETURNING id'
+        ],
+        [cid, rid, eid]
+      )[0]['id'].to_i
+    end
   end
 
   def delete(id)

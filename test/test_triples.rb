@@ -33,6 +33,18 @@ class Rsk::TriplesTest < Minitest::Test
     triples.fetch.each { |t| triples.delete(t[:id]) }
   end
 
+  def test_rejects_cross_project_parts
+    login = "sarahX#{rand(99_999)}"
+    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(99_999)}")
+    Rsk::Causes.new(test_pgsql, project).add('we have data')
+    rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
+    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
+    other = Rsk::Projects.new(test_pgsql, "sarahY#{rand(99_999)}").add("test#{rand(99_999)}")
+    cid2 = Rsk::Causes.new(test_pgsql, other).add('data from other project')
+    triples = Rsk::Triples.new(test_pgsql, project)
+    assert_raises(Rsk::Urror) { triples.add(cid2, rid, eid) }
+  end
+
   def test_fetches_with_plans
     login = "sarahP#{rand(99_999)}"
     project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(99_999)}")
