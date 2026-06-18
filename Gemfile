@@ -13,7 +13,7 @@ gem 'loog', '~>0.5'
 gem 'minitest', '~>6.0', require: false
 gem 'minitest-reporters', '~>1.6', require: false
 gem 'pgtk', '~>0.9'
-gem 'rack', '~>2.2'
+gem 'rack', '~>3.2'
 gem 'rack-ssl', '~>1.4'
 gem 'rack-test', '~>2.1'
 gem 'rake', '13.3.1', require: false
@@ -28,7 +28,7 @@ gem 'rubocop-rake', '>0', require: false
 gem 'sentry-ruby'
 gem 'simplecov', '~>0.22'
 gem 'simplecov-cobertura', '~> 3.0'
-gem 'sinatra', '~>3.2'
+gem 'sinatra', '~>4.2'
 gem 'sprockets', '~>4.2'
 gem 'telebot', '~>0.1'
 gem 'thin', '~>2.0'
