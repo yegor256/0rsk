@@ -6,6 +6,7 @@
 source 'https://rubygems.org'
 
 gem 'eslintrb', '~>2.1'
+gem 'faraday-multipart', '~>1.2'
 gem 'glogin', '~>0.14'
 gem 'haml', '~>5.2'
 gem 'iri', '~>0.8'
