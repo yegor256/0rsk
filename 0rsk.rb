@@ -9,12 +9,12 @@ require 'glogin'
 require 'glogin/codec'
 require 'haml'
 require 'iri'
-require 'loog'
 require 'json'
+require 'loog'
 require 'pgtk'
 require 'pgtk/pool'
-require 'sentry-ruby'
 require 'relative_time'
+require 'sentry-ruby'
 require 'sinatra'
 require 'telebot'
 require 'time'
@@ -29,14 +29,7 @@ end
 
 configure do
   Haml::Options.defaults[:format] = :xhtml
-  config = {
-    'github' => {
-      'client_id' => '?',
-      'client_secret' => '?',
-      'encryption_secret' => ''
-    },
-    'sentry' => ''
-  }
+  config = { 'github' => { 'client_id' => '?', 'client_secret' => '?', 'encryption_secret' => '' }, 'sentry' => '' }
   config = YAML.safe_load(File.open(File.join(File.dirname(__FILE__), 'config.yml'))) unless ENV['RACK_ENV'] == 'test'
   if ENV['RACK_ENV'] != 'test'
     Sentry.init do |c|
@@ -59,29 +52,21 @@ configure do
     'https://www.0rsk.com/github-callback'
   )
   if File.exist?('target/pgsql-config.yml')
-    set :pgsql, Pgtk::Pool.new(
-      Pgtk::Wire::Yaml.new(File.join(__dir__, 'target/pgsql-config.yml')),
-      log: settings.log
-    )
+    set :pgsql, Pgtk::Pool.new(Pgtk::Wire::Yaml.new(File.join(__dir__, 'target/pgsql-config.yml')), log: settings.log)
   else
-    set :pgsql, Pgtk::Pool.new(
-      Pgtk::Wire::Env.new('DATABASE_URL'),
-      log: settings.log
-    )
+    set :pgsql, Pgtk::Pool.new(Pgtk::Wire::Env.new('DATABASE_URL'), log: settings.log)
   end
   settings.pgsql.start(4)
 end
 
 get '/' do
   flash('/ranked') if @locals[:user]
-  haml :index, layout: :layout, locals: merged(
-    title: '/'
-  )
+  haml :index, layout: :layout, locals: merged(title: '/')
 end
 
 get '/ranked' do
-  offset = [(params[:offset] || '0').to_i, 0].max
-  limit = (params[:limit] || '10').to_i
+  offset = [Integer(params[:offset] || '0'), 0].max
+  limit = Integer(params[:limit] || '10')
   query = params[:q] || ''
   haml :ranked, layout: :layout, locals: merged(
     title: '/ranked',
@@ -101,10 +86,7 @@ get '/ranked/delete' do
 end
 
 get '/projects' do
-  haml :projects, layout: :layout, locals: merged(
-    title: '/projects',
-    projects: projects.fetch
-  )
+  haml :projects, layout: :layout, locals: merged(title: '/projects', projects: projects.fetch)
 end
 
 get '/projects/select' do
@@ -128,16 +110,13 @@ end
 get '/project/{id}' do
   pid = params[:id]
   raise Rsk::Urror, "Project ##{pid} not found" unless projects.exists?(pid)
-  haml :project, layout: :layout, locals: merged(
-    title: "##{pid}",
-    pid: pid
-  )
+  haml :project, layout: :layout, locals: merged(title: "##{pid}", pid: pid)
 end
 
 get '/responses' do
-  id = params[:id].to_i
+  id = Integer(params[:id])
   triple = triples.fetch(id: id, limit: 1)[0]
-  raise Rsk::Urror, "Triple ##{id} not found" if triple.nil?
+  raise(Rsk::Urror, "Triple ##{id} not found") if triple.nil?
   haml :responses, layout: :layout, locals: merged(
     title: '/triple',
     triple: triple,
@@ -146,24 +125,24 @@ get '/responses' do
 end
 
 post '/responses/add' do
-  id = params[:id].to_i
-  part = params[:strategy].to_i
+  id = Integer(params[:id])
+  part = Integer(params[:strategy])
   pid = plans.add(part, params[:plan])
-  plans.get(pid, part).schedule = params[:schedule].strip
+  plans.get(pid, part).reschedule(params[:schedule].strip)
   flash("/responses?id=#{id}", "Thanks, plan ##{pid}/#{part} added to the triple ##{id}")
 end
 
 get '/responses/detach' do
-  tid = params[:tid].to_i
-  id = params[:id].to_i
-  part = params[:part].to_i
+  tid = Integer(params[:tid])
+  id = Integer(params[:id])
+  part = Integer(params[:part])
   plans.get(id, part).detach
   flash("/responses?id=#{tid}", "Thanks, plan ##{id} detached from the triple ##{tid}")
 end
 
 get '/causes' do
-  offset = [(params[:offset] || '0').to_i, 0].max
-  limit = (params[:limit] || '25').to_i
+  offset = [Integer(params[:offset] || '0'), 0].max
+  limit = Integer(params[:limit] || '25')
   query = params[:q] || ''
   haml :causes, layout: :layout, locals: merged(
     title: '/causes',
@@ -177,8 +156,8 @@ get '/causes' do
 end
 
 get '/risks' do
-  offset = [(params[:offset] || '0').to_i, 0].max
-  limit = (params[:limit] || '25').to_i
+  offset = [Integer(params[:offset] || '0'), 0].max
+  limit = Integer(params[:limit] || '25')
   query = params[:q] || ''
   haml :risks, layout: :layout, locals: merged(
     title: '/risks',
@@ -191,8 +170,8 @@ get '/risks' do
 end
 
 get '/effects' do
-  offset = [(params[:offset] || '0').to_i, 0].max
-  limit = (params[:limit] || '25').to_i
+  offset = [Integer(params[:offset] || '0'), 0].max
+  limit = Integer(params[:limit] || '25')
   query = params[:q] || ''
   haml :effects, layout: :layout, locals: merged(
     title: '/effects',
@@ -205,8 +184,8 @@ get '/effects' do
 end
 
 get '/plans' do
-  offset = [(params[:offset] || '0').to_i, 0].max
-  limit = (params[:limit] || '25').to_i
+  offset = [Integer(params[:offset] || '0'), 0].max
+  limit = Integer(params[:limit] || '25')
   query = params[:q] || ''
   haml :plans, layout: :layout, locals: merged(
     title: '/plans',
@@ -219,68 +198,69 @@ get '/plans' do
 end
 
 get '/terms' do
-  haml :terms, layout: :layout, locals: merged(
-    title: '/terms'
-  )
+  haml :terms, layout: :layout, locals: merged(title: '/terms')
 end
 
-def current_user
-  redirect '/' unless @locals[:user]
-  @locals[:user]['id'].downcase
-end
-
-def current_project
-  pid = request.cookies['0rsk-project']
-  flash('/projects', 'Pick up a project to work with, or create a new one') unless pid
-  unless projects.exists?(pid)
-    response.delete_cookie('0rsk-project')
-    flash('/projects', 'Pick up a new project')
+module Rsk::App
+  def identity
+    redirect('/') unless @locals[:user]
+    @locals[:user]['id'].downcase
   end
-  pid
-end
 
-def users
-  require_relative 'objects/users'
-  @users ||= Rsk::Users.new(settings.pgsql)
-end
+  def pid
+    id = request.cookies['0rsk-project']
+    flash('/projects', 'Pick up a project to work with, or create a new one') unless id
+    unless projects.exists?(id)
+      response.delete_cookie('0rsk-project')
+      flash('/projects', 'Pick up a new project')
+    end
+    id
+  end
 
-def projects(login: current_user)
-  require_relative 'objects/projects'
-  Rsk::Projects.new(settings.pgsql, login)
-end
+  def users
+    require_relative('objects/users')
+    @users ||= Rsk::Users.new(settings.pgsql)
+  end
 
-def triples(project: current_project)
-  require_relative 'objects/triples'
-  Rsk::Triples.new(settings.pgsql, project)
-end
+  def projects(login: identity)
+    require_relative('objects/projects')
+    Rsk::Projects.new(settings.pgsql, login)
+  end
 
-def causes(project: current_project)
-  require_relative 'objects/causes'
-  Rsk::Causes.new(settings.pgsql, project)
-end
+  def triples(project: pid)
+    require_relative('objects/triples')
+    Rsk::Triples.new(settings.pgsql, project)
+  end
 
-def risks(project: current_project)
-  require_relative 'objects/risks'
-  Rsk::Risks.new(settings.pgsql, project)
-end
+  def causes(project: pid)
+    require_relative('objects/causes')
+    Rsk::Causes.new(settings.pgsql, project)
+  end
 
-def effects(project: current_project)
-  require_relative 'objects/effects'
-  Rsk::Effects.new(settings.pgsql, project)
-end
+  def risks(project: pid)
+    require_relative('objects/risks')
+    Rsk::Risks.new(settings.pgsql, project)
+  end
 
-def plans(project: current_project)
-  require_relative 'objects/plans'
-  Rsk::Plans.new(settings.pgsql, project)
-end
+  def effects(project: pid)
+    require_relative('objects/effects')
+    Rsk::Effects.new(settings.pgsql, project)
+  end
 
-def iri
-  Iri.new(request.url)
-end
+  def plans(project: pid)
+    require_relative('objects/plans')
+    Rsk::Plans.new(settings.pgsql, project)
+  end
 
+  def iri
+    Iri.new(request.url)
+  end
+end
+Object.include(Rsk::App)
+
+require_relative 'front/front_helpers'
+require_relative 'front/front_login'
+require_relative 'front/front_misc'
 require_relative 'front/front_tasks'
 require_relative 'front/front_telegram'
 require_relative 'front/front_triple'
-require_relative 'front/front_misc'
-require_relative 'front/front_login'
-require_relative 'front/front_helpers'

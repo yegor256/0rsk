@@ -1,36 +1,33 @@
 # frozen_string_literal: true
 
+require_relative 'plan'
+require_relative 'query'
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
 require_relative 'rsk'
-require_relative 'plan'
-require_relative 'query'
 
-# Plans.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::Plans
   def initialize(pgsql, project)
     @pgsql = pgsql
     @project = project
   end
 
-  # Returns plan ID.
   def add(part, text)
     @pgsql.transaction do |t|
-      id = t.exec(
-        'INSERT INTO part (project, text, type) VALUES ($1, $2, $3) RETURNING id',
-        [@project, text, 'Plan']
-      )[0]['id'].to_i
+      id = Integer(
+        t.exec(
+          'INSERT INTO part (project, text, type) VALUES ($1, $2, $3) RETURNING id',
+          [@project, text, 'Plan']
+        )[0]['id']
+      )
       t.exec('INSERT INTO plan (id, part) VALUES ($1, $2)', [id, part])
       id
     end
   end
 
   def get(id, part)
-    require_relative 'plan'
+    require_relative('plan')
     Rsk::Plan.new(@pgsql, id, part)
   end
 
@@ -41,13 +38,13 @@ class Rsk::Plans
   def fetch(query: '', limit: 10, offset: 0)
     query(query).fetch(offset, limit).map do |r|
       {
-        id: r['id'].to_i,
-        triple: r['tid'].to_i,
+        id: Integer(r['id']),
+        triple: Integer(r['tid'] || 0),
         text: r['text'],
         prefix: r['prefix'],
         positive: r['positive'] == 't',
-        part: r['pid'].to_i,
-        rank: r['rank'].to_i,
+        part: Integer(r['pid']),
+        rank: Integer(r['rank'] || 0),
         completed: Time.parse(r['completed']),
         schedule: r['schedule']
       }

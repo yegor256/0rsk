@@ -5,10 +5,6 @@
 
 require_relative 'rsk'
 
-# Risk.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::Risk
   attr_reader :id
 
@@ -21,18 +17,15 @@ class Rsk::Risk
     @pgsql.exec('SELECT text FROM part WHERE id = $1', [@id])[0]['text']
   end
 
-  def text=(text)
+  def rename(text)
     @pgsql.exec('UPDATE part SET text = $2 WHERE id = $1', [@id, text])
   end
 
   def probability
-    @pgsql.exec('SELECT probability FROM risk WHERE id = $1', [@id])[0]['probability'].to_i
+    Integer(@pgsql.exec('SELECT probability FROM risk WHERE id = $1', [@id])[0]['probability'])
   end
 
-  def probability=(value)
-    @pgsql.exec(
-      'UPDATE risk SET probability = $2 WHERE id = $1',
-      [@id, value]
-    )
+  def weigh(value)
+    @pgsql.exec('UPDATE risk SET probability = $2 WHERE id = $1', [@id, value])
   end
 end

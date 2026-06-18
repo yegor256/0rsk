@@ -5,8 +5,4 @@
 
 require_relative 'rsk'
 
-# User error.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::Urror < StandardError; end

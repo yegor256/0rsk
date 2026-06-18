@@ -6,10 +6,6 @@
 require 'sentry-ruby'
 require_relative 'rsk'
 
-# Daemon.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::Daemon
   def initialize(minutes = 1)
     @minutes = minutes

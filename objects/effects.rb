@@ -1,16 +1,12 @@
 # frozen_string_literal: true
 
+require_relative 'effect'
+require_relative 'query'
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
 require_relative 'rsk'
-require_relative 'effect'
-require_relative 'query'
 
-# Effects.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::Effects
   def initialize(pgsql, project)
     @pgsql = pgsql
@@ -19,17 +15,19 @@ class Rsk::Effects
 
   def add(text)
     @pgsql.transaction do |t|
-      id = t.exec(
-        'INSERT INTO part (project, text, type) VALUES ($1, $2, $3) RETURNING id',
-        [@project, text, 'Effect']
-      )[0]['id'].to_i
+      id = Integer(
+        t.exec(
+          'INSERT INTO part (project, text, type) VALUES ($1, $2, $3) RETURNING id',
+          [@project, text, 'Effect']
+        )[0]['id']
+      )
       t.exec('INSERT INTO effect (id) VALUES ($1)', [id])
       id
     end
   end
 
   def get(id)
-    require_relative 'effect'
+    require_relative('effect')
     Rsk::Effect.new(@pgsql, id)
   end
 
@@ -40,12 +38,12 @@ class Rsk::Effects
   def fetch(query: '', limit: 10, offset: 0)
     query(query).fetch(offset, limit).map do |r|
       {
-        id: r['id'].to_i,
+        id: Integer(r['id']),
         text: r['text'],
-        impact: r['impact'].to_i,
+        impact: Integer(r['impact']),
         positive: r['positive'] == 't',
-        rank: r['rank'].to_i,
-        risks: r['risks'].to_i
+        rank: Integer(r['rank'] || 0),
+        risks: Integer(r['risks'])
       }
     end
   end

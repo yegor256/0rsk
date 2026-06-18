@@ -1,16 +1,12 @@
 # frozen_string_literal: true
 
+require_relative 'query'
+require_relative 'risk'
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
 require_relative 'rsk'
-require_relative 'risk'
-require_relative 'query'
 
-# Risks.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::Risks
   def initialize(pgsql, project)
     @pgsql = pgsql
@@ -19,17 +15,19 @@ class Rsk::Risks
 
   def add(text)
     @pgsql.transaction do |t|
-      id = t.exec(
-        'INSERT INTO part (project, text, type) VALUES ($1, $2, $3) RETURNING id',
-        [@project, text, 'Risk']
-      )[0]['id'].to_i
+      id = Integer(
+        t.exec(
+          'INSERT INTO part (project, text, type) VALUES ($1, $2, $3) RETURNING id',
+          [@project, text, 'Risk']
+        )[0]['id']
+      )
       t.exec('INSERT INTO risk (id) VALUES ($1)', [id])
       id
     end
   end
 
   def get(id)
-    require_relative 'risk'
+    require_relative('risk')
     Rsk::Risk.new(@pgsql, id)
   end
 
@@ -40,11 +38,11 @@ class Rsk::Risks
   def fetch(query: '', limit: 10, offset: 0)
     query(query).fetch(offset, limit).map do |r|
       {
-        id: r['id'].to_i,
+        id: Integer(r['id']),
         text: r['text'],
-        probability: r['probability'].to_i,
-        rank: r['rank'].to_i,
-        effects: r['effects'].to_i
+        probability: Integer(r['probability']),
+        rank: Integer(r['rank'] || 0),
+        effects: Integer(r['effects'])
       }
     end
   end

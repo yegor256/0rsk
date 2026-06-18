@@ -39,7 +39,7 @@
                 %a{href: '/projects'}= "@#{user[:login]}"
                 - if request.cookies['0rsk-project']
                   = '/'
-                  %a{href: iri.cut('/project').append(current_project)}= "##{current_project}"
+                  %a{href: iri.cut('/project').append(pid)}= "##{pid}"
               - else
                 %a{href: login_link}
                   Login

@@ -5,19 +5,14 @@
 
 require 'time'
 
-# Pipeline of plans.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::Pipeline
   def initialize(pgsql, login)
     @pgsql = pgsql
     @login = login
   end
 
-  # Fetch all plans that are good to go into tasks right now.
   def fetch
-    plans = @pgsql.exec(
+    @pgsql.exec(
       [
         'SELECT plan.id, plan.completed, plan.schedule,',
         'SUM(risk.probability * effect.impact) / COUNT(triple.id) AS rank',
@@ -32,9 +27,9 @@ class Rsk::Pipeline
         'GROUP BY plan.id, plan.completed, plan.schedule'
       ],
       [@login]
-    )
-    plans.select { |p| deadline(Time.parse(p['completed']), p['schedule'].strip.downcase) < Time.now }
-      .map { |p| p['id'].to_i }
+    ).filter_map do |p|
+      Integer(p['id']) if deadline(Time.parse(p['completed']), p['schedule'].strip.downcase) < Time.now
+    end
   end
 
   private

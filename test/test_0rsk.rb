@@ -4,16 +4,18 @@
 # SPDX-License-Identifier: MIT
 
 require_relative 'test__helper'
+
 require_relative '../0rsk'
-require_relative '../objects/rsk'
 require_relative '../objects/projects'
+require_relative '../objects/rsk'
 
 module Rack
   module Test
     class Session
-      def default_env
+      def defaults
         { 'REMOTE_ADDR' => '127.0.0.1', 'HTTPS' => 'on' }.merge(headers_for_env)
       end
+      alias default_env defaults
     end
   end
 end
@@ -26,14 +28,7 @@ class Rsk::AppTest < Minitest::Test
   end
 
   def test_renders_pages
-    pages = [
-      '/version',
-      '/robots.txt',
-      '/',
-      '/js/triple.js',
-      '/js/responses.js',
-      '/terms'
-    ]
+    pages = ['/version', '/robots.txt', '/', '/js/triple.js', '/js/responses.js', '/terms']
     pages.each do |p|
       get(p)
       assert_predicate(last_response, :ok?, last_response.body)
@@ -48,9 +43,8 @@ class Rsk::AppTest < Minitest::Test
     end
   end
 
-  def test_200_user_pages
-    name = 'bill'
-    login(name)
+  def test_user_pages
+    login('bill')
     pages = [
       '/projects',
       '/ranked',
@@ -72,8 +66,7 @@ class Rsk::AppTest < Minitest::Test
   end
 
   def test_add
-    name = "jeff09#{rand(99_999)}"
-    login(name)
+    login("jeff09#{rand(99_999)}")
     post(
       '/triple/save',
       [
@@ -97,8 +90,6 @@ class Rsk::AppTest < Minitest::Test
 
   def login(name)
     set_cookie("glogin=#{name}")
-    projects = Rsk::Projects.new(test_pgsql, name)
-    pid = projects.add('test')
-    set_cookie("0rsk-project=#{pid}")
+    set_cookie("0rsk-project=#{Rsk::Projects.new(test_pgsql, name).add('test')}")
   end
 end

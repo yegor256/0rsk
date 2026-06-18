@@ -1,22 +1,22 @@
 # frozen_string_literal: true
 
+require_relative '../objects/daemon'
+require_relative '../objects/pipeline'
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
 require_relative '../objects/tasks'
-require_relative '../objects/pipeline'
-require_relative '../objects/daemon'
 
 Rsk::Daemon.new(10).start do
   users.fetch.each do |login|
     tasks(login: login).create
   end
-  @tasks_updated = Time.now
+  @updated = Time.now
 end
 
 get '/tasks' do
-  offset = [(params[:offset] || '0').to_i, 0].max
-  limit = (params[:limit] || '10').to_i
+  offset = [Integer(params[:offset] || '0'), 0].max
+  limit = Integer(params[:limit] || '10')
   query = params[:q] || ''
   haml :tasks, layout: :layout, locals: merged(
     title: '/tasks',
@@ -26,19 +26,19 @@ get '/tasks' do
     pipeline: pipeline.fetch.count,
     total: tasks.count(query: query),
     tasks: tasks.fetch(query: query, offset: offset, limit: limit),
-    wired: telechats.wired?(current_user),
-    updated: @tasks_updated
+    wired: telechats.wired?(identity),
+    updated: @updated
   )
 end
 
 get '/tasks/done' do
-  id = params[:id].to_i
+  id = Integer(params[:id])
   tasks.done(id)
   flash('/tasks', "Thanks, task ##{id} was completed!")
 end
 
 get '/tasks/later' do
-  id = params[:id].to_i
+  id = Integer(params[:id])
   seconds = 1
   seconds *= 7 * 24 * 60 * 60 if params[:period] == 'week'
   seconds *= 30 * 24 * 60 * 60 if params[:period] == 'month'
@@ -52,10 +52,13 @@ get '/tasks/create' do
   flash('/tasks', 'All necessary tasks were created, thanks!')
 end
 
-def tasks(login: current_user)
-  Rsk::Tasks.new(settings.pgsql, login)
-end
+module Rsk::TasksFront
+  def tasks(login: identity)
+    Rsk::Tasks.new(settings.pgsql, login)
+  end
 
-def pipeline(login: current_user)
-  Rsk::Pipeline.new(settings.pgsql, login)
+  def pipeline(login: identity)
+    Rsk::Pipeline.new(settings.pgsql, login)
+  end
 end
+Object.include(Rsk::TasksFront)

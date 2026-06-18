@@ -1,19 +1,14 @@
 # frozen_string_literal: true
 
+require_relative 'pipeline'
+require_relative 'plans'
+require_relative 'query'
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
 require_relative 'rsk'
-require_relative 'plans'
-require_relative 'query'
-require_relative 'pipeline'
 
-# Tasks.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::Tasks
-  # Max allowed.
   THRESHOLD = 8
 
   def initialize(pgsql, login)
@@ -21,7 +16,6 @@ class Rsk::Tasks
     @login = login
   end
 
-  # Promote plans into tasks, if their schedules require.
   def create
     Rsk::Pipeline.new(@pgsql, @login).fetch.each do |p|
       next if count >= THRESHOLD
@@ -29,47 +23,41 @@ class Rsk::Tasks
     end
   end
 
-  # Close this task, remove it from the list and destroy the plan
-  # it was attached to, if it was a one-time plan.
   def done(id)
-    row = plan_of(id)
+    row = plan(id)
     @pgsql.transaction do |t|
       t.exec('DELETE FROM task WHERE id = $1', [id])
-      Rsk::Plans.new(@pgsql, row['project'].to_i).get(row['id'].to_i, row['part'].to_i).complete
+      Rsk::Plans.new(@pgsql, Integer(row['project'] || 0)).get(Integer(row['id']), Integer(row['part'])).complete
     end
   end
 
-  # Postpone this task for some time.
   def postpone(id, seconds)
-    row = plan_of(id)
+    row = plan(id)
     @pgsql.transaction do |t|
       t.exec('DELETE FROM task WHERE id = $1', [id])
-      s = (Time.now + seconds).strftime('%d-%m-%Y')
-      plan = Rsk::Plans.new(@pgsql, row['project'].to_i).get(row['id'].to_i, row['part'].to_i)
-      raise Rsk::Urror, "Can't postpone plan ##{row['id']}" if /^[a-z]+$/.match?(plan.schedule)
-      plan.schedule = s
+      plan = Rsk::Plans.new(@pgsql, Integer(row['project'] || 0)).get(Integer(row['id']), Integer(row['part']))
+      raise(Rsk::Urror, "Can't postpone plan ##{row['id']}") if /^[a-z]+$/.match?(plan.schedule)
+      plan.reschedule((Time.now + seconds).strftime('%d-%m-%Y'))
     end
   end
 
-  # Total amount of tasks in this user account.
   def count(query: '')
     query(query).count
   end
 
-  # Fetch them all and return an array of hashes.
   def fetch(query: '', limit: 10, offset: 0)
     query(query).fetch(offset, limit).map do |r|
       {
-        id: r['id'].to_i,
-        pid: r['pid'].to_i,
+        id: Integer(r['id']),
+        pid: Integer(r['pid']),
         emoji: r['emoji'],
-        rank: r['rank'].to_i,
+        rank: Integer(r['rank']),
         positive: r['positive'] == 't',
-        triple: r['tid'].to_i,
+        triple: Integer(r['tid']),
         prefix: r['prefix'],
         title: r['title'],
-        plan: r['plan'].to_i,
-        part: r['part'].to_i,
+        plan: Integer(r['plan']),
+        part: Integer(r['part']),
         text: r['text'],
         ctext: r['ctext'],
         rtext: r['rtext'],
@@ -123,8 +111,7 @@ class Rsk::Tasks
     )
   end
 
-  # The plan of the task, the row.
-  def plan_of(id)
+  def plan(id)
     project = @pgsql.exec(
       [
         'SELECT project.* FROM project',
@@ -135,10 +122,10 @@ class Rsk::Tasks
       ],
       [id]
     )[0]
-    raise Rsk::Urror, "Task ##{id} not found in projects of #{@login}" if project.nil?
-    raise Rsk::Urror, "Task ##{id} doesn't belong to #{@login}" if project['login'] != @login
+    raise(Rsk::Urror, "Task ##{id} not found in projects of #{@login}") if project.nil?
+    raise(Rsk::Urror, "Task ##{id} doesn't belong to #{@login}") if project['login'] != @login
     row = @pgsql.exec('SELECT plan.* FROM plan JOIN task ON task.plan = plan.id WHERE task.id = $1', [id])[0]
-    raise Rsk::Urror, "Plan for task ##{id} not found" if row.nil?
+    raise(Rsk::Urror, "Plan for task ##{id} not found") if row.nil?
     row
   end
 end

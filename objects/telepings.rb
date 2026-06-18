@@ -5,10 +5,6 @@
 
 require_relative 'rsk'
 
-# Telepings.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::Telepings
   def initialize(pgsql)
     @pgsql = pgsql
@@ -25,7 +21,6 @@ class Rsk::Telepings
     )
   end
 
-  # Ping required for this user?
   def required(login, hours: 4)
     max = @pgsql.exec(
       [
@@ -42,7 +37,6 @@ class Rsk::Telepings
     Time.parse(max) < Time.now - (hours * 60 * 60)
   end
 
-  # Returns a list of task IDs, which were not notified yet.
   def fresh(login)
     @pgsql.exec(
       [
@@ -56,19 +50,10 @@ class Rsk::Telepings
         'GROUP BY task.id'
       ],
       [login]
-    ).map { |r| r['id'].to_i }
+    ).map { |r| Integer(r['id']) }
   end
 
-  # Resolve fresh task ids into their hashes and drop any that the supplied
-  # +tasks+ collection cannot fetch. The +fresh+ predicate is wider than
-  # Tasks#fetch (it does not require a triple), so the two diverge whenever
-  # a plan's part is not (yet) wired into a triple, or when the task is
-  # deleted between calls. The result is sorted by rank, descending.
-  def fresh_tasks(login, tasks)
-    fresh(login)
-      .map { |tid| tasks.fetch(query: tid)[0] }
-      .compact
-      .sort_by { |t| t[:rank] }
-      .reverse
+  def pending(login, tasks)
+    fresh(login).filter_map { |tid| tasks.fetch(query: tid)[0] }.sort_by { |t| t[:rank] }.reverse
   end
 end

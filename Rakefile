@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
+require 'rake'
+require 'rake/clean'
+require 'rdoc'
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
 require 'rubygems'
-require 'rake'
-require 'rdoc'
-require 'rake/clean'
 
 ENV['RACK_ENV'] = 'test'
 

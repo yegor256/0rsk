@@ -1,16 +1,12 @@
 # frozen_string_literal: true
 
+require_relative 'query'
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
 require_relative 'rsk'
-require_relative 'query'
 require_relative 'urror'
 
-# Triples.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::Triples
   def initialize(pgsql, project)
     @pgsql = pgsql
@@ -19,32 +15,34 @@ class Rsk::Triples
 
   def add(cid, rid, eid)
     @pgsql.transaction do |t|
-      cnt = t.exec(
-        'SELECT COUNT(*) FROM part WHERE id IN ($1, $2, $3) AND project = $4',
-        [cid, rid, eid, @project]
-      )[0]['count'].to_i
-      if cnt < 3
-        raise Rsk::Urror,
-              "Parts ##{cid}, ##{rid}, ##{eid} must all belong to project ##{@project}"
+      if Integer(
+        t.exec(
+          'SELECT COUNT(*) FROM part WHERE id IN ($1, $2, $3) AND project = $4',
+          [cid, rid, eid, @project]
+        )[0]['count']
+      ) < 3
+        raise(Rsk::Urror, "Parts ##{cid}, ##{rid}, ##{eid} must all belong to project ##{@project}")
       end
-      t.exec(
-        [
-          'INSERT INTO triple (cause, risk, effect)',
-          'VALUES ($1, $2, $3)',
-          'ON CONFLICT(cause, risk, effect) DO UPDATE SET cause = $1',
-          'RETURNING id'
-        ],
-        [cid, rid, eid]
-      )[0]['id'].to_i
+      Integer(
+        t.exec(
+          [
+            'INSERT INTO triple (cause, risk, effect)',
+            'VALUES ($1, $2, $3)',
+            'ON CONFLICT(cause, risk, effect) DO UPDATE SET cause = $1',
+            'RETURNING id'
+          ],
+          [cid, rid, eid]
+        )[0]['id']
+      )
     end
   end
 
   def delete(id)
     @pgsql.transaction do |t|
-      triple = fetch(id: id.to_i)[0]
-      raise Rsk::Urror, "Triple ##{id} not found in your project ##{@project}" if triple.nil?
+      triple = fetch(id: Integer(id))[0]
+      raise(Rsk::Urror, "Triple ##{id} not found in your project ##{@project}") if triple.nil?
       if t.exec('SELECT * FROM part WHERE id = $1 AND project = $2', [triple[:cid], @project]).empty?
-        raise Rsk::Urror, "Triple ##{id} is not in your project ##{@project}"
+        raise(Rsk::Urror, "Triple ##{id} is not in your project ##{@project}")
       end
       t.exec('DELETE FROM triple WHERE id = $1', [id])
       if t.exec('SELECT * FROM triple WHERE cause = $1', [triple[:cid]]).empty?
@@ -66,21 +64,21 @@ class Rsk::Triples
   def fetch(id: 0, query: '', limit: 10, offset: 0)
     query(id, query).fetch(offset, limit).map do |r|
       {
-        id: r['id'].to_i,
-        cid: r['cid'].to_i,
-        rid: r['rid'].to_i,
-        eid: r['eid'].to_i,
+        id: Integer(r['id']),
+        cid: Integer(r['cid']),
+        rid: Integer(r['rid']),
+        eid: Integer(r['eid']),
         emoji: r['emoji'],
         ctext: r['ctext'],
         rtext: r['rtext'],
         etext: r['etext'],
-        probability: r['probability'].to_i,
-        impact: r['impact'].to_i,
+        probability: Integer(r['probability']),
+        impact: Integer(r['impact']),
         positive: r['positive'] == 't',
-        rank: r['rank'].to_i,
+        rank: Integer(r['rank']),
         plans: r['plans'] == '{NULL}' ? [] : JSON.parse("[#{r['plans'][1..-2]}]").map do |p|
           id, text = p.split(':', 2)
-          { id: id.to_i, text: text }
+          { id: Integer(id), text: text }
         end
       }
     end
@@ -97,10 +95,10 @@ class Rsk::Triples
           if w == '+alone'
             where << 'plan.id IS NULL'
           elsif /^\+[0-9]+$/.match?(w)
-            p = w[1..].to_i
+            p = Integer(w[1..])
             where << "t.cause = #{p} OR t.risk = #{p} OR t.effect = #{p}"
           else
-            raise Rsk::Urror, "Can't understand query operator #{w.inspect}"
+            raise(Rsk::Urror, "Can't understand query operator #{w.inspect}")
           end
         else
           words << w

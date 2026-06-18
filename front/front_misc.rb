@@ -23,9 +23,7 @@ end
 not_found do
   status :not_found
   content_type 'text/html', charset: 'utf-8'
-  haml :not_found, layout: :layout, locals: merged(
-    title: request.url
-  )
+  haml :not_found, layout: :layout, locals: merged(title: request.url)
 end
 
 error do
@@ -46,25 +44,27 @@ error do
   end
 end
 
-def context
-  "#{request.ip} #{request.user_agent} #{Rsk::VERSION} #{Time.now.strftime('%Y/%m')}"
-end
-
-def merged(hash)
-  out = @locals.merge(hash)
-  out[:local_assigns] = out
-
-  if request.cookies['flash_msg']
-    out[:flash_msg] = request.cookies['flash_msg']
-    response.delete_cookie('flash_msg')
+module Rsk::Misc
+  def context
+    "#{request.ip} #{request.user_agent} #{Rsk::VERSION} #{Time.now.strftime('%Y/%m')}"
   end
-  out[:flash_color] = request.cookies['flash_color'] || 'darkgreen'
-  response.delete_cookie('flash_color')
-  out
-end
 
-def flash(uri, msg = '', color: 'darkgreen')
-  response.set_cookie('flash_msg', msg)
-  response.set_cookie('flash_color', color)
-  redirect(uri)
+  def merged(hash)
+    out = @locals.merge(hash)
+    out[:local_assigns] = out
+    if request.cookies['flash_msg']
+      out[:flash_msg] = request.cookies['flash_msg']
+      response.delete_cookie('flash_msg')
+    end
+    out[:flash_color] = request.cookies['flash_color'] || 'darkgreen'
+    response.delete_cookie('flash_color')
+    out
+  end
+
+  def flash(uri, msg = '', color: 'darkgreen')
+    response.set_cookie('flash_msg', msg)
+    response.set_cookie('flash_color', color)
+    redirect(uri)
+  end
 end
+Object.include(Rsk::Misc)

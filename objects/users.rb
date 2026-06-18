@@ -5,10 +5,6 @@
 
 require_relative 'rsk'
 
-# Users.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::Users
   def initialize(pgsql)
     @pgsql = pgsql

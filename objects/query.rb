@@ -3,10 +3,6 @@
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
-# SQL Query builder.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::Query
   def initialize(pgsql, sql, params)
     @pgsql = pgsql
@@ -15,10 +11,10 @@ class Rsk::Query
   end
 
   def fetch(offset, limit)
-    @pgsql.exec(@sql + ["OFFSET #{offset.to_i} LIMIT #{limit.to_i}"], @params)
+    @pgsql.exec(@sql + ["OFFSET #{Integer(offset)} LIMIT #{Integer(limit)}"], @params)
   end
 
   def count
-    @pgsql.exec(['SELECT COUNT(*) FROM ('] + @sql + [') x'], @params)[0]['count'].to_i
+    Integer(@pgsql.exec(['SELECT COUNT(*) FROM ('] + @sql + [') x'], @params)[0]['count'])
   end
 end

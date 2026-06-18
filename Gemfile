@@ -21,6 +21,7 @@ gem 'relative_time', '~>1.1'
 gem 'rerun', '~>0.14', require: false
 gem 'rspec-rails', '~>6.1', require: false
 gem 'rubocop', '~>1.61', require: false
+gem 'rubocop-elegant', '>0', require: false
 gem 'rubocop-minitest', '>0', require: false
 gem 'rubocop-performance', '>0', require: false
 gem 'rubocop-rake', '>0', require: false

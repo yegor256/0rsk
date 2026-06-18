@@ -4,12 +4,7 @@
 # SPDX-License-Identifier: MIT
 
 before '/*' do
-  @locals = {
-    http_start: Time.now,
-    ver: Rsk::VERSION,
-    login_link: settings.glogin.login_uri,
-    request_ip: request.ip
-  }
+  @locals = { http_start: Time.now, ver: Rsk::VERSION, login_link: settings.glogin.login_uri, request_ip: request.ip }
   response.set_cookie('glogin', params[:glogin]) if params[:glogin]
   if request.cookies['glogin']
     begin
@@ -28,11 +23,13 @@ end
 get '/github-callback' do
   code = params[:code]
   error(400) if code.nil?
-  response.set_cookie(:glogin, GLogin::Cookie::Open.new(
-    settings.glogin.user(code),
-    settings.config['github']['encryption_secret'],
-    context
-  ).to_s)
+  response.set_cookie(
+    :glogin, GLogin::Cookie::Open.new(
+      settings.glogin.user(code),
+      settings.config['github']['encryption_secret'],
+      context
+    ).to_s
+  )
   flash('/', 'You have been logged in')
 end
 

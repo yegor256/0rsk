@@ -15,8 +15,8 @@ unless SimpleCov.running || ENV['PICKS']
       SimpleCov::Formatter::CoberturaFormatter
     ]
   )
-  SimpleCov.minimum_coverage 30
-  SimpleCov.minimum_coverage_by_file 10
+  SimpleCov.minimum_coverage(30)
+  SimpleCov.minimum_coverage_by_file(10)
   SimpleCov.start do
     add_filter 'test/'
     add_filter 'vendor/'
@@ -30,8 +30,8 @@ end
 require 'minitest/autorun'
 require 'minitest/manual_plugins'
 require 'minitest/reporters'
-Minitest::Reporters.use! [Minitest::Reporters::SpecReporter.new]
-Minitest.load :minitest_reporter
+Minitest::Reporters.use!([Minitest::Reporters::SpecReporter.new])
+Minitest.load(:minitest_reporter)
 
 require 'loog'
 require 'pgtk/pool'
@@ -39,7 +39,6 @@ require 'yaml'
 
 class Minitest::Test
   def test_pgsql
-    # rubocop:disable Style/ClassVars
     @@test_pgsql ||= Pgtk::Pool.new(
       Pgtk::Wire::Yaml.new(File.join(__dir__, '../target/pgsql-config.yml')),
       log: Loog::NULL

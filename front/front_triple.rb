@@ -69,11 +69,11 @@ get '/plans.json' do
 end
 
 get '/triple' do
-  vars = { title: '/triple', project: current_project, emojis: causes.emojis }
-  id = params[:id].to_i
+  vars = { title: '/triple', project: pid, emojis: causes.emojis }
+  id = Integer(params[:id] || 0)
   if id.positive?
     triple = triples.fetch(id: id, limit: 1)[0]
-    raise Rsk::Urror, "Triple ##{id} not found" if triple.nil?
+    raise(Rsk::Urror, "Triple ##{id} not found") if triple.nil?
     vars[:triple] = triple
   end
   haml :triple, layout: :layout, locals: merged(vars)
@@ -86,13 +86,13 @@ post '/triple/save' do
   cid = params[:cid].empty? ? causes.add(ctext) : params[:cid]
   rid = params[:rid].empty? ? risks.add(rtext) : params[:rid]
   eid = params[:eid].empty? ? effects.add(etext) : params[:eid]
-  causes.get(cid).text = ctext
-  causes.get(cid).emoji = params[:emoji]
-  risks.get(rid).text = rtext
-  effects.get(eid).text = etext
-  risks.get(rid).probability = params[:probability].to_i
-  effects.get(eid).impact = params[:impact].to_i
-  effects.get(eid).positive = !params[:positive].nil?
+  causes.get(cid).rename(ctext)
+  causes.get(cid).decorate(params[:emoji])
+  risks.get(rid).rename(rtext)
+  effects.get(eid).rename(etext)
+  risks.get(rid).weigh(Integer(params[:probability]))
+  effects.get(eid).weigh(Integer(params[:impact]))
+  effects.get(eid).polarize(!params[:positive].nil?)
   tid = triples.add(cid, rid, eid)
   flash("/responses?id=#{tid}", "Thanks, the triple ##{tid} successfully saved!")
 end

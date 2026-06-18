@@ -5,10 +5,6 @@
 
 require_relative 'rsk'
 
-# Effect.
-# Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2019-2026 Yegor Bugayenko
-# License:: MIT
 class Rsk::Effect
   attr_reader :id
 
@@ -21,26 +17,23 @@ class Rsk::Effect
     @pgsql.exec('SELECT text FROM part WHERE id = $1', [@id])[0]['text']
   end
 
-  def text=(text)
+  def rename(text)
     @pgsql.exec('UPDATE part SET text = $2 WHERE id = $1', [@id, text])
   end
 
   def impact
-    @pgsql.exec('SELECT impact FROM effect WHERE id = $1', [@id])[0]['impact'].to_i
+    Integer(@pgsql.exec('SELECT impact FROM effect WHERE id = $1', [@id])[0]['impact'])
   end
 
-  def impact=(value)
-    @pgsql.exec(
-      'UPDATE effect SET impact = $2 WHERE id = $1',
-      [@id, value]
-    )
+  def weigh(value)
+    @pgsql.exec('UPDATE effect SET impact = $2 WHERE id = $1', [@id, value])
   end
 
   def positive?
     @pgsql.exec('SELECT positive FROM effect WHERE id = $1', [@id])[0]['positive'] == 't'
   end
 
-  def positive=(v)
+  def polarize(v)
     @pgsql.exec('UPDATE effect SET positive = $2 WHERE id = $1', [@id, v])
   end
 end
