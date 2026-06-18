@@ -21,8 +21,9 @@ class Rsk::Plan
 
   def detach
     @pgsql.transaction do |t|
-      if t.exec('SELECT * FROM part WHERE id = $1 AND project = $2', [@part, pid]).empty?
-        raise Rsk::Urror, "##{@id} is not in your project ##{pid}"
+      project = pid(t)
+      if t.exec('SELECT * FROM part WHERE id = $1 AND project = $2', [@part, project]).empty?
+        raise Rsk::Urror, "##{@id} is not in your project ##{project}"
       end
       t.exec('DELETE FROM plan WHERE id = $1 AND part = $2', [@id, @part])
       t.exec('DELETE FROM part WHERE id = $1', [@id]) if t.exec('SELECT * FROM plan WHERE id = $1', [@id]).empty?
@@ -53,7 +54,9 @@ class Rsk::Plan
 
   private
 
-  def pid
-    @pgsql.exec('SELECT project FROM part WHERE id = $1', [@id])[0]['project'].to_i
+  def pid(pgsql = @pgsql)
+    row = pgsql.exec('SELECT project FROM part WHERE id = $1 FOR UPDATE', [@id])[0]
+    raise Rsk::Urror, "Plan part ##{@id} not found" if row.nil?
+    row['project'].to_i
   end
 end
