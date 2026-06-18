@@ -22,7 +22,7 @@ require 'yaml'
 require_relative 'objects/urror'
 require_relative 'version'
 
-if ENV['RACK_ENV'] != 'test'
+unless %w[test development].include?(ENV['RACK_ENV'])
   require 'rack/ssl'
   use Rack::SSL
 end
@@ -65,7 +65,7 @@ configure do
     )
   else
     set :pgsql, Pgtk::Pool.new(
-      Pgtk::Wire::Env.new('DATABASE_URL'),
+      Pgtk::Wire::Env.new("#{Sinatra::Application.environment.upcase}_DATABASE_URL"),
       log: settings.log
     )
   end

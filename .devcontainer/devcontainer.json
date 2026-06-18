@@ -1,0 +1,32 @@
+{
+  "name": "0rsk",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopContainer",
+  "remoteUser": "vscode",
+  "postCreateCommand": "bash .devcontainer/post_create.sh",
+  "postStartCommand": "bash .devcontainer/post_start.sh",
+  "containerEnv": {
+    "SINATRA_PORT": "3000",
+    "WORKSPACE_DIR": "${containerWorkspaceFolder}",
+    "DEVELOPMENT_DATABASE_URL": "postgres://postgres:postgres@db:5432/postgres",
+    "TEST_DATABASE_URL": "postgres://postgres:postgres@db:5432/test"
+  },
+  "forwardPorts": [
+    "${containerEnv:SINATRA_PORT}"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "shopify.ruby-lsp",
+        "streetsidesoftware.code-spell-checker",
+        "ckolkman.vscode-postgres",
+        "maattdd.gitless",
+        "sysoev.vscode-open-in-github",
+        "GitHub.vscode-pull-request-github",
+        "rubocop.vscode-rubocop"
+      ]
+    }
+  }
+}
