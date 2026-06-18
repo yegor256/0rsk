@@ -26,10 +26,15 @@ RuboCop::RakeTask.new(:rubocop) do |task|
   task.fail_on_error = true
 end
 
-require 'eslintrb/eslinttask'
-Eslintrb::EslintTask.new(:eslint) do |t|
-  t.pattern = 'js/**/*.js'
-  t.options = :defaults
+begin
+  require 'eslintrb/eslinttask'
+  Eslintrb::EslintTask.new(:eslint) do |t|
+    t.pattern = 'js/**/*.js'
+    t.options = :defaults
+  end
+rescue ExecJS::RuntimeUnavailable, LoadError => e
+  desc 'eslint (disabled — no JS runtime)'
+  task(:eslint) { warn "eslint disabled: #{e.message}" }
 end
 
 require 'pgtk/pgsql_task'
