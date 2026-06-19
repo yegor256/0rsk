@@ -17,11 +17,24 @@ jobs:
         os: [ubuntu-24.04]
         ruby: [3.3]
     runs-on: ${{ matrix.os }}
+    services:
+      postgres:
+        image: postgres:18.1
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v7
         with:
           submodules: true
-      - run: sudo dockers/extras/install-postgres.sh
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
