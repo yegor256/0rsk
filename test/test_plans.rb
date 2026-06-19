@@ -5,9 +5,9 @@
 
 require_relative 'test__helper'
 
-require_relative '../objects/plans'
 require_relative '../objects/causes'
 require_relative '../objects/effects'
+require_relative '../objects/plans'
 require_relative '../objects/projects'
 require_relative '../objects/risks'
 require_relative '../objects/rsk'
@@ -28,7 +28,7 @@ class Rsk::PlansTest < Minitest::Test
     plans.get(id, rid).complete
   end
 
-  def test_fetch_no_duplicates_when_part_in_multiple_triples
+  def test_fetch_no_duplicates
     pid = Rsk::Projects.new(test_pgsql, "dups#{rand(99_999)}").add("test#{rand(99_999)}")
     cid = Rsk::Causes.new(test_pgsql, pid).add('some cause')
     eid = Rsk::Effects.new(test_pgsql, pid).add('some effect')
