@@ -37,3 +37,8 @@ get '/logout' do
   response.delete_cookie('glogin')
   flash('/', 'You have been logged out')
 end
+
+post '/logout' do
+  response.delete_cookie('glogin')
+  flash('/', 'You have been logged out')
+end
