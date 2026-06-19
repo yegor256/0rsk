@@ -17,6 +17,8 @@ class Rsk::Projects
       @pgsql.exec('INSERT INTO project (login, title) VALUES ($1, $2) RETURNING id', [@login, title])[0]['id'],
       10
     )
+  rescue PG::UniqueViolation
+    raise(Rsk::Urror, "Project with title \"#{title}\" already exists")
   end
 
   def delete(id)
