@@ -3,13 +3,6 @@
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
-get '/js/*.js' do
-  file = "#{File.join('js', params[:splat].first)}.js"
-  error(404, "File not found: #{file}") unless File.exist?(file)
-  content_type 'application/javascript'
-  File.read(file)
-end
-
 get '/robots.txt' do
   content_type 'text/plain'
   "User-agent: *\nDisallow: /"
