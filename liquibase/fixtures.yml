@@ -1,0 +1,61 @@
+# SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
+# SPDX-License-Identifier: MIT
+#
+# Sample data for demo/development environments.
+# Load with: bundle exec rake seed_dummy
+
+mobile:
+  title: Mobile Payment App
+  causes:
+    - text: We rely on a single payment gateway
+    - text: QA team is understaffed for the release
+    - text: App uses a deprecated API
+  risks:
+    - text: Payment gateway goes down during peak hours
+    - text: Unreleased bugs slip into production
+    - text: Apple rejects the App Store submission
+  effects:
+    - text: Users cannot complete purchases
+    - text: Negative reviews damage app rating
+    - text: Product launch is delayed by weeks
+  plans:
+    - cause: We rely on a single payment gateway
+      risk: Payment gateway goes down during peak hours
+      effect: Users cannot complete purchases
+      text: Integrate a fallback payment provider (Stripe)
+    - cause: QA team is understaffed for the release
+      risk: Unreleased bugs slip into production
+      effect: Negative reviews damage app rating
+      text: Hire two freelance QA engineers for the release sprint
+    - cause: App uses a deprecated API
+      risk: Apple rejects the App Store submission
+      effect: Product launch is delayed by weeks
+      text: Migrate from deprecated API to the new framework
+
+cloud:
+  title: Cloud Migration Project
+  causes:
+    - text: Team lacks cloud infrastructure expertise
+    - text: On-premise hardware is end-of-life
+    - text: Legacy database schema is poorly documented
+  risks:
+    - text: Migration takes longer than planned
+    - text: Data is lost during the transfer
+    - text: Application performance degrades after migration
+  effects:
+    - text: Operational costs exceed the budget
+    - text: Customer data is exposed
+    - text: Users experience slow page loads
+  plans:
+    - cause: Team lacks cloud infrastructure expertise
+      risk: Migration takes longer than planned
+      effect: Operational costs exceed the budget
+      text: Hire a cloud consultant for architecture review
+    - cause: On-premise hardware is end-of-life
+      risk: Data is lost during the transfer
+      effect: Customer data is exposed
+      text: Run full data backup and verify restore before cutover
+    - cause: Legacy database schema is poorly documented
+      risk: Application performance degrades after migration
+      effect: Users experience slow page loads
+      text: Run load tests and optimize slow queries post-migration
