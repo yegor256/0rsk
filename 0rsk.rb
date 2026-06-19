@@ -36,7 +36,6 @@ configure do
     c.release = Rsk::VERSION
   end
   set :bind, '0.0.0.0'
-  set :server, :thin
   set :show_exceptions, false
   set :raise_errors, false
   set :dump_errors, false
