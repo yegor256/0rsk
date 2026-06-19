@@ -62,7 +62,6 @@ else
     t.yaml = 'target/pgsql-config.yml'
   end
 end
-end
 
 require 'pgtk/liquibase_task'
 Pgtk::LiquibaseTask.new(:liquibase) do |t|
@@ -84,20 +83,17 @@ end
 
 desc 'Load sample data for development/demo'
 task(seed_dummy: %i[pgsql liquibase]) do
-  require 'yaml'
   require 'loog'
   require 'pgtk/pool'
-  require_relative 'objects/rsk'
-  require_relative 'objects/projects'
+  require 'yaml'
   require_relative 'objects/causes'
-  require_relative 'objects/risks'
   require_relative 'objects/effects'
-  require_relative 'objects/triples'
   require_relative 'objects/plans'
-  pgsql = Pgtk::Pool.new(
-    Pgtk::Wire::Yaml.new('target/pgsql-config.yml'),
-    log: Loog::NULL
-  ).start
+  require_relative 'objects/projects'
+  require_relative 'objects/risks'
+  require_relative 'objects/rsk'
+  require_relative 'objects/triples'
+  pgsql = Pgtk::Pool.new(Pgtk::Wire::Yaml.new('target/pgsql-config.yml'), log: Loog::NULL).start
   fixtures = YAML.safe_load(File.read('liquibase/fixtures.yml'))
   fixtures.each do |key, data|
     login = "demo_#{key}"
