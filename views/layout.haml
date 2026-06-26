@@ -11,7 +11,7 @@
     %meta{name: 'description', content: 'Online Risk Manager: identify your risks in Cause+Risk+Effect format and let us manage them'}
     %link{href: 'https://cdn.jsdelivr.net/gh/yegor256/tacit@gh-pages/tacit-css.min.css', rel: 'stylesheet'}
     %link{href: 'https://www.yegor256.com/css/icons.css', rel: 'stylesheet'}
-    %link{rel: 'shortcut icon', href: iri.cut('/logo-64.png')}
+    %link{rel: 'shortcut icon', href: '/favicon.svg', type: 'image/svg+xml'}
     %script{src: 'https://code.jquery.com/jquery-3.3.1.min.js'}
     :css
       .item { margin-right: 1em; }
@@ -48,15 +48,13 @@
                 %a{href: iri.cut('/triple')}
                   Add
               %li
-                %a{href: iri.cut('/tasks')}
+                %a{href: iri.cut('/tasks'), title: 'Your tasks'}
+                  Tasks
                   - if tasks_count.zero?
-                    No tasks
-                  - elsif tasks_count == 1
-                    One task
+                    (0)
                   - else
                     %span{class: tasks_count >= Rsk::Tasks::THRESHOLD ? 'red' : ''}
-                      = tasks_count
-                      tasks
+                      = "(#{tasks_count})"
               %li
                 %form{action: iri.cut('/logout'), method: 'POST', style: 'display:inline'}
                   %button{type: 'submit', style: 'background:none;border:none;padding:0;color:inherit;font:inherit;cursor:pointer'}

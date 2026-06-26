@@ -13,6 +13,20 @@ get '/version' do
   Rsk::VERSION
 end
 
+get '/favicon.svg' do
+  content_type 'image/svg+xml'
+  response.headers['Cache-Control'] = 'no-cache'
+  count = @locals[:tasks_count] || 0
+  display = count > 99 ? '99+' : count.to_s
+  color = count.zero? ? '#888' : '#C5283D'
+  sz = count > 9 ? 10 : 14
+  "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>
+    <circle cx='16' cy='16' r='15' fill='#{color}'/>
+    <text x='16' y='21' text-anchor='middle' fill='white' font-size='#{sz}'
+      font-weight='bold' font-family='Helvetica,Arial,sans-serif'>#{display}</text>
+  </svg>"
+end
+
 not_found do
   status :not_found
   content_type 'text/html', charset: 'utf-8'
