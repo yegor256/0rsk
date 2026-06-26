@@ -131,7 +131,7 @@ end
 
 post '/project/{id}/tracker/delete' do
   pid = params[:id]
-  tid = params[:tid].to_i
+  tid = Integer(params[:tid], 10)
   raise Rsk::Urror, "Project ##{pid} not found" unless projects.exists?(pid)
   trackers(pid: pid).delete(tid)
   flash("/project/#{pid}", 'Tracker removed')

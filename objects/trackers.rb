@@ -12,16 +12,18 @@ class Rsk::Trackers
   end
 
   def add(repo, token)
-    @pgsql.exec(
-      'INSERT INTO tracker (project, repo, token) VALUES ($1, $2, $3) RETURNING id',
-      [@project, repo, token]
-    )[0]['id'].to_i
+    Integer(
+      @pgsql.exec(
+        'INSERT INTO tracker (project, repo, token) VALUES ($1, $2, $3) RETURNING id',
+        [@project, repo, token]
+      )[0]['id'], 10
+    )
   end
 
   def fetch
     @pgsql.exec('SELECT * FROM tracker WHERE project = $1 ORDER BY created', [@project]).map do |r|
       {
-        id: r['id'].to_i,
+        id: Integer(r['id'], 10),
         type: r['type'],
         repo: r['repo'],
         created: Time.parse(r['created'])
