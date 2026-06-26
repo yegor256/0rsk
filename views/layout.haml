@@ -24,6 +24,21 @@
       .up { content:url('/up.svg'); width: 1em; height:1em; }
       .down { content:url('/down.svg'); width: 1em; height:1em; }
       .dimmed { background-color: #eee; }
+      @media (max-width: 768px) {
+        table { font-size: .8em; }
+        nav ul { flex-direction: column; }
+        nav li { display: block; margin: .3em 0; }
+        input[type="text"] { width: 100%; box-sizing: border-box; }
+        select { width: 100%; }
+        .logo { width: 48px; height: 48px; }
+        .item { margin-right: .5em; }
+      }
+      @media (prefers-color-scheme: dark) {
+        body { background: #1a1a2e; color: #e0e0e0; }
+        a { color: #80bfff; }
+        input, select, textarea { background: #16213e; color: #e0e0e0; border-color: #0f3460; }
+        .dimmed { background-color: #16213e; }
+      }
   %body
     %section
       %header
