@@ -12,6 +12,7 @@ gem 'iri', '~>0.8'
 gem 'loog', '~>0.5'
 gem 'minitest', '~>6.0', require: false
 gem 'minitest-reporters', '~>1.6', require: false
+gem 'ostruct'
 gem 'pgtk', '~>0.9'
 gem 'puma'
 gem 'rack', '~>3.2'
