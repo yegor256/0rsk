@@ -116,6 +116,15 @@ class Rsk::AppTest < Minitest::Test
     assert_includes(cookie.to_s, 'deleted')
   end
 
+  def test_deletes_project
+    get("/projects/delete?id=#{login("deleter#{rand(99_999)}")}")
+    assert_equal(302, last_response.status, last_response.body)
+    assert(last_response.location.end_with?('/projects'))
+    cookie = last_response.headers['Set-Cookie']
+    refute_nil(cookie, last_response.body)
+    assert_includes(cookie.to_s, 'deleted')
+  end
+
   private
 
   def login(name)
