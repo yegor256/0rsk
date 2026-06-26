@@ -1,0 +1,96 @@
+# SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
+# SPDX-License-Identifier: MIT
+
+security:
+  - cause: weak passwords
+    emoji: "🔐"
+    risk: account compromised
+    probability: 7
+    effect: data breach
+    impact: 9
+  - cause: unpatched software
+    emoji: "🐛"
+    risk: vulnerability exploited
+    probability: 6
+    effect: system downtime
+    impact: 8
+  - cause: insider threat
+    emoji: "👤"
+    risk: sensitive data leaked
+    probability: 3
+    effect: regulatory fine
+    impact: 9
+
+infrastructure:
+  - cause: single server deployment
+    emoji: "💾"
+    risk: server failure
+    probability: 4
+    effect: service unavailable
+    impact: 8
+  - cause: no backups
+    emoji: "📀"
+    risk: data loss
+    probability: 5
+    effect: permanent data loss
+    impact: 9
+  - cause: cloud cost overrun
+    emoji: "💰"
+    risk: budget exceeded
+    probability: 6
+    effect: project canceled
+    impact: 7
+
+software:
+  - cause: tight deadline
+    emoji: "⏰"
+    risk: technical debt accumulated
+    probability: 8
+    effect: maintenance cost grows
+    impact: 6
+  - cause: no code reviews
+    emoji: "📝"
+    risk: bugs in production
+    probability: 7
+    effect: customer dissatisfaction
+    impact: 6
+  - cause: single developer knowledge
+    emoji: "🧠"
+    risk: bus factor risk
+    probability: 5
+    effect: delivery blocked
+    impact: 8
+
+management:
+  - cause: unclear requirements
+    emoji: "❓"
+    risk: wrong product built
+    probability: 7
+    effect: rework and delays
+    impact: 7
+  - cause: poor communication
+    emoji: "📢"
+    risk: missed deadlines
+    probability: 6
+    effect: team burnout
+    impact: 5
+  - cause: scope creep
+    emoji: "📈"
+    risk: budget and time overrun
+    probability: 8
+    effect: project failure
+    impact: 8
+
+legal:
+  - cause: no GDPR compliance
+    emoji: "⚖️"
+    risk: regulatory action
+    probability: 4
+    effect: heavy fine
+    impact: 9
+  - cause: third-party dependency
+    emoji: "🔗"
+    risk: license violation
+    probability: 3
+    effect: legal dispute
+    impact: 7
