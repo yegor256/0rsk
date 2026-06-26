@@ -33,4 +33,13 @@ class Rsk::CauseTest < Minitest::Test
     cause.decorate('📚')
     assert_equal('📚', cause.emoji)
   end
+
+  def test_rejects_nil_emoji
+    causes = Rsk::Causes.new(
+      test_pgsql,
+      Rsk::Projects.new(test_pgsql, "nill#{rand(99_999)}").add("test#{rand(99_999)}")
+    )
+    cause = causes.get(causes.add('test nil'))
+    assert_raises(Rsk::Urror) { cause.decorate(nil) }
+  end
 end
