@@ -162,6 +162,7 @@ GEM
       racc (~> 1.4)
     openssl (4.0.2)
     os (1.1.4)
+    ostruct (0.6.3)
     parallel (2.1.0)
     parser (3.3.11.1)
       ast (~> 2.4.1)
@@ -372,6 +373,7 @@ DEPENDENCIES
   loog (~> 0.5)
   minitest (~> 6.0)
   minitest-reporters (~> 1.6)
+  ostruct
   pgtk (~> 0.9)
   puma
   rack (~> 3.2)
