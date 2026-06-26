@@ -83,6 +83,12 @@ get '/ranked/delete' do
   flash('/ranked', "The ranked triple ##{id} deleted")
 end
 
+post '/ranked/delete' do
+  id = params[:id]
+  triples.delete(id)
+  flash('/ranked', "The ranked triple ##{id} deleted")
+end
+
 get '/projects' do
   haml :projects, layout: :layout, locals: merged(title: '/projects', projects: projects.fetch)
 end
