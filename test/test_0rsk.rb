@@ -6,8 +6,12 @@
 require_relative 'test__helper'
 
 require_relative '../0rsk'
+require_relative '../objects/causes'
+require_relative '../objects/effects'
 require_relative '../objects/projects'
+require_relative '../objects/risks'
 require_relative '../objects/rsk'
+require_relative '../objects/triples'
 
 module Rack
   module Test
@@ -96,10 +100,28 @@ class Rsk::AppTest < Minitest::Test
     assert_includes(cookie.to_s, 'glogin=', last_response.body)
   end
 
+  def test_deletes_ranked
+    pid = login("deleter#{rand(99_999)}")
+    get(
+      "/ranked/delete?id=#{Rsk::Triples.new(test_pgsql, pid).add(
+        Rsk::Causes.new(test_pgsql, pid).add('test cause'),
+        Rsk::Risks.new(test_pgsql, pid).add('test risk'),
+        Rsk::Effects.new(test_pgsql, pid).add('test effect')
+      )}"
+    )
+    assert_equal(302, last_response.status, last_response.body)
+    assert(last_response.location.end_with?('/ranked'))
+    cookie = last_response.headers['Set-Cookie']
+    refute_nil(cookie, last_response.body)
+    assert_includes(cookie.to_s, 'deleted')
+  end
+
   private
 
   def login(name)
     set_cookie("glogin=#{name}")
-    set_cookie("0rsk-project=#{Rsk::Projects.new(test_pgsql, name).add('test')}")
+    pid = Rsk::Projects.new(test_pgsql, name).add('test')
+    set_cookie("0rsk-project=#{pid}")
+    pid
   end
 end
