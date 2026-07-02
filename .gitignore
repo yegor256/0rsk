@@ -1,5 +1,6 @@
 .bundle/
 .DS_Store
+config.yml
 .idea/
 .yardoc/
 *.gem
