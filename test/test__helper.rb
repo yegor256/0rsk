@@ -39,12 +39,13 @@ require 'yaml'
 
 class Minitest::Test
   def test_pgsql
-    @@test_pgsql ||= Pgtk::Pool.new(
-      Pgtk::Wire::Yaml.new(File.join(__dir__, '../target/pgsql-config.yml')),
-      log: Loog::NULL
-    )
-    @@test_pgsql.start!
-    @@test_pgsql
+    @@test_pgsql_mutex ||= Mutex.new
+    @@test_pgsql_mutex.synchronize do
+      @@test_pgsql ||= Pgtk::Pool.new(
+        Pgtk::Wire::Yaml.new(File.join(__dir__, '../target/pgsql-config.yml')),
+        log: Loog::NULL
+      ).start
+    end
     # rubocop:enable Style/ClassVars
   end
 end
