@@ -17,6 +17,7 @@ gem 'ostruct'
 gem 'pgtk', '~>0.9'
 gem 'puma'
 gem 'rack', '~>3.2'
+gem 'rdoc', '~>6.10'
 gem 'rack-ssl', '~>1.4'
 gem 'rack-test', '~>2.1'
 gem 'rake', '13.3.1', require: false
