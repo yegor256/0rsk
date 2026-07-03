@@ -31,10 +31,15 @@ configure do
   Haml::Options.defaults[:format] = :xhtml
   config = { 'github' => { 'client_id' => '?', 'client_secret' => '?', 'encryption_secret' => '' }, 'sentry' => '' }
   cfg = File.join(File.dirname(__FILE__), 'config.yml')
-  config = YAML.safe_load(File.open(cfg)) if ENV['RACK_ENV'] != 'test' && File.exist?(cfg)
-  Sentry.init do |c|
-    c.dsn = config['sentry']
-    c.release = Rsk::VERSION
+  if File.exist?(cfg)
+    loaded = YAML.safe_load(File.open(cfg))
+    config.merge!(loaded) if loaded.is_a?(Hash)
+  end
+  if config['sentry'] && !config['sentry'].empty?
+    Sentry.init do |c|
+      c.dsn = config['sentry']
+      c.release = Rsk::VERSION
+    end
   end
   set :bind, '0.0.0.0'
   set :show_exceptions, false

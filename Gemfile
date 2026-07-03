@@ -22,7 +22,6 @@ gem 'rack-test', '~>2.1'
 gem 'rake', '13.3.1', require: false
 gem 'relative_time', '~>1.1'
 gem 'rerun', '~>0.14', require: false
-gem 'rspec-rails', '~>6.1', require: false
 gem 'rubocop', '~>1.61', require: false
 gem 'rubocop-elegant', '>0', require: false
 gem 'rubocop-minitest', '>0', require: false
@@ -32,6 +31,5 @@ gem 'sentry-ruby'
 gem 'simplecov', '~>0.22'
 gem 'simplecov-cobertura', '~> 3.0'
 gem 'sinatra', '~>4.2'
-gem 'sprockets', '~>4.2'
 gem 'telebot', '~>0.1'
 gem 'xcop', '~>0.7'
