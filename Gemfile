@@ -19,8 +19,8 @@ gem 'puma'
 gem 'rack', '~>3.2'
 gem 'rack-ssl', '~>1.4'
 gem 'rack-test', '~>2.1'
-gem 'rdoc', '~>6.10'
 gem 'rake', '13.3.1', require: false
+gem 'rdoc', '~>6.10'
 gem 'relative_time', '~>1.1'
 gem 'rerun', '~>0.14', require: false
 gem 'rubocop', '~>1.61', require: false
