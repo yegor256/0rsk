@@ -7,8 +7,7 @@
 
 - unless alone.empty?
   %p
-    = succeed ':' do
-      %strong.red ATTENTION
+    %strong.red ATTENTION:
     There are
     %a{href: iri.cut('/ranked').add(q: '+alone')} a few risks
     without any plans!
