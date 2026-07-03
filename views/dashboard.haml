@@ -1,0 +1,117 @@
+-# SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
+-# SPDX-License-Identifier: MIT
+
+%script{src: 'https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js'}
+
+%h2
+  Dashboard
+
+.coverage
+  %h3 Coverage
+  %canvas#coverageChart{width: 400, height: 200}
+
+.heatmap
+  %h3 Risk Heatmap
+  %canvas#heatmapChart{width: 400, height: 400}
+
+.distribution
+  %h3 Risk Distribution
+  %canvas#distributionChart{width: 400, height: 200}
+
+%script
+  :javascript
+    (function() {
+      var req = new XMLHttpRequest();
+      req.open('GET', '/dashboard.json', true);
+      req.onload = function() {
+        var data = JSON.parse(req.responseText);
+
+        // Coverage chart
+        var cov = data.coverage;
+        if (cov.total > 0) {
+          new Chart(document.getElementById('coverageChart'), {
+            type: 'doughnut',
+            data: {
+              labels: ['With Plans', 'Without Plans'],
+              datasets: [{
+                data: [cov.with_plans, cov.without_plans],
+                backgroundColor: ['#4caf50', '#f44336']
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { position: 'bottom' },
+                tooltip: { callbacks: { label: function(ctx) {
+                  return ctx.label + ': ' + ctx.raw + ' (' + (ctx.raw / cov.total * 100).toFixed(1) + '%)';
+                }}}
+              }
+            }
+          });
+        }
+
+        // Heatmap as a scatter/bar chart
+        if (data.heatmap.length > 0) {
+          var labels = [];
+          var probs = [];
+          var impacts = [];
+          var counts = [];
+          data.heatmap.sort(function(a, b) {
+            return a.probability - b.probability || a.impact - b.impact;
+          });
+          data.heatmap.forEach(function(h) {
+            labels.push('P' + h.probability + '/I' + h.impact);
+            probs.push(h.probability);
+            impacts.push(h.impact);
+            counts.push(h.count);
+          });
+          new Chart(document.getElementById('heatmapChart'), {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Triples',
+                data: counts,
+                backgroundColor: counts.map(function(c) {
+                  var max = Math.max.apply(null, counts);
+                  var intensity = c / max;
+                  return 'rgba(255, 99, 132, ' + (0.3 + intensity * 0.7) + ')';
+                })
+              }]
+            },
+            options: {
+              responsive: true,
+              scales: {
+                x: { title: { display: true, text: 'Probability / Impact' } },
+                y: { title: { display: true, text: 'Count' }, beginAtZero: true }
+              },
+              plugins: { legend: { display: false } }
+            }
+          });
+        }
+
+        // Distribution chart
+        if (data.distribution.length > 0) {
+          new Chart(document.getElementById('distributionChart'), {
+            type: 'bar',
+            data: {
+              labels: data.distribution.map(function(d) { return d.rank + '-' + (d.rank + 10); }),
+              datasets: [{
+                label: 'Triples',
+                data: data.distribution.map(function(d) { return d.count; }),
+                backgroundColor: '#2196f3'
+              }]
+            },
+            options: {
+              responsive: true,
+              scales: {
+                x: { title: { display: true, text: 'Rank Range' } },
+                y: { title: { display: true, text: 'Count' }, beginAtZero: true }
+              },
+              plugins: { legend: { display: false } }
+            }
+          });
+        }
+      };
+      req.send();
+    })();
