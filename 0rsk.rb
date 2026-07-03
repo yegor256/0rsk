@@ -227,16 +227,15 @@ get '/terms' do
 end
 
 get '/dashboard' do
-  haml :dashboard, layout: :layout, locals: merged(
-    title: '/dashboard'
-  )
+  haml :dashboard, layout: :layout, locals: merged(title: '/dashboard')
 end
 
 get '/dashboard.json' do
   content_type 'application/json'
   pid = request.cookies['0rsk-project']
   unless pid && projects.exists?(pid)
-    halt 200, { 'Content-Type' => 'application/json' },
+    halt 200,
+         { 'Content-Type' => 'application/json' },
          JSON.generate(heatmap: [], distribution: [], coverage: { total: 0, with_plans: 0, without_plans: 0 })
   end
   p = settings.pgsql
@@ -253,7 +252,12 @@ get '/dashboard.json' do
         'ORDER BY risk.probability, effect.impact'
       ],
       [pid]
-    ).map { |r| { probability: r['probability'].to_i, impact: r['impact'].to_i, count: r['cnt'].to_i } }
+    ).map do |r|
+      {
+        probability: Integer(r['probability'], 10), impact: Integer(r['impact'], 10),
+        count: Integer(r['cnt'], 10)
+      }
+    end
   distribution =
     p.exec(
       [
@@ -267,7 +271,7 @@ get '/dashboard.json' do
         'ORDER BY bucket'
       ],
       [pid]
-    ).map { |r| { rank: r['bucket'].to_i, count: r['cnt'].to_i } }
+    ).map { |r| { rank: Integer(r['bucket'], 10), count: Integer(r['cnt'], 10) } }
   coverage = p.exec(
     [
       'SELECT COUNT(t.id) AS total,',
@@ -279,8 +283,8 @@ get '/dashboard.json' do
     ],
     [pid]
   ).map do |r|
-    total = r['total'].to_i
-    wp = r['with_plans'].to_i
+    total = Integer(r['total'], 10)
+    wp = Integer(r['with_plans'], 10)
     { total: total, with_plans: wp, without_plans: total - wp }
   end[0]
   JSON.generate(heatmap: heatmap, distribution: distribution, coverage: coverage)
