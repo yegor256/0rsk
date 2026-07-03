@@ -9,7 +9,7 @@ require_relative '../objects/effects'
 require_relative '../objects/projects'
 require_relative '../objects/rsk'
 
-class Rsk::EffectsTest < Minitest::Test
+class Rsk::EffectsTest < TestCase
   def test_adds_and_fetches
     effects = Rsk::Effects.new(test_pgsql, Rsk::Projects.new(test_pgsql, 'jeff98').add('test'))
     text = 'the business will halt'

@@ -13,7 +13,7 @@ require_relative '../objects/risks'
 require_relative '../objects/rsk'
 require_relative '../objects/triples'
 
-class Rsk::TriplesTest < Minitest::Test
+class Rsk::TriplesTest < TestCase
   def test_adds_and_fetches
     project = Rsk::Projects.new(test_pgsql, "sarah#{rand(99_999)}").add("test#{rand(99_999)}")
     cid = Rsk::Causes.new(test_pgsql, project).add('we have data')

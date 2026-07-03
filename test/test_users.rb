@@ -9,7 +9,7 @@ require_relative '../objects/projects'
 require_relative '../objects/rsk'
 require_relative '../objects/users'
 
-class Rsk::UsersTest < Minitest::Test
+class Rsk::UsersTest < TestCase
   def test_adds_and_fetches
     login = "bobbydick#{rand(99_999)}"
     projects = Rsk::Projects.new(test_pgsql, login)

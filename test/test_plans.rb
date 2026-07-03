@@ -13,7 +13,7 @@ require_relative '../objects/risks'
 require_relative '../objects/rsk'
 require_relative '../objects/triples'
 
-class Rsk::PlansTest < Minitest::Test
+class Rsk::PlansTest < TestCase
   def test_adds_and_fetches
     pid = Rsk::Projects.new(test_pgsql, 'jeff23').add("test#{rand(99_999)}")
     rid = Rsk::Risks.new(test_pgsql, pid).add('we may lose data')
