@@ -149,6 +149,26 @@ module Rsk::Telegram
     end
   end
 
+  def alone
+    users.fetch.each do |login|
+      next unless telechats.wired?(login)
+      chat = telechats.chat(login)
+      Rsk::Projects.new(settings.pgsql, login).fetch.each do |project|
+        count = Rsk::Triples.new(settings.pgsql, project[:id]).count(query: '+alone')
+        next if count.zero?
+        msg = [
+          "You have #{count} risk#{'s' unless count == 1} without response",
+          "plan#{'s' unless count == 1} in project '#{project[:title]}'.",
+          '[View them](https://www.0rsk.com/ranked?q=%2Balone).'
+        ].join(' ')
+        telepost(msg, chat) if telechats.diff?(msg, chat)
+      end
+    rescue StandardError => e
+      settings.log.error(e.message)
+      next
+    end
+  end
+
   def listing(list)
     if list.count < 8
       [
@@ -203,5 +223,11 @@ end
 if settings.config['telegram']
   Rsk::Daemon.new(10).start do
     broadcast
+  end
+end
+
+if settings.config['telegram']
+  Rsk::Daemon.new(1440).start do
+    alone
   end
 end
