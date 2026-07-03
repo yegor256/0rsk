@@ -234,10 +234,11 @@ end
 post '/templates/import' do
   templates = YAML.safe_load(File.read(File.join(__dir__, 'seeds/risks.yml')))
   category = params[:category]
-  indices = (params[:indices] || '').split(',').map(&:to_i)
+  indices = (params[:indices] || '').split(',').map { |i| Integer(i, 10) }
   selected = templates[category]
   raise Rsk::Urror, "Category '#{category}' not found in templates" if selected.nil?
-  selected = selected.values_at(*indices).compact
+  selected = selected.values_at(*indices)
+  selected.compact!
   raise Rsk::Urror, 'No templates selected' if selected.empty?
   selected.each do |t|
     cid = causes.add(t['cause'])
