@@ -241,11 +241,11 @@ post '/templates/import' do
   raise Rsk::Urror, 'No templates selected' if selected.empty?
   selected.each do |t|
     cid = causes.add(t['cause'])
-    causes.get(cid).emoji = t['emoji']
+    causes.get(cid).decorate(t['emoji'])
     rid = risks.add(t['risk'])
-    risks.get(rid).probability = t['probability']
+    risks.get(rid).weigh(t['probability'])
     eid = effects.add(t['effect'])
-    effects.get(eid).impact = t['impact']
+    effects.get(eid).weigh(t['impact'])
     triples.add(cid, rid, eid)
   end
   flash('/ranked', "Imported #{selected.size} template(s) from '#{category}'")
