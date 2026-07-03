@@ -5,6 +5,7 @@
 
 require_relative 'test__helper'
 
+require 'securerandom'
 require_relative '../objects/causes'
 require_relative '../objects/effects'
 require_relative '../objects/plans'
@@ -28,7 +29,7 @@ class Rsk::TelepingsTest < TestCase
   def test_adds
     login = "judyTA#{rand(99_999)}"
     tasks = test_tasks(login)
-    chat = rand(99_999)
+    chat = SecureRandom.random_number(2_000_000_000) + 1
     Rsk::Telechats.new(test_pgsql).add(chat, login)
     telepings = Rsk::Telepings.new(test_pgsql)
     refute_empty(telepings.fresh(login))
