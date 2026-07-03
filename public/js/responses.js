@@ -5,22 +5,22 @@
 
 function on_schedule(label, f) {
   "use strict";
-  $("#schedule_" + label).on("click", function() {
-    $("#schedule").val(dateFns.format(f(new Date()), "DD-MM-YYYY"));
+  document.getElementById("schedule_" + label).addEventListener("click", function() {
+    document.getElementById("schedule").value = dateFns.format(f(new Date()), "DD-MM-YYYY");
     return false;
   });
 }
 
 function on_mnemo(id) {
   "use strict";
-  var $span = $("#" + id);
-  $span.on("click", function() {
-    $("#schedule").val($span.text());
+  var span = document.getElementById(id);
+  span.addEventListener("click", function() {
+    document.getElementById("schedule").value = span.textContent;
     return false;
   });
 }
 
-$(function() {
+document.addEventListener("DOMContentLoaded", function() {
   "use strict";
   on_schedule("asap", function(today) { return dateFns.addDays(today, 2); });
   on_schedule("week", function(today) { return dateFns.addDays(today, 4); });
