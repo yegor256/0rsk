@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
+# SPDX-License-Identifier: MIT
+---
+# Copy this file to config.yml and fill in real values before
+# running "ruby 0rsk.rb" directly. Without config.yml, the app
+# still starts with placeholder GitHub credentials, but GitHub
+# login and Telegram notifications won't work.
+github:
+  client_id: your-github-oauth-app-client-id
+  client_secret: your-github-oauth-app-client-secret
+  encryption_secret: any-random-string
+sentry: ''
+telegram:
+  token: your-telegram-bot-token

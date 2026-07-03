@@ -30,7 +30,8 @@ end
 configure do
   Haml::Options.defaults[:format] = :xhtml
   config = { 'github' => { 'client_id' => '?', 'client_secret' => '?', 'encryption_secret' => '' }, 'sentry' => '' }
-  config = YAML.safe_load(File.open(File.join(File.dirname(__FILE__), 'config.yml'))) unless ENV['RACK_ENV'] == 'test'
+  cfg = File.join(File.dirname(__FILE__), 'config.yml')
+  config = YAML.safe_load(File.open(cfg)) if ENV['RACK_ENV'] != 'test' && File.exist?(cfg)
   Sentry.init do |c|
     c.dsn = config['sentry']
     c.release = Rsk::VERSION
