@@ -234,8 +234,7 @@ get '/dashboard.json' do
   content_type 'application/json'
   pid = request.cookies['0rsk-project']
   unless pid && projects.exists?(pid)
-    halt 200,
-         { 'Content-Type' => 'application/json' },
+    halt 200, { 'Content-Type' => 'application/json' },
          JSON.generate(heatmap: [], distribution: [], coverage: { total: 0, with_plans: 0, without_plans: 0 })
   end
   p = settings.pgsql
