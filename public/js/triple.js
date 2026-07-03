@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
+/*global dateFns */
+
 function by_id(id) {
   "use strict";
   return document.getElementById(id);
