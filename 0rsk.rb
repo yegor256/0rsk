@@ -10,6 +10,7 @@ require 'glogin/codec'
 require 'haml'
 require 'iri'
 require 'json'
+require 'csv'
 require 'loog'
 require 'pgtk'
 require 'pgtk/pool'
@@ -206,6 +207,55 @@ get '/effects' do
     total: effects.count(query: query),
     effects: effects.fetch(query: query, offset: offset, limit: limit)
   )
+end
+
+get '/ranked.csv' do
+  content_type 'text/csv'
+  CSV.generate do |csv|
+    csv << %w[id cause risk effect probability impact rank positive emoji plans]
+    triples.fetch(query: params[:q] || '', limit: 1000).each do |t|
+      csv << [
+        t[:id], t[:ctext], t[:rtext], t[:etext],
+        t[:probability], t[:impact], t[:rank],
+        t[:positive], t[:emoji], t[:plans].size
+      ]
+    end
+  end
+end
+
+get '/ranked.json' do
+  content_type 'application/json'
+  triples.fetch(query: params[:q] || '', limit: 1000).to_json
+end
+
+get '/causes.csv' do
+  content_type 'text/csv'
+  CSV.generate do |csv|
+    csv << %w[id text emoji rank risks]
+    causes.fetch(limit: 1000).each do |c|
+      csv << [c[:id], c[:text], c[:emoji], c[:rank], c[:risks]]
+    end
+  end
+end
+
+get '/risks.csv' do
+  content_type 'text/csv'
+  CSV.generate do |csv|
+    csv << %w[id text probability rank effects]
+    risks.fetch(limit: 1000).each do |r|
+      csv << [r[:id], r[:text], r[:probability], r[:rank], r[:effects]]
+    end
+  end
+end
+
+get '/effects.csv' do
+  content_type 'text/csv'
+  CSV.generate do |csv|
+    csv << %w[id text impact rank risks]
+    effects.fetch(limit: 1000).each do |e|
+      csv << [e[:id], e[:text], e[:impact], e[:rank], e[:risks]]
+    end
+  end
 end
 
 get '/plans' do
