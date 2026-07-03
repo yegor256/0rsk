@@ -31,7 +31,7 @@
 
 %p
   Need inspiration? Read this
-  %a{href: 'https://github.com/yegor256/awesome-risks'} curated list.
+  %a{href: 'https://github.com/yegor256/awesome-risks', title: 'Risk examples'} curated list.
 
 %form{method: 'POST', action: iri.cut('/triple/save')}
   %label
@@ -41,11 +41,11 @@
   %input.dimmed#cid{type: 'text', name: 'cid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:cid] : '', title: 'The ID of an existing cause'}
   %a#ctext_detach.small.item{href: '#', style: defined?(triple) ? '' : 'display: none;', title: 'Click to detach it from the existing cause'} Detach
   %br
-  %a{href: 'https://unicode.org/emoji/charts/full-emoji-list.html'} Emoji:
+  %a{href: 'https://unicode.org/emoji/charts/full-emoji-list.html', title: 'Emoji reference'} Emoji:
   %input#emoji{type: 'text', name: 'emoji', size: 2, maxlength: 2, autocomplete: 'off', tabindex: 2, placeholder: '💰', value: defined?(triple) ? triple[:emoji] : '💰', required: true}
   - unless emojis.empty?
     - emojis.each do |e|
-      %a{onclick: '$("#emoji").val($(this).text());return false;', href: '#'}= e
+      %a{onclick: '$("#emoji").val($(this).text());return false;', href: '#', title: 'Insert emoji'}= e
   %br
   %label
     Risk:
@@ -91,4 +91,4 @@
 %p
   If you are in doubt and need to learn more about
   the cause+risk+effect model of risk management, read
-  %a{href: 'https://www.yegor256.com/2019/05/14/cause-risk-effect.html'} this blog post.
+  %a{href: 'https://www.yegor256.com/2019/05/14/cause-risk-effect.html', title: 'Learn about C+R+E model'} this blog post.
