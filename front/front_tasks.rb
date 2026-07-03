@@ -40,7 +40,7 @@ end
 
 get '/tasks/later' do
   id = Integer(params[:id])
-  tasks.postpone(id, Rsk::Postpone.seconds(params[:period]))
+  tasks.postpone(id, Rsk::Postpone.new(params[:period]).seconds)
   flash('/tasks', "Thanks, the task ##{id} was postponed")
 end
 

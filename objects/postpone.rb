@@ -6,12 +6,16 @@
 require_relative 'rsk'
 require_relative 'urror'
 
-module Rsk::Postpone
+class Rsk::Postpone
   PERIODS = { 'week' => 7 * 24 * 60 * 60, 'month' => 30 * 24 * 60 * 60, 'quarter' => 3 * 30 * 24 * 60 * 60 }.freeze
 
-  def self.seconds(period)
-    Rsk::Postpone::PERIODS.fetch(period) do
-      raise(Rsk::Urror, "Unknown postpone period: #{period.inspect}")
+  def initialize(period)
+    @period = period
+  end
+
+  def seconds
+    Rsk::Postpone::PERIODS.fetch(@period) do
+      raise(Rsk::Urror, "Unknown postpone period: #{@period.inspect}")
     end
   end
 end
