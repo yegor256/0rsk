@@ -5,11 +5,11 @@
 
 $stdout.sync = true
 
+require 'csv'
 require 'glogin'
 require 'glogin/codec'
 require 'haml'
 require 'iri'
-require 'csv'
 require 'json'
 require 'loog'
 require 'pgtk'
