@@ -226,6 +226,31 @@ get '/terms' do
   haml :terms, layout: :layout, locals: merged(title: '/terms')
 end
 
+get '/templates.json' do
+  content_type 'application/json'
+  YAML.safe_load(File.read(File.join(__dir__, 'seeds/risks.yml'))).to_json
+end
+
+post '/templates/import' do
+  templates = YAML.safe_load(File.read(File.join(__dir__, 'seeds/risks.yml')))
+  category = params[:category]
+  indices = (params[:indices] || '').split(',').map(&:to_i)
+  selected = templates[category]
+  raise Rsk::Urror, "Category '#{category}' not found in templates" if selected.nil?
+  selected = selected.values_at(*indices).compact
+  raise Rsk::Urror, 'No templates selected' if selected.empty?
+  selected.each do |t|
+    cid = causes.add(t['cause'])
+    causes.get(cid).emoji = t['emoji']
+    rid = risks.add(t['risk'])
+    risks.get(rid).probability = t['probability']
+    eid = effects.add(t['effect'])
+    effects.get(eid).impact = t['impact']
+    triples.add(cid, rid, eid)
+  end
+  flash('/ranked', "Imported #{selected.size} template(s) from '#{category}'")
+end
+
 module Rsk::App
   def identity
     redirect('/') unless @locals[:user]
