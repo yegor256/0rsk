@@ -35,6 +35,7 @@ Minitest.load(:minitest_reporter)
 
 require 'loog'
 require 'pgtk/pool'
+require 'securerandom'
 require 'yaml'
 require_relative '../objects/causes'
 require_relative '../objects/effects'
@@ -56,23 +57,23 @@ class TestCase < Minitest::Test
 
   private
 
-  def test_project(login: "u#{rand(99_999)}", title: "t#{rand(99_999)}")
+  def test_project(login: "u#{SecureRandom.hex(8)}", title: "t#{SecureRandom.hex(8)}")
     Rsk::Projects.new(test_pgsql, login).add(title)
   end
 
-  def test_risk(project: test_project, text: "risk #{rand(99_999)}")
+  def test_risk(project: test_project, text: "risk #{SecureRandom.hex(8)}")
     Rsk::Risks.new(test_pgsql, project).add(text)
   end
 
-  def test_cause(project: test_project, text: "cause #{rand(99_999)}")
+  def test_cause(project: test_project, text: "cause #{SecureRandom.hex(8)}")
     Rsk::Causes.new(test_pgsql, project).add(text)
   end
 
-  def test_effect(project: test_project, text: "effect #{rand(99_999)}")
+  def test_effect(project: test_project, text: "effect #{SecureRandom.hex(8)}")
     Rsk::Effects.new(test_pgsql, project).add(text)
   end
 
-  def test_plan(project: test_project, subject: test_risk(project:), text: "plan #{rand(99_999)}")
+  def test_plan(project: test_project, subject: test_risk(project:), text: "plan #{SecureRandom.hex(8)}")
     Rsk::Plans.new(test_pgsql, project).add(subject, text)
   end
 
