@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'json'
 require_relative 'pipeline'
 require_relative 'plans'
 require_relative 'query'
@@ -27,8 +28,15 @@ class Rsk::Tasks
     row = plan(id)
     @pgsql.transaction do |t|
       t.exec('DELETE FROM task WHERE id = $1', [id])
-      Rsk::Plans.new(@pgsql, Integer(row['project'] || 0)).get(Integer(row['id']), Integer(row['part'])).complete
+      Rsk::Plans.new(@pgsql, Integer(row['project'] || 0)).get(
+        Integer(row['id']),
+        Integer(row['part'])
+      ).complete(con: t)
     end
+  end
+
+  def track(id, repo, issue)
+    @pgsql.exec('UPDATE task SET tracker_data = $1 WHERE id = $2', [JSON.generate({ repo: repo, issue: issue }), id])
   end
 
   def postpone(id, seconds)

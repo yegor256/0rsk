@@ -3,14 +3,19 @@
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
+require 'json'
+require 'openssl'
+
 require_relative 'test__helper'
 
 require_relative '../0rsk'
 require_relative '../objects/causes'
 require_relative '../objects/effects'
+require_relative '../objects/plans'
 require_relative '../objects/projects'
 require_relative '../objects/risks'
 require_relative '../objects/rsk'
+require_relative '../objects/tasks'
 require_relative '../objects/triples'
 
 module Rack
@@ -123,6 +128,69 @@ class Rsk::AppTest < TestCase
     cookie = last_response.headers['Set-Cookie']
     refute_nil(cookie, last_response.body)
     assert_includes(cookie.to_s, 'deleted')
+  end
+
+  def test_webhook_ignores_non_closed
+    login("wh_ign#{SecureRandom.hex(8)}")
+    payload = { action: 'opened', issue: { number: 1 }, repository: { full_name: 'owner/repo' } }.to_json
+    ENV['GITHUB_WEBHOOK_SECRET'] = 'test'
+    header('X-Hub-Signature-256', "sha256=#{OpenSSL::HMAC.hexdigest('sha256', 'test', payload)}")
+    post('/webhook/github', payload, { 'CONTENT_TYPE' => 'application/json' })
+    assert_equal(200, last_response.status)
+  ensure
+    ENV.delete('GITHUB_WEBHOOK_SECRET')
+  end
+
+  def test_webhook_closes_task
+    ref = SecureRandom.hex(8)
+    pid = login("wh_close_#{ref}")
+    rid = Rsk::Risks.new(test_pgsql, pid).add("risk #{ref}")
+    Rsk::Triples.new(test_pgsql, pid).add(
+      Rsk::Causes.new(test_pgsql, pid).add("cause #{ref}"), rid,
+      Rsk::Effects.new(test_pgsql, pid).add("effect #{ref}")
+    )
+    Rsk::Plans.new(test_pgsql, pid).get(
+      Rsk::Plans.new(test_pgsql, pid).add(rid, "plan #{ref}"),
+      rid
+    ).reschedule('01-01-2000')
+    Rsk::Tasks.new(test_pgsql, the_login).create
+    task = Rsk::Tasks.new(test_pgsql, the_login).fetch.first
+    refute_nil(task, 'No task was created')
+    test_pgsql.exec(
+      'UPDATE task SET tracker_data = $1 WHERE id = $2',
+      [JSON.generate({ repo: 'owner/repo', issue: 42 }), task[:id]]
+    )
+    payload = { action: 'closed', issue: { number: 42 }, repository: { full_name: 'owner/repo' } }.to_json
+    ENV['GITHUB_WEBHOOK_SECRET'] = 'test'
+    header('X-Hub-Signature-256', "sha256=#{OpenSSL::HMAC.hexdigest('sha256', 'test', payload)}")
+    post('/webhook/github', payload, { 'CONTENT_TYPE' => 'application/json' })
+    assert_equal(200, last_response.status)
+    refute_includes(Rsk::Tasks.new(test_pgsql, the_login).fetch.map { |t| t[:id] }, task[:id])
+  ensure
+    ENV.delete('GITHUB_WEBHOOK_SECRET')
+  end
+
+  def test_webhook_hmac_missing_rejects
+    ENV['GITHUB_WEBHOOK_SECRET'] = 'secret'
+    post('/webhook/github', '{}', { 'CONTENT_TYPE' => 'application/json' })
+    assert_equal(401, last_response.status)
+  ensure
+    ENV.delete('GITHUB_WEBHOOK_SECRET')
+  end
+
+  def test_webhook_hmac_invalid_rejects
+    ENV['GITHUB_WEBHOOK_SECRET'] = 'real'
+    header('X-Hub-Signature-256', "sha256=#{'a' * 64}")
+    post('/webhook/github', '{}', { 'CONTENT_TYPE' => 'application/json' })
+    assert_equal(401, last_response.status)
+  ensure
+    ENV.delete('GITHUB_WEBHOOK_SECRET')
+  end
+
+  def test_webhook_no_secret_rejects
+    ENV.delete('GITHUB_WEBHOOK_SECRET')
+    post('/webhook/github', '{}', { 'CONTENT_TYPE' => 'application/json' })
+    assert_equal(503, last_response.status)
   end
 
   private

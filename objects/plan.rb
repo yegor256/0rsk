@@ -15,26 +15,32 @@ class Rsk::Plan
     @part = part
   end
 
-  def detach
-    @pgsql.transaction do |t|
-      if t.exec('SELECT * FROM part WHERE id = $1 AND project = $2', [@part, pid]).empty?
-        raise(Rsk::Urror, "##{@id} is not in your project ##{pid}")
+  def detach(txn: nil)
+    detachit =
+      proc do |c|
+        raise(Rsk::Urror, "##{@id} is not in your project") if c.exec(
+          'SELECT * FROM part WHERE id = $1 AND project = $2', [@part, pid(con: c)]
+        ).empty?
+        c.exec('DELETE FROM plan WHERE id = $1 AND part = $2', [@id, @part])
+        c.exec('DELETE FROM part WHERE id = $1', [@id]) if c.exec('SELECT * FROM plan WHERE id = $1', [@id]).empty?
       end
-      t.exec('DELETE FROM plan WHERE id = $1 AND part = $2', [@id, @part])
-      t.exec('DELETE FROM part WHERE id = $1', [@id]) if t.exec('SELECT * FROM plan WHERE id = $1', [@id]).empty?
-    end
-  end
-
-  def complete(time: Time.now - (4 * 60 * 60))
-    if /^[a-z]+$/.match?(schedule)
-      @pgsql.exec('UPDATE plan SET completed = $3 WHERE id = $1 AND part = $2', [@id, @part, time])
+    if txn
+      detachit.call(txn)
     else
-      detach
+      @pgsql.transaction { |t| detachit.call(t) }
     end
   end
 
-  def schedule
-    @pgsql.exec('SELECT schedule FROM plan WHERE id = $1 AND part = $2', [@id, @part])[0]['schedule']
+  def complete(time: Time.now - (4 * 60 * 60), con: nil)
+    if /^[a-z]+$/.match?(schedule(con: con))
+      (con || @pgsql).exec('UPDATE plan SET completed = $3 WHERE id = $1 AND part = $2', [@id, @part, time])
+    else
+      detach(txn: con)
+    end
+  end
+
+  def schedule(con: nil)
+    (con || @pgsql).exec('SELECT schedule FROM plan WHERE id = $1 AND part = $2', [@id, @part])[0]['schedule']
   end
 
   def reschedule(text)
@@ -46,7 +52,7 @@ class Rsk::Plan
 
   private
 
-  def pid
-    Integer(@pgsql.exec('SELECT project FROM part WHERE id = $1', [@id])[0]['project'])
+  def pid(con: nil)
+    Integer((con || @pgsql).exec('SELECT project FROM part WHERE id = $1', [@id])[0]['project'])
   end
 end
