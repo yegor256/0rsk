@@ -16,9 +16,9 @@ require_relative '../objects/triples'
 class Rsk::TriplesTest < TestCase
   def test_adds_and_fetches
     project = test_project
-    cid = test_cause(project:)
-    rid = test_risk(project:)
-    eid = test_effect(project:)
+    cid = test_cause(project: project)
+    rid = test_risk(project: project)
+    eid = test_effect(project: project)
     triples = Rsk::Triples.new(test_pgsql, project)
     assert_equal(0, triples.count)
     tid = triples.add(cid, rid, eid)
@@ -31,8 +31,8 @@ class Rsk::TriplesTest < TestCase
 
   def test_rejects_cross_project_parts
     project = test_project
-    rid = test_risk(project:)
-    eid = test_effect(project:)
+    rid = test_risk(project: project)
+    eid = test_effect(project: project)
     other = test_cause
     triples = Rsk::Triples.new(test_pgsql, project)
     assert_raises(Rsk::Urror) { triples.add(other, rid, eid) }

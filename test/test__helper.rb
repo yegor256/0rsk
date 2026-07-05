@@ -73,11 +73,15 @@ class TestCase < Minitest::Test
     Rsk::Effects.new(test_pgsql, project).add(text)
   end
 
-  def test_plan(project: test_project, subject: test_risk(project:), text: "plan #{SecureRandom.hex(8)}")
+  def test_plan(project: test_project, subject: test_risk(project: project), text: "plan #{SecureRandom.hex(8)}")
     Rsk::Plans.new(test_pgsql, project).add(subject, text)
   end
 
   def test_triple(project: test_project)
-    Rsk::Triples.new(test_pgsql, project).add(test_cause(project:), test_risk(project:), test_effect(project:))
+    Rsk::Triples.new(test_pgsql, project).add(
+      test_cause(project: project),
+      test_risk(project: project),
+      test_effect(project: project)
+    )
   end
 end
