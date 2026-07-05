@@ -131,7 +131,7 @@ end
 post '/project/{id}/tracker/add' do
   pid = params[:id]
   raise Rsk::Urror, "Project ##{pid} not found" unless projects.exists?(pid)
-  trackers(pid: pid).add(params[:repo], params[:token])
+  trackers(pid: pid).add(params[:repo], params[:token], type: params[:type])
   flash("/project/#{pid}", 'Tracker added')
 end
 
