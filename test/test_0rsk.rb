@@ -143,7 +143,8 @@ class Rsk::AppTest < TestCase
 
   def test_webhook_closes_task
     ref = SecureRandom.hex(8)
-    pid = login("wh_close_#{ref}")
+    the_login = "wh_close_#{ref}"
+    pid = login(the_login)
     rid = Rsk::Risks.new(test_pgsql, pid).add("risk #{ref}")
     Rsk::Triples.new(test_pgsql, pid).add(
       Rsk::Causes.new(test_pgsql, pid).add("cause #{ref}"), rid,
