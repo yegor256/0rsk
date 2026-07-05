@@ -15,10 +15,10 @@ require_relative '../objects/triples'
 
 class Rsk::TriplesTest < TestCase
   def test_adds_and_fetches
-    project = Rsk::Projects.new(test_pgsql, "sarah#{rand(99_999)}").add("test#{rand(99_999)}")
-    cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
-    rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
-    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
+    project = test_project
+    cid = test_cause(project:)
+    rid = test_risk(project:)
+    eid = test_effect(project:)
     triples = Rsk::Triples.new(test_pgsql, project)
     assert_equal(0, triples.count)
     tid = triples.add(cid, rid, eid)
@@ -30,20 +30,16 @@ class Rsk::TriplesTest < TestCase
   end
 
   def test_rejects_cross_project_parts
-    project = Rsk::Projects.new(test_pgsql, "sarahX#{rand(99_999)}").add("test#{rand(99_999)}")
-    Rsk::Causes.new(test_pgsql, project).add('we have data')
-    rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
-    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
-    other = Rsk::Causes.new(
-      test_pgsql,
-      Rsk::Projects.new(test_pgsql, "sarahY#{rand(99_999)}").add("test#{rand(99_999)}")
-    ).add('data from other project')
+    project = test_project
+    rid = test_risk(project:)
+    eid = test_effect(project:)
+    other = test_cause
     triples = Rsk::Triples.new(test_pgsql, project)
     assert_raises(Rsk::Urror) { triples.add(other, rid, eid) }
   end
 
   def test_fetches_with_plans
-    project = Rsk::Projects.new(test_pgsql, "sarahP#{rand(99_999)}").add("test#{rand(99_999)}")
+    project = test_project
     cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
     rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
     eid = Rsk::Effects.new(test_pgsql, project).add('business will stop NOW')

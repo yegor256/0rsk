@@ -36,6 +36,12 @@ Minitest.load(:minitest_reporter)
 require 'loog'
 require 'pgtk/pool'
 require 'yaml'
+require_relative '../objects/causes'
+require_relative '../objects/effects'
+require_relative '../objects/plans'
+require_relative '../objects/projects'
+require_relative '../objects/risks'
+require_relative '../objects/triples'
 
 class TestCase < Minitest::Test
   def test_pgsql
@@ -46,5 +52,31 @@ class TestCase < Minitest::Test
     @@test_pgsql.start!
     @@test_pgsql
     # rubocop:enable Style/ClassVars
+  end
+
+  private
+
+  def test_project(login: "u#{rand(99_999)}", title: "t#{rand(99_999)}")
+    Rsk::Projects.new(test_pgsql, login).add(title)
+  end
+
+  def test_risk(project: test_project, text: "risk #{rand(99_999)}")
+    Rsk::Risks.new(test_pgsql, project).add(text)
+  end
+
+  def test_cause(project: test_project, text: "cause #{rand(99_999)}")
+    Rsk::Causes.new(test_pgsql, project).add(text)
+  end
+
+  def test_effect(project: test_project, text: "effect #{rand(99_999)}")
+    Rsk::Effects.new(test_pgsql, project).add(text)
+  end
+
+  def test_plan(project: test_project, subject: test_risk(project:), text: "plan #{rand(99_999)}")
+    Rsk::Plans.new(test_pgsql, project).add(subject, text)
+  end
+
+  def test_triple(project: test_project)
+    Rsk::Triples.new(test_pgsql, project).add(test_cause(project:), test_risk(project:), test_effect(project:))
   end
 end
