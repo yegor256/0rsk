@@ -43,7 +43,7 @@ class Rsk::TelepingsTest < TestCase
   end
 
   def test_required
-    assert(Rsk::Telepings.new(test_pgsql).required("judyR#{SecureRandom.hex(8)}"))
+    assert(Rsk::Telepings.new(test_pgsql).required?("judyR#{SecureRandom.hex(8)}"))
   end
 
   def test_required_after_add
@@ -58,7 +58,7 @@ class Rsk::TelepingsTest < TestCase
     plans = Rsk::Plans.new(test_pgsql, project)
     plans.get(plans.add(eid, 'plan'), eid).reschedule((Time.now - (60 * 60)).strftime('%d-%m-%Y'))
     Rsk::Tasks.new(test_pgsql, login).create
-    assert(Rsk::Telepings.new(test_pgsql).required(login))
+    assert(Rsk::Telepings.new(test_pgsql).required?(login))
   end
 
   def test_fresh
@@ -123,6 +123,7 @@ class Rsk::TelepingsTest < TestCase
     plans = Rsk::Plans.new(test_pgsql, project)
     pid = plans.add(rid, 'solve it!')
     plans.get(pid, rid).reschedule((Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y'))
+    tasks = Rsk::Tasks.new(test_pgsql, login)
     tasks.create
     assert(tasks.fetch.any? { |t| t[:plan] == pid })
     tasks
