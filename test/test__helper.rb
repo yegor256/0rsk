@@ -46,11 +46,14 @@ require_relative '../objects/triples'
 
 class TestCase < Minitest::Test
   def test_pgsql
-    @@test_pgsql ||= Pgtk::Pool.new(
-      Pgtk::Wire::Yaml.new(File.join(__dir__, '../target/pgsql-config.yml')),
-      log: Loog::NULL
-    )
-    @@test_pgsql.start!
+    @@mtx ||= Mutex.new
+    @@mtx.synchronize do
+      @@test_pgsql ||= Pgtk::Pool.new(
+        Pgtk::Wire::Yaml.new(File.join(__dir__, '../target/pgsql-config.yml')),
+        log: Loog::NULL
+      )
+      @@test_pgsql.start!
+    end
     @@test_pgsql
     # rubocop:enable Style/ClassVars
   end
