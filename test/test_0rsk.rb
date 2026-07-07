@@ -32,7 +32,7 @@ class Rsk::AppTest < TestCase
   end
 
   def test_renders_pages
-    pages = ['/version', '/robots.txt', '/', '/js/triple.js', '/js/responses.js', '/terms']
+    pages = ['/version', '/robots.txt', '/', '/js/triple.js', '/js/responses.js', '/terms', '/templates.json']
     pages.each do |p|
       get(p)
       assert_predicate(last_response, :ok?, last_response.body)
@@ -123,6 +123,29 @@ class Rsk::AppTest < TestCase
     cookie = last_response.headers['Set-Cookie']
     refute_nil(cookie, last_response.body)
     assert_includes(cookie.to_s, 'deleted')
+  end
+
+  def test_templates_import
+    login("bob_import#{rand(99_999)}")
+    post('/templates/import', 'category=security&indices=0')
+    assert_equal(302, last_response.status, last_response.body)
+    get('/ranked')
+    assert_equal(200, last_response.status, last_response.body)
+    assert_includes(last_response.body, 'weak passwords')
+    assert_includes(last_response.body, 'account compromised')
+    assert_includes(last_response.body, 'data breach')
+  end
+
+  def test_templates_import_invalid_category
+    login("bob_badcat#{rand(99_999)}")
+    post('/templates/import', 'category=nonexistent&indices=0')
+    assert_equal(302, last_response.status, last_response.body)
+  end
+
+  def test_templates_import_empty_indices
+    login("bob_empty#{rand(99_999)}")
+    post('/templates/import', 'category=security&indices=')
+    assert_equal(302, last_response.status, last_response.body)
   end
 
   private

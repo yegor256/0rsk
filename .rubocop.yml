@@ -41,6 +41,8 @@ Metrics/ParameterLists:
   Max: 10
 Layout/ParameterAlignment:
   Enabled: false
+Layout/ArgumentAlignment:
+  Enabled: false
 Metrics/PerceivedComplexity:
   Max: 25
 Layout/LineLength:
