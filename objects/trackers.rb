@@ -7,7 +7,7 @@ require_relative 'rsk'
 require_relative 'urror'
 
 class Rsk::Trackers
-  REPO_PATTERN = %r{\A[a-zA-Z0-9._-]+/[a-zA-Z0-9._-]+\z}.freeze
+  REPO_PATTERN = %r{\A[a-zA-Z0-9._-]+/[a-zA-Z0-9._-]+\z}
 
   def initialize(pgsql, project)
     @pgsql = pgsql
