@@ -11,7 +11,7 @@ require_relative '../objects/rsk'
 
 class Rsk::RisksTest < TestCase
   def test_adds_and_fetches
-    risks = Rsk::Risks.new(test_pgsql, test_project)
+    risks = Rsk::Risks.new(fake_pgsql, test_project)
     text = 'we may lose data'
     rid = risks.add(text)
     assert_predicate(rid, :positive?)

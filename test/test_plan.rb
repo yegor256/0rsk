@@ -46,9 +46,9 @@ class Rsk::PlanTest < TestCase
   private
 
   def with_plan(login: "planT#{SecureRandom.hex(8)}", title: "pt#{SecureRandom.hex(8)}")
-    pid = Rsk::Projects.new(test_pgsql, login).add(title)
-    rid = Rsk::Risks.new(test_pgsql, pid).add('we may lose data')
-    @plans = Rsk::Plans.new(test_pgsql, pid)
+    pid = Rsk::Projects.new(fake_pgsql, login).add(title)
+    rid = Rsk::Risks.new(fake_pgsql, pid).add('we may lose data')
+    @plans = Rsk::Plans.new(fake_pgsql, pid)
     @plans.get(@plans.add(rid, 'we make backups'), rid)
   end
 end

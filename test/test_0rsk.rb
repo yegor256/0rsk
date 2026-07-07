@@ -103,10 +103,10 @@ class Rsk::AppTest < TestCase
   def test_deletes_ranked
     pid = login("deleter#{rand(99_999)}")
     get(
-      "/ranked/delete?id=#{Rsk::Triples.new(test_pgsql, pid).add(
-        Rsk::Causes.new(test_pgsql, pid).add('test cause'),
-        Rsk::Risks.new(test_pgsql, pid).add('test risk'),
-        Rsk::Effects.new(test_pgsql, pid).add('test effect')
+      "/ranked/delete?id=#{Rsk::Triples.new(fake_pgsql, pid).add(
+        Rsk::Causes.new(fake_pgsql, pid).add('test cause'),
+        Rsk::Risks.new(fake_pgsql, pid).add('test risk'),
+        Rsk::Effects.new(fake_pgsql, pid).add('test effect')
       )}"
     )
     assert_equal(302, last_response.status, last_response.body)
@@ -129,7 +129,7 @@ class Rsk::AppTest < TestCase
 
   def login(name)
     set_cookie("glogin=#{name}")
-    pid = Rsk::Projects.new(test_pgsql, name).add('test')
+    pid = Rsk::Projects.new(fake_pgsql, name).add('test')
     set_cookie("0rsk-project=#{pid}")
     pid
   end

@@ -13,7 +13,7 @@ class Rsk::RiskTest < TestCase
   def test_modifies_text
     before = 'text first'
     after = 'another text to set'
-    risks = Rsk::Risks.new(test_pgsql, test_project)
+    risks = Rsk::Risks.new(fake_pgsql, test_project)
     risk = risks.get(risks.add(before))
     assert_equal(before, risk.text)
     risk.rename(after)
@@ -23,7 +23,7 @@ class Rsk::RiskTest < TestCase
 
   def test_modifies_probability
     after = 9
-    risks = Rsk::Risks.new(test_pgsql, test_project)
+    risks = Rsk::Risks.new(fake_pgsql, test_project)
     risk = risks.get(risks.add('some risk'))
     risk.weigh(after)
     risk.weigh(after)
