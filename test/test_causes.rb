@@ -11,7 +11,7 @@ require_relative '../objects/rsk'
 
 class Rsk::CausesTest < TestCase
   def test_adds_and_fetches
-    causes = Rsk::Causes.new(test_pgsql, Rsk::Projects.new(test_pgsql, "timm#{rand(99_999)}").add("t#{rand(99_999)}"))
+    causes = Rsk::Causes.new(test_pgsql, test_project)
     text = 'we use Ruby'
     assert_equal(0, causes.count)
     cid = causes.add(text)
@@ -22,7 +22,7 @@ class Rsk::CausesTest < TestCase
   end
 
   def test_fetch_emojis
-    causes = Rsk::Causes.new(test_pgsql, Rsk::Projects.new(test_pgsql, "tim#{rand(99_999)}").add("t#{rand(99_999)}"))
+    causes = Rsk::Causes.new(test_pgsql, test_project)
     causes.get(causes.add('some cause')).decorate('💰')
     assert_operator(causes.emojis.count, :>, 1)
   end

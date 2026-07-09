@@ -25,8 +25,7 @@
 - else
   - if total >= Rsk::Tasks::THRESHOLD
     %p
-      = succeed ':' do
-        %strong.red WARNING
+      %strong.red WARNING:
       Since you have too many tasks, new
       %strong.red= pipeline
       tasks are not being created.
@@ -72,7 +71,7 @@
             %a{href: iri.cut('/tasks/later').add(id: t[:id], period: 'month')} month
             = '|'
             %a{href: iri.cut('/tasks/later').add(id: t[:id], period: 'quarter')} quarter
-  = Haml::Engine.new(File.read('views/_paging.haml')).render(self, locals.merge(count: tasks.count))
+  = Tilt::HamlTemplate.new('views/_paging.haml', 1, format: :xhtml).render(self, locals.merge(count: tasks.count))
 
 %p
   We're checking all your plans regularly and create tasks
@@ -81,5 +80,4 @@
   to pull the latest plans in, right now.
   - if updated
     The last time plans were checked
-    = succeed '.' do
-      = RelativeTime.in_words(updated.utc)
+    = RelativeTime.in_words(updated.utc.iso8601) + "."
