@@ -54,4 +54,4 @@
           %td.right
             = thumb(r)
             = rank(r)
-  = Haml::Engine.new(File.read('views/_paging.haml')).render(self, locals.merge(count: plans.count))
+    = Tilt::HamlTemplate.new('views/_paging.haml', 1, format: :xhtml).render(self, locals.merge(count: plans.count))

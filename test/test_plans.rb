@@ -15,8 +15,8 @@ require_relative '../objects/triples'
 
 class Rsk::PlansTest < TestCase
   def test_adds_and_fetches
-    pid = Rsk::Projects.new(test_pgsql, 'jeff23').add("test#{rand(99_999)}")
-    rid = Rsk::Risks.new(test_pgsql, pid).add('we may lose data')
+    pid = test_project
+    rid = test_risk(project: pid)
     plans = Rsk::Plans.new(test_pgsql, pid)
     text = 'we make backups'
     id = plans.add(rid, text)
@@ -29,12 +29,12 @@ class Rsk::PlansTest < TestCase
   end
 
   def test_fetch_no_duplicates
-    pid = Rsk::Projects.new(test_pgsql, "dups#{rand(99_999)}").add("test#{rand(99_999)}")
-    cid = Rsk::Causes.new(test_pgsql, pid).add('some cause')
-    eid = Rsk::Effects.new(test_pgsql, pid).add('some effect')
+    pid = test_project
+    cid = test_cause(project: pid)
+    eid = test_effect(project: pid)
     triples = Rsk::Triples.new(test_pgsql, pid)
-    triples.add(cid, Rsk::Risks.new(test_pgsql, pid).add('risk one'), eid)
-    triples.add(cid, Rsk::Risks.new(test_pgsql, pid).add('risk two'), eid)
+    triples.add(cid, test_risk(project: pid), eid)
+    triples.add(cid, test_risk(project: pid), eid)
     plans = Rsk::Plans.new(test_pgsql, pid)
     plans.add(cid, 'mitigate it')
     assert_equal(1, plans.count)

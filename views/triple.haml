@@ -4,7 +4,7 @@
 %script{src: '/js/triple.js'}
 
 %div.small.right{style: 'float:right; width:200px;'}
-  %img{src: '/dont-talk.png', style: 'width: 120px;'}
+  %img{src: '/dont-talk.png', alt: "Don't talk", style: 'width: 120px;'}
   %br
   Cause: The data you enter
   %strong is
@@ -29,8 +29,7 @@
 
 %p
   Need inspiration? Read this
-  = succeed '.' do
-    %a{href: 'https://github.com/yegor256/awesome-risks'} curated list
+  %a{href: 'https://github.com/yegor256/awesome-risks'} curated list.
 
 %form{method: 'POST', action: iri.cut('/triple/save')}
   %label
@@ -40,8 +39,7 @@
   %input.dimmed#cid{type: 'text', name: 'cid', size: 3, autocomplete: 'off', readonly: true, value: defined?(triple) ? triple[:cid] : '', title: 'The ID of an existing cause'}
   %a#ctext_detach.small.item{href: '#', style: defined?(triple) ? '' : 'display: none;', title: 'Click to detach it from the existing cause'} Detach
   %br
-  = succeed ':' do
-    %a{href: 'https://unicode.org/emoji/charts/full-emoji-list.html'} Emoji
+  %a{href: 'https://unicode.org/emoji/charts/full-emoji-list.html'} Emoji:
   %input#emoji{type: 'text', name: 'emoji', size: 2, maxlength: 2, autocomplete: 'off', tabindex: 2, placeholder: '💰', value: defined?(triple) ? triple[:emoji] : '💰', required: true}
   - unless emojis.empty?
     - emojis.each do |e|
@@ -82,14 +80,13 @@
     - {'Fantastic' => 9, 'Awesome' => 8, 'Very good' => 6, 'Average' => 5, 'Good to have' => 4, 'Minor' => 2, 'Unnoticeable' => 1}.each do |k, v|
       %option{value: v, selected: defined?(triple) && triple[:impact] == v, type: 'positive', hidden: !defined?(triple) || !triple[:positive]}= "#{k} (#{v})"
   - if defined?(triple) && triple[:positive]
-    %img#marker.up
+    %img#marker.up{alt: 'up'}
   - else
-    %img#marker.down
+    %img#marker.down{alt: 'down'}
   %br
   %input{type: 'submit', value: 'Submit', tabindex: 8}
 
 %p
   If you are in doubt and need to learn more about
   the cause+risk+effect model of risk management, read
-  = succeed '.' do
-    %a{href: 'https://www.yegor256.com/2019/05/14/cause-risk-effect.html'} this blog post
+  %a{href: 'https://www.yegor256.com/2019/05/14/cause-risk-effect.html'} this blog post.
