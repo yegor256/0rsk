@@ -125,6 +125,28 @@ class Rsk::AppTest < TestCase
     assert_includes(cookie.to_s, 'deleted')
   end
 
+  def test_telegram_listing_plain_text
+    listing = Object.new.extend(Rsk::Telegram).listing(
+      [
+        {
+          id: 42,
+          triple: 7,
+          positive: true,
+          rank: 3,
+          text: 'Fix "urgent" bug',
+          title: 'Project',
+          pid: 5,
+          ctext: 'Cause',
+          rtext: 'Risk',
+          etext: 'Effect',
+          schedule: 'today'
+        }
+      ]
+    ).flatten.join(' ')
+    assert_includes(listing, 'Fix "urgent" bug')
+    refute_includes(listing, '"Fix \\"urgent\\" bug"')
+  end
+
   private
 
   def login(name)
