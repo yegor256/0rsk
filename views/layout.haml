@@ -12,6 +12,7 @@
     %link{href: 'https://cdn.jsdelivr.net/gh/yegor256/tacit@gh-pages/tacit-css.min.css', rel: 'stylesheet'}
     %link{href: 'https://www.yegor256.com/css/icons.css', rel: 'stylesheet'}
     %link{rel: 'shortcut icon', href: '/favicon.svg', type: 'image/svg+xml'}
+    %script{src: '/js/dom.js'}
     :css
       .item { margin-right: 1em; }
       .logo { width: 64px; height: 64px; }
@@ -23,6 +24,10 @@
       .up { content:url('/up.svg'); width: 1em; height:1em; }
       .down { content:url('/down.svg'); width: 1em; height:1em; }
       .dimmed { background-color: #eee; }
+      .autocomplete { display: none; position: absolute; z-index: 1000; margin: 0; padding: .2em .4em; list-style: none; border: 1px solid #999; background: Canvas; color: CanvasText; }
+      .autocomplete.open { display: block; }
+      .autocomplete button { background: none; border: 0; color: inherit; cursor: pointer; display: block; font: inherit; padding: .2em; text-align: left; width: 100%; }
+      .autocomplete button.active { outline: 1px solid currentColor; }
       @media (max-width: 768px) {
         table { font-size: .8em; }
         nav ul { flex-direction: column; }

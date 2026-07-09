@@ -1,17 +1,12 @@
 // SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-/*global dateFns */
-
-function by_id(id) {
-  "use strict";
-  return document.getElementById(id);
-}
+/*global dateFns, dom_by_id */
 
 function on_schedule(label, f) {
   "use strict";
-  var link = by_id("schedule_" + label);
-  var schedule = by_id("schedule");
+  var link = dom_by_id("schedule_" + label);
+  var schedule = dom_by_id("schedule");
   if (!link || !schedule) {
     return;
   }
@@ -23,8 +18,8 @@ function on_schedule(label, f) {
 
 function on_mnemo(id) {
   "use strict";
-  var link = by_id(id);
-  var schedule = by_id("schedule");
+  var link = dom_by_id(id);
+  var schedule = dom_by_id("schedule");
   if (!link || !schedule) {
     return;
   }

@@ -1,22 +1,9 @@
 // SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-/*global dateFns */
+/*global dom_by_id, dom_hide, dom_show */
 
-function by_id(id) {
-  "use strict";
-  return document.getElementById(id);
-}
-
-function show(element) {
-  "use strict";
-  element.style.display = "";
-}
-
-function hide(element) {
-  "use strict";
-  element.style.display = "none";
-}
+var autocomplete_widgets = [];
 
 function trigger_change(element) {
   "use strict";
@@ -26,7 +13,7 @@ function trigger_change(element) {
 function apply_fields(fields) {
   "use strict";
   Object.keys(fields).forEach(function(field) {
-    var element = by_id(field);
+    var element = dom_by_id(field);
     if (!element) {
       return;
     }
@@ -44,53 +31,82 @@ function item_text(item) {
   return item.label || item.value || item.text || "";
 }
 
+function close_autocomplete_widgets(event) {
+  "use strict";
+  autocomplete_widgets.forEach(function(widget) {
+    if (
+      event &&
+      (event.target === widget.input || widget.list.contains(event.target))
+    ) {
+      return;
+    }
+    widget.close();
+  });
+}
+
 function auto(kind, uri) {
   "use strict";
-  var input = by_id(kind);
-  var detach = by_id(kind + "_detach");
+  var input = dom_by_id(kind);
+  var detach = dom_by_id(kind + "_detach");
   var timer = null;
+  var closing = false;
+  var items = [];
+  var active = -1;
   var list = document.createElement("ul");
-  list.style.display = "none";
-  list.style.position = "absolute";
-  list.style.zIndex = "1000";
-  list.style.margin = "0";
-  list.style.padding = ".2em .4em";
-  list.style.listStyle = "none";
-  list.style.border = "1px solid #999";
-  list.style.background = "Canvas";
-  list.style.color = "CanvasText";
+  if (!input || !detach) {
+    return;
+  }
+  list.className = "autocomplete";
+  list.id = kind + "_autocomplete";
+  list.setAttribute("role", "listbox");
+  input.setAttribute("aria-autocomplete", "list");
+  input.setAttribute("aria-controls", list.id);
   input.insertAdjacentElement("afterend", list);
 
   function close() {
-    hide(list);
+    list.classList.remove("open");
     list.replaceChildren();
+    items = [];
+    active = -1;
+    input.removeAttribute("aria-activedescendant");
+    closing = true;
+    setTimeout(function() { closing = false; }, 300);
+  }
+
+  function activate(index) {
+    active = index;
+    list.querySelectorAll("button").forEach(function(button, pos) {
+      var selected = pos === active;
+      button.classList.toggle("active", selected);
+      button.setAttribute("aria-selected", selected ? "true" : "false");
+      if (selected) {
+        input.setAttribute("aria-activedescendant", button.id);
+      }
+    });
   }
 
   function select(item) {
     if (item.fields) {
       apply_fields(item.fields);
     }
-    show(detach);
+    dom_show(detach);
     detach.classList.remove("red");
     close();
   }
 
-  function render(items) {
+  function render(found) {
     close();
-    items.forEach(function(item) {
+    items = found.filter(function(item) {
+      return item_text(item);
+    });
+    items.forEach(function(item, index) {
       var option = document.createElement("li");
       var button = document.createElement("button");
       button.type = "button";
+      button.id = kind + "_autocomplete_" + index;
       button.textContent = item_text(item);
-      button.style.background = "none";
-      button.style.border = "0";
-      button.style.color = "inherit";
-      button.style.cursor = "pointer";
-      button.style.display = "block";
-      button.style.font = "inherit";
-      button.style.padding = ".2em";
-      button.style.textAlign = "left";
-      button.style.width = "100%";
+      button.setAttribute("role", "option");
+      button.setAttribute("aria-selected", "false");
       button.addEventListener("click", function() {
         select(item);
       });
@@ -98,7 +114,7 @@ function auto(kind, uri) {
       list.appendChild(option);
     });
     if (items.length > 0) {
-      show(list);
+      list.classList.add("open");
     }
   }
 
@@ -118,16 +134,30 @@ function auto(kind, uri) {
     clearTimeout(timer);
     timer = setTimeout(search, 300);
   });
-  input.addEventListener("focus", search);
+  input.addEventListener("focus", function() {
+    if (!closing) {
+      search();
+    }
+  });
   input.addEventListener("keydown", function(event) {
-    if (event.key === "Escape") {
+    if (event.key === "ArrowDown" && items.length > 0) {
+      event.preventDefault();
+      activate((active + 1) % items.length);
+    } else if (event.key === "ArrowUp" && items.length > 0) {
+      event.preventDefault();
+      activate((active + items.length - 1) % items.length);
+    } else if (event.key === "Enter" && active >= 0) {
+      event.preventDefault();
+      select(items[active]);
+    } else if (event.key === "Escape") {
       close();
     }
   });
-  document.addEventListener("click", function(event) {
-    if (event.target !== input && !list.contains(event.target)) {
-      close();
-    }
+
+  autocomplete_widgets.push({
+    input: input,
+    list: list,
+    close: close
   });
 }
 
@@ -141,15 +171,15 @@ function on_detach(button, id) {
   link.addEventListener("click", function(event) {
     event.preventDefault();
     input.value = "";
-    hide(link);
+    dom_hide(link);
   });
 }
 
 function on_positive() {
   "use strict";
-  var positive = by_id("positive");
-  var marker = by_id("marker");
-  var impact = by_id("impact");
+  var positive = dom_by_id("positive");
+  var marker = dom_by_id("marker");
+  var impact = dom_by_id("impact");
   if (!positive || !marker || !impact) {
     return;
   }
@@ -169,7 +199,7 @@ function on_positive() {
 
 function on_emojis() {
   "use strict";
-  var emoji = by_id("emoji");
+  var emoji = dom_by_id("emoji");
   if (!emoji) {
     return;
   }
@@ -184,14 +214,17 @@ function on_emojis() {
 function on_submit() {
   "use strict";
   var form = document.querySelector('form[action$="/triple/save"]');
+  var cid = dom_by_id("cid");
+  var rid = dom_by_id("rid");
+  var eid = dom_by_id("eid");
   if (!form) {
     return;
   }
   form.addEventListener("submit", function(event) {
     if (
-      by_id("cid").value ||
-      by_id("rid").value ||
-      by_id("eid").value
+      (cid && cid.value) ||
+      (rid && rid.value) ||
+      (eid && eid.value)
     ) {
       if (!confirm("You are going to MODIFY existing data, are you sure?")) {
         event.preventDefault();
@@ -205,6 +238,7 @@ document.addEventListener("DOMContentLoaded", function() {
   auto("ctext", "/causes.json");
   auto("rtext", "/risks.json");
   auto("etext", "/effects.json");
+  document.addEventListener("click", close_autocomplete_widgets);
   on_detach("#ctext_detach", "#cid");
   on_detach("#rtext_detach", "#rid");
   on_detach("#etext_detach", "#eid");
