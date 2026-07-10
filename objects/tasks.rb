@@ -45,6 +45,10 @@ class Rsk::Tasks
     query(query).count
   end
 
+  def track(id, repo, issue)
+    @pgsql.exec('UPDATE task SET tracker_data = $1 WHERE id = $2', [%({"repo":"#{repo}","issue":#{issue}}"), id])
+  end
+
   def fetch(query: '', limit: 10, offset: 0)
     query(query).fetch(offset, limit).map do |r|
       {
@@ -63,7 +67,8 @@ class Rsk::Tasks
         rtext: r['rtext'],
         etext: r['etext'],
         ptext: r['ptext'],
-        schedule: r['schedule']
+        schedule: r['schedule'],
+        tracker_data: r['tracker_data']
       }
     end
   end
