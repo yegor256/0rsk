@@ -51,4 +51,55 @@ class Rsk::TasksTest < TestCase
     tasks.create
     tasks.postpone(tasks.fetch[0][:id], 60 * 60)
   end
+
+  def test_postpones_without_reusing_outer_pool_in_transaction
+    pgsql = Class.new do
+      attr_reader :updated
+
+      def initialize
+        @in_transaction = false
+      end
+
+      def exec(sql, args)
+        return exec_in_transaction(sql, args) if @in_transaction
+        outer_exec(sql)
+      end
+
+      def transaction
+        @in_transaction = true
+        yield(self)
+      ensure
+        @in_transaction = false
+      end
+
+      def exec_in_transaction(sql, args)
+        case sql
+        when /DELETE FROM task WHERE id = \$1/
+          nil
+        when /SELECT schedule FROM plan WHERE id = \$1 AND part = \$2/
+          [{ 'schedule' => '01-01-2001' }]
+        when /UPDATE plan SET schedule = \$3 WHERE id = \$1 AND part = \$2/
+          @updated = args
+          nil
+        else
+          raise "Unexpected transaction SQL: #{sql}"
+        end
+      end
+
+      def outer_exec(sql)
+        case sql
+        when /SELECT project\.\* FROM project/
+          [{ 'login' => 'jeff' }]
+        when /SELECT plan\.\* FROM plan JOIN task/
+          [{ 'id' => '7', 'part' => '11', 'project' => '13' }]
+        else
+          raise "Unexpected outer SQL: #{sql}"
+        end
+      end
+    end.new
+    tasks = Rsk::Tasks.new(pgsql, 'jeff')
+    tasks.postpone(5, 0)
+    assert_equal(['7', '11'], pgsql.updated[0..1])
+    assert_match(/^\d{2}-\d{2}-\d{4}$/, pgsql.updated[2])
+  end
 end
