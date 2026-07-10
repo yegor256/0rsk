@@ -5,28 +5,29 @@
 
 ENV['RACK_ENV'] = 'test'
 
-require 'simplecov'
-require 'simplecov-cobertura'
-unless SimpleCov.running || ENV['PICKS']
-  SimpleCov.command_name('test')
-  SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
-    [
-      SimpleCov::Formatter::HTMLFormatter,
-      SimpleCov::Formatter::CoberturaFormatter
-    ]
-  )
-  SimpleCov.minimum_coverage(40)
-  SimpleCov.minimum_coverage_by_file(10)
-  SimpleCov.start do
-    add_filter 'test/'
-    add_filter 'vendor/'
-    add_filter 'target/'
-    track_files 'front/**.rb'
-    track_files 'objects/**.rb'
-    track_files '0rsk.rb'
+if ARGV.include?('--coverage') || ENV['PICKS']
+  require 'simplecov'
+  require 'simplecov-cobertura'
+  unless SimpleCov.running
+    SimpleCov.command_name('test')
+    SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
+      [
+        SimpleCov::Formatter::HTMLFormatter,
+        SimpleCov::Formatter::CoberturaFormatter
+      ]
+    )
+    SimpleCov.minimum_coverage(40)
+    SimpleCov.minimum_coverage_by_file(10)
+    SimpleCov.start do
+      add_filter 'test/'
+      add_filter 'vendor/'
+      add_filter 'target/'
+      track_files 'front/**.rb'
+      track_files 'objects/**.rb'
+      track_files '0rsk.rb'
+    end
   end
 end
-
 require 'minitest/autorun'
 require 'minitest/manual_plugins'
 require 'minitest/reporters'
