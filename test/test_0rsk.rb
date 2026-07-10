@@ -61,7 +61,12 @@ class Rsk::AppTest < TestCase
       '/causes.json',
       '/risks.json',
       '/effects.json',
-      '/plans.json'
+      '/plans.json',
+      '/ranked.csv',
+      '/ranked.json',
+      '/causes.csv',
+      '/risks.csv',
+      '/effects.csv'
     ]
     pages.each do |p|
       get(p)
