@@ -51,4 +51,31 @@ class Rsk::TasksTest < TestCase
     tasks.create
     tasks.postpone(tasks.fetch[0][:id], 60 * 60)
   end
+
+  def test_postpones_using_transaction_connection
+    queries = []
+    transaction = Object.new
+    transaction.define_singleton_method(:exec) do |query, _params|
+      queries << query
+      query.start_with?('SELECT schedule') ? [{ 'schedule' => '01-01-2026' }] : []
+    end
+    calls = 0
+    active = false
+    pgsql = Object.new
+    pgsql.define_singleton_method(:exec) do |query, _params|
+      raise(RuntimeError, 'Pool connection checked out inside transaction') if active
+      calls += 1
+      Array(query).join.include?('SELECT project.*') ? [{ 'login' => 'tester' }] :
+        [{ 'project' => '1', 'id' => '2', 'part' => '3' }]
+    end
+    pgsql.define_singleton_method(:transaction) do |&block|
+      active = true
+      block.call(transaction)
+    ensure
+      active = false
+    end
+    Rsk::Tasks.new(pgsql, 'tester').postpone(4, 60)
+    assert_equal(2, calls)
+    assert_equal(3, queries.size)
+  end
 end
