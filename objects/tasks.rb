@@ -35,9 +35,15 @@ class Rsk::Tasks
     row = plan(id)
     @pgsql.transaction do |t|
       t.exec('DELETE FROM task WHERE id = $1', [id])
-      plan = Rsk::Plans.new(@pgsql, Integer(row['project'] || 0)).get(Integer(row['id']), Integer(row['part']))
-      raise(Rsk::Urror, "Can't postpone plan ##{row['id']}") if /^[a-z]+$/.match?(plan.schedule)
-      plan.reschedule((Time.now + seconds).strftime('%d-%m-%Y'))
+      schedule = t.exec(
+        'SELECT schedule FROM plan WHERE id = $1 AND part = $2',
+        [row['id'], row['part']]
+      )[0]['schedule']
+      raise(Rsk::Urror, "Can't postpone plan ##{row['id']}") if /^[a-z]+$/.match?(schedule)
+      t.exec(
+        'UPDATE plan SET schedule = $3 WHERE id = $1 AND part = $2',
+        [row['id'], row['part'], (Time.now + seconds).strftime('%d-%m-%Y')]
+      )
     end
   end
 
