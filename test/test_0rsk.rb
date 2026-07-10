@@ -32,7 +32,7 @@ class Rsk::AppTest < TestCase
   end
 
   def test_renders_pages
-    pages = ['/version', '/robots.txt', '/', '/js/triple.js', '/js/responses.js', '/terms']
+    pages = ['/version', '/robots.txt', '/', '/js/triple.js', '/js/responses.js', '/terms', '/dashboard']
     pages.each do |p|
       get(p)
       assert_predicate(last_response, :ok?, last_response.body)
@@ -61,7 +61,8 @@ class Rsk::AppTest < TestCase
       '/causes.json',
       '/risks.json',
       '/effects.json',
-      '/plans.json'
+      '/plans.json',
+      '/dashboard.json'
     ]
     pages.each do |p|
       get(p)
