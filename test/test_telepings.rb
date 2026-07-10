@@ -42,6 +42,58 @@ class Rsk::TelepingsTest < TestCase
     refute(telepings.required?(login))
   end
 
+  def test_required
+    assert(Rsk::Telepings.new(test_pgsql).required?("judyR#{SecureRandom.hex(8)}"))
+  end
+
+  def test_required_after_add
+    login = "judyRA#{SecureRandom.hex(8)}"
+    project = Rsk::Projects.new(test_pgsql, login).add("test#{SecureRandom.hex(8)}")
+    Rsk::Telechats.new(test_pgsql).add(SecureRandom.random_number(2_000_000_000) + 1, login)
+    eid = Rsk::Effects.new(test_pgsql, project).add('effect')
+    Rsk::Triples.new(test_pgsql, project).add(
+      Rsk::Causes.new(test_pgsql, project).add('cause'),
+      Rsk::Risks.new(test_pgsql, project).add('risk'), eid
+    )
+    plans = Rsk::Plans.new(test_pgsql, project)
+    plans.get(plans.add(eid, 'plan'), eid).reschedule((Time.now - (60 * 60)).strftime('%d-%m-%Y'))
+    Rsk::Tasks.new(test_pgsql, login).create
+    assert(Rsk::Telepings.new(test_pgsql).required?(login))
+  end
+
+  def test_fresh
+    login = "judyF#{SecureRandom.hex(8)}"
+    project = Rsk::Projects.new(test_pgsql, login).add("test#{SecureRandom.hex(8)}")
+    Rsk::Telechats.new(test_pgsql).add(SecureRandom.random_number(2_000_000_000) + 1, login)
+    eid = Rsk::Effects.new(test_pgsql, project).add('effect')
+    Rsk::Triples.new(test_pgsql, project).add(
+      Rsk::Causes.new(test_pgsql, project).add('cause'),
+      Rsk::Risks.new(test_pgsql, project).add('risk'), eid
+    )
+    plans = Rsk::Plans.new(test_pgsql, project)
+    plans.get(plans.add(eid, 'plan'), eid).reschedule((Time.now - (60 * 60)).strftime('%d-%m-%Y'))
+    Rsk::Tasks.new(test_pgsql, login).create
+    refute_empty(Rsk::Telepings.new(test_pgsql).fresh(login))
+  end
+
+  def test_fresh_after_ping
+    login = "judyFA#{SecureRandom.hex(8)}"
+    project = Rsk::Projects.new(test_pgsql, login).add("test#{SecureRandom.hex(8)}")
+    chat = SecureRandom.random_number(2_000_000_000) + 1
+    Rsk::Telechats.new(test_pgsql).add(chat, login)
+    eid = Rsk::Effects.new(test_pgsql, project).add('effect')
+    Rsk::Triples.new(test_pgsql, project).add(
+      Rsk::Causes.new(test_pgsql, project).add('cause'),
+      Rsk::Risks.new(test_pgsql, project).add('risk'), eid
+    )
+    plans = Rsk::Plans.new(test_pgsql, project)
+    plans.get(plans.add(eid, 'plan'), eid).reschedule((Time.now - (60 * 60)).strftime('%d-%m-%Y'))
+    Rsk::Tasks.new(test_pgsql, login).create
+    telepings = Rsk::Telepings.new(test_pgsql)
+    telepings.add(telepings.fresh(login)[0], chat)
+    assert_empty(telepings.fresh(login))
+  end
+
   def test_fresh_tasks_skips_orphan_ids
     login = "judyTO#{rand(99_999)}"
     project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(9999)}")
