@@ -42,13 +42,13 @@ configure do
     end
   end
   set :bind, '0.0.0.0'
+  set :server, :puma
   set :show_exceptions, false
   set :raise_errors, false
   set :dump_errors, false
   set :config, config
   set :logging, true
   set :log, Loog::REGULAR
-  set :server_settings, timeout: 25
   set :glogin, GLogin::Auth.new(
     config['github']['client_id'],
     config['github']['client_secret'],
