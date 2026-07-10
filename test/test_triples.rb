@@ -19,7 +19,7 @@ class Rsk::TriplesTest < TestCase
     cid = test_cause(project: project)
     rid = test_risk(project: project)
     eid = test_effect(project: project)
-    triples = Rsk::Triples.new(test_pgsql, project)
+    triples = Rsk::Triples.new(fake_pgsql, project)
     assert_equal(0, triples.count)
     tid = triples.add(cid, rid, eid)
     triples.add(cid, rid, eid)
@@ -34,22 +34,22 @@ class Rsk::TriplesTest < TestCase
     rid = test_risk(project: project)
     eid = test_effect(project: project)
     other = test_cause
-    triples = Rsk::Triples.new(test_pgsql, project)
+    triples = Rsk::Triples.new(fake_pgsql, project)
     assert_raises(Rsk::Urror) { triples.add(other, rid, eid) }
   end
 
   def test_fetches_with_plans
     project = test_project
-    cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
-    rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
-    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop NOW')
-    triples = Rsk::Triples.new(test_pgsql, project)
+    cid = Rsk::Causes.new(fake_pgsql, project).add('we have data')
+    rid = Rsk::Risks.new(fake_pgsql, project).add('we may lose it')
+    eid = Rsk::Effects.new(fake_pgsql, project).add('business will stop NOW')
+    triples = Rsk::Triples.new(fake_pgsql, project)
     triples.add(cid, rid, eid)
     assert_equal(1, triples.fetch(query: '+alone').count)
     assert_equal(1, triples.fetch(query: "+#{cid}").count)
     assert_equal(1, triples.fetch(query: "+#{rid}").count)
     assert_equal(1, triples.fetch(query: "+#{eid}").count)
-    plans = Rsk::Plans.new(test_pgsql, project)
+    plans = Rsk::Plans.new(fake_pgsql, project)
     plans.add(rid, 'we\'ll do "it"')
     plans.add(eid, 'and this "one" too SUPER')
     assert_equal(2, triples.fetch(query: "+#{cid}")[0][:plans].count)
