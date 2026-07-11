@@ -52,30 +52,29 @@ class Rsk::TasksTest < TestCase
     tasks.postpone(tasks.fetch[0][:id], 60 * 60)
   end
 
-  def test_postpones_using_transaction_connection
-    queries = []
-    transaction = Object.new
-    transaction.define_singleton_method(:exec) do |query, _params|
-      queries << query
-      query.start_with?('SELECT schedule') ? [{ 'schedule' => '01-01-2026' }] : []
-    end
-    calls = 0
-    active = false
-    pgsql = Object.new
-    pgsql.define_singleton_method(:exec) do |query, _params|
-      raise(RuntimeError, 'Pool connection checked out inside transaction') if active
-      calls += 1
-      Array(query).join.include?('SELECT project.*') ? [{ 'login' => 'tester' }] :
-        [{ 'project' => '1', 'id' => '2', 'part' => '3' }]
-    end
-    pgsql.define_singleton_method(:transaction) do |&block|
-      active = true
-      block.call(transaction)
-    ensure
-      active = false
-    end
-    Rsk::Tasks.new(pgsql, 'tester').postpone(4, 60)
-    assert_equal(2, calls)
-    assert_equal(3, queries.size)
+  def test_postpones_tasks_with_one_connection
+    pgsql = Pgtk::Pool.new(
+      Pgtk::Wire::Yaml.new(File.join(__dir__, '../target/pgsql-config.yml')),
+      max: 1,
+      timeout: 0.1,
+      log: Loog::NULL
+    )
+    pgsql.start!
+    login = "bobbyX#{rand(99_999)}"
+    project = Rsk::Projects.new(pgsql, login).add("test#{rand(99_999)}")
+    eid = Rsk::Effects.new(pgsql, project).add('business will stop')
+    Rsk::Triples.new(pgsql, project).add(
+      Rsk::Causes.new(pgsql, project).add('we have data'),
+      Rsk::Risks.new(pgsql, project).add('we may lose it'), eid
+    )
+    plans = Rsk::Plans.new(pgsql, project)
+    plan = plans.get(plans.add(eid, 'solve it!'), eid)
+    schedule = (Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y')
+    plan.reschedule(schedule)
+    tasks = Rsk::Tasks.new(pgsql, login)
+    tasks.create
+    tasks.postpone(tasks.fetch[0][:id], 60 * 60)
+    assert_equal(0, tasks.count)
+    refute_equal(schedule, plan.schedule)
   end
 end
