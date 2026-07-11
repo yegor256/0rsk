@@ -11,34 +11,9 @@
     %meta{name: 'description', content: 'Online Risk Manager: identify your risks in Cause+Risk+Effect format and let us manage them'}
     %link{href: 'https://cdn.jsdelivr.net/gh/yegor256/tacit@gh-pages/tacit-css.min.css', rel: 'stylesheet'}
     %link{href: 'https://www.yegor256.com/css/icons.css', rel: 'stylesheet'}
+    %link{href: '/css/style.css', rel: 'stylesheet'}
     %link{rel: 'shortcut icon', href: '/favicon.svg', type: 'image/svg+xml'}
     %script{src: 'https://code.jquery.com/jquery-3.7.1.min.js'}
-    :css
-      .item { margin-right: 1em; }
-      .logo { width: 64px; height: 64px; }
-      .small { font-size: .8em; line-height: 1.4em; }
-      .gray { color: gray; }
-      .red { color: #C5283D; }
-      .green { color: #0B7A75; }
-      .right { text-align: right; }
-      .up { content:url('/up.svg'); width: 1em; height:1em; }
-      .down { content:url('/down.svg'); width: 1em; height:1em; }
-      .dimmed { background-color: #eee; }
-      @media (max-width: 768px) {
-        table { font-size: .8em; }
-        nav ul { flex-direction: column; }
-        nav li { display: block; margin: .3em 0; }
-        input[type="text"] { width: 100%; box-sizing: border-box; }
-        select { width: 100%; }
-        .logo { width: 48px; height: 48px; }
-        .item { margin-right: .5em; }
-      }
-      @media (prefers-color-scheme: dark) {
-        body { background: #1a1a2e; color: #e0e0e0; }
-        a { color: #80bfff; }
-        input, select, textarea { background: #16213e; color: #e0e0e0; border-color: #0f3460; }
-        .dimmed { background-color: #16213e; }
-      }
   %body
     %section
       %header
@@ -71,11 +46,11 @@
                     %span{class: tasks_count >= Rsk::Tasks::THRESHOLD ? 'red' : ''}
                       = "(#{tasks_count})"
               %li
-                %form{action: iri.cut('/logout'), method: 'POST', style: 'display:inline'}
-                  %button{type: 'submit', style: 'background:none;border:none;padding:0;color:inherit;font:inherit;cursor:pointer'}
+                %form.inline-form{action: iri.cut('/logout'), method: 'POST'}
+                  %button.plain-button{type: 'submit'}
                     Logout
         - if defined?(flash_msg) && !flash_msg.empty?
-          %p{style: 'background-color:' + flash_color + ';color:white;padding:.1em .5em;border-radius:4px;width:100%;'}
+          %p{class: "flash-msg #{flash_color == 'darkred' ? 'flash-error' : 'flash-success'}"}
             = flash_msg
       %article
         = yield
@@ -96,7 +71,7 @@
                 %li
                   %a{href: iri.cut('/plans')} Plans
               %li
-                %img{src: iri.cut('/telegram-logo.svg'), alt: 'Telegram', style: 'height: 1.1em; vertical-align: middle;'}
+                %img.telegram-icon{src: iri.cut('/telegram-logo.svg'), alt: 'Telegram'}
                 %a{href: 'https://t.me/zerorsk_bot'} Talk to me
         %nav
           %ul

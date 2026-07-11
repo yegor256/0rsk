@@ -20,6 +20,13 @@ function on_mnemo(id) {
   });
 }
 
+function on_detach_link() {
+  "use strict";
+  $(".detach-link").on("click", function() {
+    return confirm("Are sure you want to detach plan #" + $(this).data("plan") + "?");
+  });
+}
+
 $(function() {
   "use strict";
   on_schedule("asap", function(today) { return dateFns.addDays(today, 2); });
@@ -32,4 +39,5 @@ $(function() {
   on_mnemo("monthly");
   on_mnemo("quarterly");
   on_mnemo("annually");
+  on_detach_link();
 });
