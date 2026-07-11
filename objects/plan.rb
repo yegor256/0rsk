@@ -33,15 +33,15 @@ class Rsk::Plan
     end
   end
 
-  def schedule
-    @pgsql.exec('SELECT schedule FROM plan WHERE id = $1 AND part = $2', [@id, @part])[0]['schedule']
+  def schedule(con: nil)
+    (con || @pgsql).exec('SELECT schedule FROM plan WHERE id = $1 AND part = $2', [@id, @part])[0]['schedule']
   end
 
-  def reschedule(text)
+  def reschedule(text, con: nil)
     unless /^(daily|weekly|biweekly|monthly|quarterly|annually|\d{2}-\d{2}-\d{4})$/.match?(text)
       raise(Rsk::Urror, "Schedule can either be a word or a date DD-MM-YYYY: #{text.inspect}")
     end
-    @pgsql.exec('UPDATE plan SET schedule = $3 WHERE id = $1 AND part = $2', [@id, @part, text])
+    (con || @pgsql).exec('UPDATE plan SET schedule = $3 WHERE id = $1 AND part = $2', [@id, @part, text])
   end
 
   private
