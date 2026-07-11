@@ -4,6 +4,16 @@
 # SPDX-License-Identifier: MIT
 
 before '/*' do
+  response.headers['Content-Security-Policy'] = [
+    "default-src 'self'",
+    "script-src 'self' https://code.jquery.com https://cdnjs.cloudflare.com",
+    "script-src-attr 'unsafe-inline'",
+    "style-src 'self' https://cdn.jsdelivr.net https://www.yegor256.com",
+    "img-src 'self' https://img.shields.io https://www.sixnines.io",
+    "font-src 'self' https://www.yegor256.com",
+    "base-uri 'self'",
+    "form-action 'self'"
+  ].join('; ')
   @locals = { http_start: Time.now, ver: Rsk::VERSION, login_link: settings.glogin.login_uri, request_ip: request.ip }
   response.set_cookie('glogin', params[:glogin]) if params[:glogin]
   if request.cookies['glogin']
