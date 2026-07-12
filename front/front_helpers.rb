@@ -4,6 +4,10 @@
 # SPDX-License-Identifier: MIT
 
 helpers do
+  def csrf_token
+    Rack::Protection::AuthenticityToken.token(session)
+  end
+
   def part(prefix, id)
     "<a href='#{iri.cut('/ranked').add(q: "+#{id}")}'><code>#{prefix}#{id}</code></a>"
   end

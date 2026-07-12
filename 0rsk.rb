@@ -13,7 +13,9 @@ require 'json'
 require 'loog'
 require 'pgtk'
 require 'pgtk/pool'
+require 'rack/protection'
 require 'relative_time'
+require 'securerandom'
 require 'sentry-ruby'
 require 'sinatra'
 require 'telebot'
@@ -41,6 +43,10 @@ configure do
       c.release = Rsk::VERSION
     end
   end
+  secret = config.dig('github', 'encryption_secret').to_s
+  secret = SecureRandom.hex(32) if secret.empty?
+  use Rack::Session::Cookie, secret: secret, same_site: :lax, httponly: true
+  use Rack::Protection::AuthenticityToken
   set :bind, '0.0.0.0'
   set :show_exceptions, false
   set :raise_errors, false

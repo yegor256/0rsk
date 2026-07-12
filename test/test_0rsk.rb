@@ -71,9 +71,11 @@ class Rsk::AppTest < TestCase
 
   def test_add
     login("jeff09#{rand(99_999)}")
+    token = authenticity_token_from('/triple')
     post(
       '/triple/save',
       [
+        "authenticity_token=#{Rack::Utils.escape(token)}",
         'ctext=test+cause',
         'rtext=test+risk',
         'probability=5',
@@ -92,7 +94,7 @@ class Rsk::AppTest < TestCase
 
   def test_logout
     login('bob')
-    get('/logout')
+    post('/logout', "authenticity_token=#{Rack::Utils.escape(authenticity_token_from('/projects'))}")
     assert_equal(302, last_response.status, last_response.body)
     assert(last_response.location.end_with?('/'))
     cookie = last_response.headers['Set-Cookie']
@@ -125,6 +127,42 @@ class Rsk::AppTest < TestCase
     assert_includes(cookie.to_s, 'deleted')
   end
 
+  def test_rejects_project_creation_without_csrf_token
+    login("creator#{rand(99_999)}")
+    post('/projects/create', 'title=test')
+    assert_equal(403, last_response.status, last_response.body)
+  end
+
+  def test_rejects_response_addition_without_csrf_token
+    pid = login("responder#{rand(99_999)}")
+    tid = Rsk::Triples.new(test_pgsql, pid).add(
+      Rsk::Causes.new(test_pgsql, pid).add('test cause'),
+      Rsk::Risks.new(test_pgsql, pid).add('test risk'),
+      Rsk::Effects.new(test_pgsql, pid).add('test effect')
+    )
+    post('/responses/add', "id=#{tid}&strategy=1&plan=test&schedule=tomorrow")
+    assert_equal(403, last_response.status, last_response.body)
+  end
+
+  def test_rejects_triple_save_without_csrf_token
+    login("adder#{rand(99_999)}")
+    post(
+      '/triple/save',
+      [
+        'ctext=test+cause',
+        'rtext=test+risk',
+        'probability=5',
+        'emoji=A',
+        'etext=test+effect',
+        'impact=5',
+        'cid=',
+        'rid=',
+        'eid='
+      ].join('&')
+    )
+    assert_equal(403, last_response.status, last_response.body)
+  end
+
   def test_telegram_listing_plain_text
     listing = Object.new.extend(Rsk::Telegram).listing(
       [
@@ -154,5 +192,14 @@ class Rsk::AppTest < TestCase
     pid = Rsk::Projects.new(test_pgsql, name).add('test')
     set_cookie("0rsk-project=#{pid}")
     pid
+  end
+
+  def authenticity_token_from(path)
+    get(path)
+    assert_equal(200, last_response.status, last_response.body)
+    match = last_response.body.match(/<input[^>]*name=['"]authenticity_token['"][^>]*value=['"]([^'"]+)['"][^>]*>/)
+    match ||= last_response.body.match(/<input[^>]*value=['"]([^'"]+)['"][^>]*name=['"]authenticity_token['"][^>]*>/)
+    refute_nil(match, last_response.body)
+    match[1] || match[2]
   end
 end

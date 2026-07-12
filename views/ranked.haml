@@ -45,6 +45,7 @@
           = "#{r[:plans].count} plan#{r[:plans].count == 1 ? '' : 's'}"
           = '&darr;'
       %form{action: iri.cut('/ranked/delete').add(id: r[:id]), method: 'POST', style: 'display:inline', onsubmit: "return confirm('Are sure you want to delete triple ##{r[:id]}?')"}
+        %input{type: 'hidden', name: 'authenticity_token', value: csrf_token}
         %button{type: 'submit', style: 'background:none;border:none;padding:0;color:inherit;font:inherit;cursor:pointer'}
           Delete
       - unless r[:plans].empty?
