@@ -80,6 +80,7 @@ get '/triple' do
 end
 
 post '/triple/save' do
+  verify_csrf!
   ctext = params[:ctext].strip
   rtext = params[:rtext].strip
   etext = params[:etext].strip

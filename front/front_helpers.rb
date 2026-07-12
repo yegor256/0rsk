@@ -5,7 +5,17 @@
 
 helpers do
   def csrf_token
-    Rack::Protection::AuthenticityToken.token(session)
+    @csrf_token ||= begin
+      token = request.cookies['csrf-token']
+      token = SecureRandom.hex(32) if token.to_s.empty?
+      response.set_cookie('csrf-token', value: token, same_site: :lax, httponly: true)
+      token
+    end
+  end
+
+  def verify_csrf!
+    token = params[:authenticity_token].to_s
+    halt(403, 'Invalid CSRF token') if token.empty? || token != request.cookies['csrf-token'].to_s
   end
 
   def part(prefix, id)

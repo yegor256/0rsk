@@ -13,8 +13,6 @@ require 'json'
 require 'loog'
 require 'pgtk'
 require 'pgtk/pool'
-require 'rack/protection'
-require 'rack/session/cookie'
 require 'relative_time'
 require 'securerandom'
 require 'sentry-ruby'
@@ -44,10 +42,6 @@ configure do
       c.release = Rsk::VERSION
     end
   end
-  secret = config.dig('github', 'encryption_secret').to_s
-  secret = SecureRandom.hex(32) if secret.empty?
-  use Rack::Session::Cookie, secret: secret, same_site: :lax, httponly: true
-  use Rack::Protection::AuthenticityToken
   set :bind, '0.0.0.0'
   set :show_exceptions, false
   set :raise_errors, false
@@ -96,6 +90,7 @@ get '/ranked/delete' do
 end
 
 post '/ranked/delete' do
+  verify_csrf!
   id = params[:id]
   triples.delete(id)
   flash('/ranked', "The ranked triple ##{id} deleted")
@@ -112,6 +107,7 @@ get '/projects/select' do
 end
 
 post '/projects/create' do
+  verify_csrf!
   title = params[:title]
   pid = projects.add(title)
   flash("/projects/select?id=#{pid}", "A new project ##{pid} selected")
@@ -124,6 +120,7 @@ get '/projects/delete' do
 end
 
 post '/projects/delete' do
+  verify_csrf!
   pid = params[:id]
   projects.delete(pid)
   flash('/projects', "The project ##{pid} has been deleted")
@@ -136,6 +133,7 @@ get '/project/{id}' do
 end
 
 post '/project/{id}/tracker/add' do
+  verify_csrf!
   pid = params[:id]
   raise Rsk::Urror, "Project ##{pid} not found" unless projects.exists?(pid)
   trackers(pid: pid).add(params[:repo], params[:token])
@@ -143,6 +141,7 @@ post '/project/{id}/tracker/add' do
 end
 
 post '/project/{id}/tracker/delete' do
+  verify_csrf!
   pid = params[:id]
   tid = Integer(params[:tid], 10)
   raise Rsk::Urror, "Project ##{pid} not found" unless projects.exists?(pid)
@@ -162,6 +161,7 @@ get '/responses' do
 end
 
 post '/responses/add' do
+  verify_csrf!
   id = Integer(params[:id])
   part = Integer(params[:strategy])
   pid = plans.add(part, params[:plan])
