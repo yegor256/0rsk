@@ -66,9 +66,7 @@ class Rsk::TasksTest < TestCase
     plans.get(pid, eid).reschedule((Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y'))
     test_pgsql.exec('INSERT INTO task (plan) VALUES ($1)', [pid])
     tasks = Rsk::Tasks.new(test_pgsql, login)
-    pipeline = Object.new
-    pipeline.define_singleton_method(:fetch) { [pid] }
-    Rsk::Pipeline.stub(:new, ->(*_) { pipeline }) { tasks.create }
+    tasks.create
     assert_equal(1, Integer(test_pgsql.exec('SELECT COUNT(*) AS c FROM task WHERE plan = $1', [pid])[0]['c']))
   end
 end
