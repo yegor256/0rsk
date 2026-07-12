@@ -94,7 +94,7 @@ class Rsk::AppTest < TestCase
 
   def test_logout
     login('bob')
-    post('/logout', "authenticity_token=#{Rack::Utils.escape(authenticity_token_from('/projects'))}")
+    get('/logout')
     assert_equal(302, last_response.status, last_response.body)
     assert(last_response.location.end_with?('/'))
     cookie = last_response.headers['Set-Cookie']
