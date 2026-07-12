@@ -51,4 +51,24 @@ class Rsk::TasksTest < TestCase
     tasks.create
     tasks.postpone(tasks.fetch[0][:id], 60 * 60)
   end
+
+  def test_ignores_duplicate_plan_insertions
+    login = "bobbyD#{rand(99_999)}"
+    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(99_999)}")
+    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
+    Rsk::Triples.new(test_pgsql, project).add(
+      Rsk::Causes.new(test_pgsql, project).add('we have data'),
+      Rsk::Risks.new(test_pgsql, project).add('we may lose it'),
+      eid
+    )
+    plans = Rsk::Plans.new(test_pgsql, project)
+    pid = plans.add(eid, 'solve it!')
+    plans.get(pid, eid).reschedule((Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y'))
+    test_pgsql.exec('INSERT INTO task (plan) VALUES ($1)', [pid])
+    tasks = Rsk::Tasks.new(test_pgsql, login)
+    pipeline = Object.new
+    pipeline.define_singleton_method(:fetch) { [pid] }
+    Rsk::Pipeline.stub(:new, pipeline) { tasks.create }
+    assert_equal(1, Integer(test_pgsql.exec('SELECT COUNT(*) AS c FROM task WHERE plan = $1', [pid])[0]['c']))
+  end
 end
