@@ -25,6 +25,7 @@
 
 %form{method: 'POST', action: iri.cut('/responses/add')}
   %fieldset
+    %input{type: 'hidden', name: 'authenticity_token', value: csrf_token}
     %input{type: 'hidden', name: 'id', value: triple[:id]}
     %label Strategy:
     %select{id: 'strategy', name: 'strategy', tabindex: 1}

@@ -31,11 +31,13 @@
         %td= t[:created].strftime('%Y-%m-%d')
         %td
           %form{method: 'POST', action: "/project/#{pid}/tracker/delete"}
+            %input{type: 'hidden', name: 'authenticity_token', value: csrf_token}
             %input{type: 'hidden', name: 'tid', value: t[:id]}
             %input{type: 'submit', value: 'Delete'}
 
 %form{method: 'POST', action: "/project/#{pid}/tracker/add"}
   %fieldset
+    %input{type: 'hidden', name: 'authenticity_token', value: csrf_token}
     %legend Add a new tracker
     %p
       %label
