@@ -20,13 +20,13 @@ class Rsk::ProjectsTest < TestCase
 
   def test_deletes_with_triple
     projects = Rsk::Projects.new(test_pgsql, 'jeff094')
-    project_id = projects.add("testfs#{rand(99_999)}")
-    Rsk::Triples.new(test_pgsql, project_id).add(
-      Rsk::Causes.new(test_pgsql, project_id).add('we have data'),
-      Rsk::Risks.new(test_pgsql, project_id).add('we may lose it'),
-      Rsk::Effects.new(test_pgsql, project_id).add('business will stop NOW')
+    pid = projects.add("testfs#{rand(99_999)}")
+    Rsk::Triples.new(test_pgsql, pid).add(
+      Rsk::Causes.new(test_pgsql, pid).add('we have data'),
+      Rsk::Risks.new(test_pgsql, pid).add('we may lose it'),
+      Rsk::Effects.new(test_pgsql, pid).add('business will stop NOW')
     )
-    projects.delete(project_id)
-    assert_empty(test_pgsql.exec('SELECT id FROM project WHERE id = $1', [project_id]).to_a)
+    projects.delete(pid)
+    assert_empty(test_pgsql.exec('SELECT id FROM project WHERE id = $1', [pid]).to_a)
   end
 end
