@@ -149,10 +149,12 @@ class Rsk::AppTest < TestCase
 
   private
 
-  def login(name)
+  def login(name = "u#{SecureRandom.hex(8)}")
     set_cookie("glogin=#{name}")
     pid = Rsk::Projects.new(test_pgsql, name).add('test')
     set_cookie("0rsk-project=#{pid}")
     pid
   end
+
+  alias login_with_project login
 end
