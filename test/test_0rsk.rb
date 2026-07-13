@@ -35,7 +35,7 @@ class Rsk::AppTest < TestCase
     pages = ['/version', '/robots.txt', '/', '/js/triple.js', '/js/responses.js', '/terms']
     pages.each do |p|
       get(p)
-      assert_page_response_status(url: p, reason_keyword: :ok)
+      assert_status(url: p, reason_keyword: :ok)
     end
   end
 
@@ -156,7 +156,7 @@ class Rsk::AppTest < TestCase
     pid
   end
 
-  def assert_page_response_status(url:, reason_keyword:)
+  def assert_status(url:, reason_keyword:)
     expected = Rack::Utils.status_code(reason_keyword)
     assert_equal(
       expected,
