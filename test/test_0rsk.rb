@@ -69,6 +69,18 @@ class Rsk::AppTest < TestCase
     end
   end
 
+  def test_forbids_anonymous_json_pages
+    [
+      '/causes.json',
+      '/risks.json',
+      '/effects.json',
+      '/plans.json'
+    ].each do |p|
+      get(p)
+      assert_equal(403, last_response.status, "#{p} fails: #{last_response.body}")
+    end
+  end
+
   def test_add
     login("jeff09#{rand(99_999)}")
     post(
