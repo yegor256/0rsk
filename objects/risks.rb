@@ -65,7 +65,7 @@ class Rsk::Risks
         'GROUP BY risk.id, part.id',
         'ORDER BY rank DESC'
       ],
-      [@project, "%#{query.to_s.downcase.strip}%"]
+      [@project, "%#{query.to_s.downcase.strip.gsub(/[%_]/, '\\\\\0')}%"]
     )
   end
 end
