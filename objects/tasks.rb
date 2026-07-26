@@ -19,7 +19,7 @@ class Rsk::Tasks
   def create
     Rsk::Pipeline.new(@pgsql, @login).fetch.each do |p|
       next if count >= THRESHOLD
-      @pgsql.exec('INSERT INTO task (plan) VALUES ($1)', [p])
+      @pgsql.exec('INSERT INTO task (plan) VALUES ($1) ON CONFLICT (plan) DO NOTHING', [p])
     end
   end
 
