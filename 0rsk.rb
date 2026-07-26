@@ -231,6 +231,11 @@ get '/terms' do
   haml :terms, layout: :layout, locals: merged(title: '/terms')
 end
 
+get '/templates.json' do
+  content_type 'application/json'
+  YAML.safe_load(File.read(File.join(__dir__, 'seeds/risks.yml'))).to_json
+end
+
 module Rsk::App
   def identity
     redirect('/') unless @locals[:user]
