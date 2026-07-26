@@ -39,6 +39,7 @@ get '/logout' do
 end
 
 post '/logout' do
+  verify_csrf!
   response.delete_cookie('glogin')
   flash('/', 'You have been logged out')
 end

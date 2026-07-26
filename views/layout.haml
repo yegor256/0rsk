@@ -72,6 +72,7 @@
                       = "(#{tasks_count})"
               %li
                 %form{action: iri.cut('/logout'), method: 'POST', style: 'display:inline'}
+                  %input{type: 'hidden', name: 'authenticity_token', value: csrf_token}
                   %button{type: 'submit', style: 'background:none;border:none;padding:0;color:inherit;font:inherit;cursor:pointer'}
                     Logout
         - if defined?(flash_msg) && !flash_msg.empty?
