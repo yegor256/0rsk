@@ -35,7 +35,7 @@ class Rsk::AppTest < TestCase
     pages = ['/version', '/robots.txt', '/', '/js/triple.js', '/js/responses.js', '/terms']
     pages.each do |p|
       get(p)
-      assert_predicate(last_response, :ok?, last_response.body)
+      assert_status(url: p, reason_keyword: :ok)
     end
   end
 
@@ -154,5 +154,14 @@ class Rsk::AppTest < TestCase
     pid = Rsk::Projects.new(test_pgsql, name).add('test')
     set_cookie("0rsk-project=#{pid}")
     pid
+  end
+
+  def assert_status(url:, reason_keyword:)
+    expected = Rack::Utils.status_code(reason_keyword)
+    assert_equal(
+      expected,
+      last_response.status,
+      "Response status of #{url} expected #{expected} #{reason_keyword}, got #{last_response.status} #{Rack::Utils::HTTP_STATUS_CODES[last_response.status]}"
+    )
   end
 end
