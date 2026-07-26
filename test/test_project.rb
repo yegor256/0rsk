@@ -15,8 +15,8 @@ class Rsk::ProjectTest < TestCase
     assert_equal(
       login,
       Rsk::Project.new(
-        test_pgsql,
-        Rsk::Projects.new(test_pgsql, login).add("t#{SecureRandom.hex(8)}")
+        fake_pgsql,
+        Rsk::Projects.new(fake_pgsql, login).add("t#{SecureRandom.hex(8)}")
       ).login
     )
   end

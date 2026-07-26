@@ -45,43 +45,43 @@ require_relative '../objects/risks'
 require_relative '../objects/triples'
 
 class TestCase < Minitest::Test
-  def test_pgsql
+  def fake_pgsql
     @@mtx ||= Mutex.new
     @@mtx.synchronize do
-      @@test_pgsql ||= Pgtk::Pool.new(
+      @@fake_pgsql ||= Pgtk::Pool.new(
         Pgtk::Wire::Yaml.new(File.join(__dir__, '../target/pgsql-config.yml')),
         log: Loog::NULL
       )
-      @@test_pgsql.start!
+      @@fake_pgsql.start!
     end
-    @@test_pgsql
+    @@fake_pgsql
     # rubocop:enable Style/ClassVars
   end
 
   private
 
   def test_project(login: "u#{SecureRandom.hex(8)}", title: "t#{SecureRandom.hex(8)}")
-    Rsk::Projects.new(test_pgsql, login).add(title)
+    Rsk::Projects.new(fake_pgsql, login).add(title)
   end
 
   def test_risk(project: test_project, text: "risk #{SecureRandom.hex(8)}")
-    Rsk::Risks.new(test_pgsql, project).add(text)
+    Rsk::Risks.new(fake_pgsql, project).add(text)
   end
 
   def test_cause(project: test_project, text: "cause #{SecureRandom.hex(8)}")
-    Rsk::Causes.new(test_pgsql, project).add(text)
+    Rsk::Causes.new(fake_pgsql, project).add(text)
   end
 
   def test_effect(project: test_project, text: "effect #{SecureRandom.hex(8)}")
-    Rsk::Effects.new(test_pgsql, project).add(text)
+    Rsk::Effects.new(fake_pgsql, project).add(text)
   end
 
   def test_plan(project: test_project, subject: test_risk(project: project), text: "plan #{SecureRandom.hex(8)}")
-    Rsk::Plans.new(test_pgsql, project).add(subject, text)
+    Rsk::Plans.new(fake_pgsql, project).add(subject, text)
   end
 
   def test_triple(project: test_project)
-    Rsk::Triples.new(test_pgsql, project).add(
+    Rsk::Triples.new(fake_pgsql, project).add(
       test_cause(project: project),
       test_risk(project: project),
       test_effect(project: project)
