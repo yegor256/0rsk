@@ -10,7 +10,7 @@
 
 %p{style: 'font-size: 1.4em;'}
   - emojis.each do |e|
-    %a{href: iri.cut('/causes').add(q: e)}= e
+    %a{href: iri.cut('/causes').add(q: e), title: "Filter by #{e}"}= e
 
 - if causes.empty?
   - if query.empty?
@@ -45,7 +45,7 @@
           %td
             = part('C', r[:id])
           %td
-            %a{href: iri.cut('/causes').add(q: r[:emoji])}<
+            %a{href: iri.cut('/causes').add(q: r[:emoji]), title: 'Filter'}<
               &= r[:emoji]
           %td
             &= r[:text]
