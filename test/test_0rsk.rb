@@ -13,17 +13,6 @@ require_relative '../objects/risks'
 require_relative '../objects/rsk'
 require_relative '../objects/triples'
 
-module Rack
-  module Test
-    class Session
-      def defaults
-        { 'REMOTE_ADDR' => '127.0.0.1', 'HTTPS' => 'on' }.merge(headers_for_env)
-      end
-      alias default_env defaults
-    end
-  end
-end
-
 class Rsk::AppTest < TestCase
   include Rack::Test::Methods
 
@@ -88,6 +77,19 @@ class Rsk::AppTest < TestCase
     assert_equal(302, last_response.status, last_response.body)
     get('/ranked')
     assert_equal(200, last_response.status, last_response.body)
+  end
+
+  def test_handles_github_callback_errors_gracefully
+    fake_auth = Object.new
+    fake_auth.define_singleton_method(:login_uri) { '/github/login' }
+    fake_auth.define_singleton_method(:user) { |_code| raise Timeout::Error, 'github timeout' }
+    Sinatra::Application.settings.stub(:glogin, fake_auth) do
+      get('/github-callback?code=abc')
+    end
+    assert_equal(302, last_response.status, last_response.body)
+    assert(last_response.location.end_with?('/'), last_response.location)
+    refute_includes(last_response.headers['Set-Cookie'].to_s, 'glogin=', last_response.body)
+    assert_includes(last_response.headers['Set-Cookie'].to_s, 'flash_msg=', last_response.body)
   end
 
   def test_logout

@@ -29,11 +29,23 @@ end
 
 configure do
   set :haml, format: :xhtml
-  config = { 'github' => { 'client_id' => '?', 'client_secret' => '?', 'encryption_secret' => '' }, 'sentry' => '' }
+  config = {
+    'github' => {
+      'client_id' => '?',
+      'client_secret' => '?',
+      'encryption_secret' => '',
+      'redirect_uri' => 'https://www.0rsk.com/github-callback'
+    },
+    'sentry' => ''
+  }
   cfg = File.join(File.dirname(__FILE__), 'config.yml')
   if File.exist?(cfg)
     loaded = YAML.safe_load(File.open(cfg))
-    config.merge!(loaded) if loaded.is_a?(Hash)
+    if loaded.is_a?(Hash)
+      github = loaded['github']
+      config['github'].merge!(github) if github.is_a?(Hash)
+      config.merge!(loaded.reject { |key, _value| key == 'github' })
+    end
   end
   if config['sentry'] && !config['sentry'].empty?
     Sentry.init do |c|
@@ -52,7 +64,7 @@ configure do
   set :glogin, GLogin::Auth.new(
     config['github']['client_id'],
     config['github']['client_secret'],
-    'https://www.0rsk.com/github-callback'
+    config['github']['redirect_uri']
   )
   if File.exist?('target/pgsql-config.yml')
     set :pgsql, Pgtk::Pool.new(Pgtk::Wire::Yaml.new(File.join(__dir__, 'target/pgsql-config.yml')), log: settings.log)
