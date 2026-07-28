@@ -13,17 +13,6 @@ require_relative '../objects/risks'
 require_relative '../objects/rsk'
 require_relative '../objects/triples'
 
-module Rack
-  module Test
-    class Session
-      def defaults
-        { 'REMOTE_ADDR' => '127.0.0.1', 'HTTPS' => 'on' }.merge(headers_for_env)
-      end
-      alias default_env defaults
-    end
-  end
-end
-
 class Rsk::AppTest < TestCase
   include Rack::Test::Methods
 
@@ -67,6 +56,13 @@ class Rsk::AppTest < TestCase
       get(p)
       assert_equal(200, last_response.status, "#{p} fails: #{last_response.body}")
     end
+  end
+
+  def test_uses_default_github_redirect_uri
+    assert_equal(
+      'https://www.0rsk.com/github-callback',
+      Sinatra::Application.settings.config['github']['redirect_uri']
+    )
   end
 
   def test_add

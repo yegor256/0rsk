@@ -66,7 +66,9 @@ cp config.sample.yml config.yml
 ```
 
 Without `config.yml`, the app still starts, using placeholder GitHub
-credentials.
+credentials. Set `github.redirect_uri` to match the callback URL of
+your OAuth app. In local development that is typically
+`http://127.0.0.1:3000/github-callback`.
 
 ### Quick start
 
