@@ -69,6 +69,13 @@ class Rsk::AppTest < TestCase
     end
   end
 
+  def test_uses_default_github_redirect_uri
+    assert_equal(
+      'https://www.0rsk.com/github-callback',
+      Sinatra::Application.settings.config['github']['redirect_uri']
+    )
+  end
+
   def test_add
     login("jeff09#{rand(99_999)}")
     post(
