@@ -13,17 +13,6 @@ require_relative '../objects/risks'
 require_relative '../objects/rsk'
 require_relative '../objects/triples'
 
-module Rack
-  module Test
-    class Session
-      def defaults
-        { 'REMOTE_ADDR' => '127.0.0.1', 'HTTPS' => 'on' }.merge(headers_for_env)
-      end
-      alias default_env defaults
-    end
-  end
-end
-
 class Rsk::AppTest < TestCase
   include Rack::Test::Methods
 
