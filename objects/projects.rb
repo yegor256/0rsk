@@ -37,6 +37,7 @@ class Rsk::Projects
   end
 
   def exists?(pid)
+    return false unless pid.to_s.match?(/\A[0-9]+\z/)
     !@pgsql.exec('SELECT * FROM project WHERE login = $1 AND id = $2', [@login, pid]).empty?
   end
 end
