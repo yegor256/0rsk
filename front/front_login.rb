@@ -7,6 +7,16 @@ before '/*' do
   if request.post? && settings.rate_limits.over?(request.ip)
     halt 429, { 'Content-Type' => 'text/plain' }, 'Too many requests'
   end
+  response.headers['Content-Security-Policy'] = [
+    "default-src 'self'",
+    "script-src 'self' https://code.jquery.com https://cdnjs.cloudflare.com",
+    "script-src-attr 'unsafe-inline'",
+    "style-src 'self' https://cdn.jsdelivr.net https://www.yegor256.com",
+    "img-src 'self' https://img.shields.io https://www.sixnines.io",
+    "font-src 'self' https://www.yegor256.com",
+    "base-uri 'self'",
+    "form-action 'self'"
+  ].join('; ')
   @locals = { http_start: Time.now, ver: Rsk::VERSION, login_link: settings.glogin.login_uri, request_ip: request.ip }
   if params[:glogin] && ENV['RACK_ENV'] != 'production'
     response.set_cookie('glogin', params[:glogin])
