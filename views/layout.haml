@@ -51,7 +51,7 @@
           %ul
             %li
               - if defined?(user)
-                %a{href: '/projects', title: 'Your projects'}= "@#{user[:login]}"
+                %a{href: '/projects', title: 'Your projects'}= "@#{user['login']}"
                 - if request.cookies['0rsk-project']
                   = '/'
                   %a{href: iri.cut('/project').append(pid), title: 'View project'}= "##{pid}"
