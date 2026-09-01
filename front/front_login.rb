@@ -11,7 +11,9 @@ before '/*' do
     halt 429, { 'Content-Type' => 'text/plain' }, 'Too many requests' if settings.rate_limits.size > 10
   end
   @locals = { http_start: Time.now, ver: Rsk::VERSION, login_link: settings.glogin.login_uri, request_ip: request.ip }
-  response.set_cookie('glogin', params[:glogin]) if params[:glogin]
+  if params[:glogin] && ENV['RACK_ENV'] != 'production'
+    response.set_cookie('glogin', params[:glogin])
+  end
   if request.cookies['glogin']
     begin
       @locals[:user] = GLogin::Cookie::Closed.new(
