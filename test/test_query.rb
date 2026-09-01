@@ -6,7 +6,7 @@
 require_relative 'test__helper'
 require_relative '../objects/query'
 
-class Rsk::QueryTest < Minitest::Test
+class Rsk::QueryTest < TestCase
   def test_fetch_pagination
     sql = ['SELECT * FROM project WHERE login = $1']
     query = Rsk::Query.new(test_pgsql, sql, ['test'])
