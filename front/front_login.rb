@@ -31,9 +31,15 @@ end
 get '/github-callback' do
   code = params[:code]
   error(400) if code.nil?
+  user = begin
+    settings.glogin.user(code)
+  rescue StandardError => e
+    settings.log.error("GitHub authentication failed: #{e.class}: #{e.message}")
+    raise Rsk::Urror, 'GitHub login is temporarily unavailable, please try again later'
+  end
   response.set_cookie(
     :glogin, GLogin::Cookie::Open.new(
-      settings.glogin.user(code),
+      user,
       settings.config['github']['encryption_secret'],
       context
     ).to_s

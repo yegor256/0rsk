@@ -9,6 +9,7 @@ github:
   client_id: your-github-oauth-app-client-id
   client_secret: your-github-oauth-app-client-secret
   encryption_secret: any-random-string
+  redirect_uri: https://www.0rsk.com/github-callback
 sentry: ''
 telegram:
   token: your-telegram-bot-token
