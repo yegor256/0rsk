@@ -114,7 +114,7 @@ class Rsk::AppTest < TestCase
 
   def test_deletes_ranked
     pid = login("deleter#{rand(99_999)}")
-    get(
+    post(
       "/ranked/delete?id=#{Rsk::Triples.new(test_pgsql, pid).add(
         Rsk::Causes.new(test_pgsql, pid).add('test cause'),
         Rsk::Risks.new(test_pgsql, pid).add('test risk'),
@@ -128,8 +128,16 @@ class Rsk::AppTest < TestCase
     assert_includes(cookie.to_s, 'deleted')
   end
 
+  def test_refuses_to_delete_over_get
+    name = "getter#{rand(99_999)}"
+    pid = login(name)
+    get("/projects/delete?id=#{pid}")
+    assert_equal(404, last_response.status, last_response.body)
+    assert(Rsk::Projects.new(test_pgsql, name).exists?(pid), last_response.body)
+  end
+
   def test_deletes_project
-    get("/projects/delete?id=#{login("deleter#{rand(99_999)}")}")
+    post("/projects/delete?id=#{login("deleter#{rand(99_999)}")}")
     assert_equal(302, last_response.status, last_response.body)
     assert(last_response.location.end_with?('/projects'))
     cookie = last_response.headers['Set-Cookie']
