@@ -6,6 +6,7 @@ require_relative 'risk'
 # SPDX-License-Identifier: MIT
 
 require_relative 'rsk'
+require_relative 'urror'
 
 class Rsk::Risks
   def initialize(pgsql, project)
@@ -28,6 +29,12 @@ class Rsk::Risks
 
   def get(id)
     require_relative('risk')
+    if @pgsql.exec(
+      'SELECT id FROM part WHERE id = $1 AND project = $2 AND type = $3',
+      [id, @project, 'Risk']
+    ).empty?
+      raise(Rsk::Urror, "Risk ##{id} is not in project ##{@project}")
+    end
     Rsk::Risk.new(@pgsql, id)
   end
 
