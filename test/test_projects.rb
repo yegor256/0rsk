@@ -18,6 +18,13 @@ class Rsk::ProjectsTest < TestCase
     refute(projects.exists?(pid))
   end
 
+  def test_refuses_id_that_is_not_a_number
+    projects = Rsk::Projects.new(test_pgsql, 'jeff12')
+    refute(projects.exists?('abc'))
+    refute(projects.exists?(''))
+    refute(projects.exists?('7abc'))
+  end
+
   def test_deletes_with_triple
     projects = Rsk::Projects.new(test_pgsql, 'jeff094')
     pid = projects.add("testfs#{rand(99_999)}")
