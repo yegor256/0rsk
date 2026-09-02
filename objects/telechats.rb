@@ -23,11 +23,11 @@ class Rsk::Telechats
   end
 
   def login(id)
-    @pgsql.exec('SELECT login FROM telechat WHERE id = $1', [id])[0]['login']
+    row('SELECT login FROM telechat WHERE id = $1', id)['login']
   end
 
   def chat(login)
-    Integer(@pgsql.exec('SELECT id FROM telechat WHERE login = $1', [login])[0]['id'])
+    Integer(row('SELECT id FROM telechat WHERE login = $1', login)['id'])
   end
 
   def posted(msg, chat)
@@ -35,6 +35,14 @@ class Rsk::Telechats
   end
 
   def diff?(msg, chat)
-    @pgsql.exec('SELECT recent FROM telechat WHERE id = $1', [chat])[0]['recent'] != msg
+    row('SELECT recent FROM telechat WHERE id = $1', chat)['recent'] != msg
+  end
+
+  private
+
+  def row(sql, key)
+    found = @pgsql.exec(sql, [key]).first
+    raise(Rsk::Urror, "Telegram chat is not wired: #{key}") if found.nil?
+    found
   end
 end
