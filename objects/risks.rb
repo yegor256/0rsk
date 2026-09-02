@@ -29,10 +29,7 @@ class Rsk::Risks
 
   def get(id)
     require_relative('risk')
-    if @pgsql.exec(
-      'SELECT id FROM part WHERE id = $1 AND project = $2 AND type = $3',
-      [id, @project, 'Risk']
-    ).empty?
+    if @pgsql.exec('SELECT id FROM part WHERE id = $1 AND project = $2 AND type = $3', [id, @project, 'Risk']).empty?
       raise(Rsk::Urror, "Risk ##{id} is not in project ##{@project}")
     end
     Rsk::Risk.new(@pgsql, id)
