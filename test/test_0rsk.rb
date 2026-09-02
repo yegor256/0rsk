@@ -133,7 +133,7 @@ class Rsk::AppTest < TestCase
     pid = login(name)
     get("/projects/delete?id=#{pid}")
     assert_equal(404, last_response.status, last_response.body)
-    assert(Rsk::Projects.new(test_pgsql, name).exists?(pid), last_response.body)
+    assert_predicate(Rsk::Projects.new(test_pgsql, name), :exists?, pid)
   end
 
   def test_deletes_project
