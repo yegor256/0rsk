@@ -12,6 +12,7 @@ require_relative '../objects/projects'
 require_relative '../objects/risks'
 require_relative '../objects/rsk'
 require_relative '../objects/tasks'
+require 'securerandom'
 require_relative '../objects/triples'
 
 class Rsk::TasksTest < TestCase
@@ -76,5 +77,20 @@ class Rsk::TasksTest < TestCase
     tasks.postpone(tasks.fetch[0][:id], 60 * 60)
     assert_equal(0, tasks.count)
     refute_equal(schedule, plan.schedule)
+  end
+
+  def test_resolves_the_owning_project
+    login = "bobbyP#{SecureRandom.hex(8)}"
+    project = Rsk::Projects.new(test_pgsql, login).add("test#{SecureRandom.hex(8)}")
+    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
+    Rsk::Triples.new(test_pgsql, project).add(
+      Rsk::Causes.new(test_pgsql, project).add('we have data'),
+      Rsk::Risks.new(test_pgsql, project).add('we may lose it'), eid
+    )
+    plans = Rsk::Plans.new(test_pgsql, project)
+    plans.get(plans.add(eid, 'solve it!'), eid).reschedule((Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y'))
+    tasks = Rsk::Tasks.new(test_pgsql, login)
+    tasks.create
+    assert_equal(project, Integer(tasks.__send__(:plan, tasks.fetch[0][:id])['project']))
   end
 end
