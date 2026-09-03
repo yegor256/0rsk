@@ -230,9 +230,9 @@ get '/dashboard.json' do
   unless pid && projects.exists?(pid)
     halt 200, JSON.generate(heatmap: [], distribution: [], coverage: { total: 0, with_plans: 0, without_plans: 0 })
   end
-  p = settings.pgsql
+  settings.pgsql
   heatmap =
-    p.exec(
+    pg.exec(
       [
         'SELECT risk.probability, effect.impact, COUNT(t.id) AS cnt',
         'FROM triple t',
@@ -251,7 +251,7 @@ get '/dashboard.json' do
       }
     end
   distribution =
-    p.exec(
+    pg.exec(
       [
         'SELECT (risk.probability * effect.impact) / 10 * 10 AS bucket, COUNT(*) AS cnt',
         'FROM triple t',
@@ -264,7 +264,7 @@ get '/dashboard.json' do
       ],
       [pid]
     ).map { |r| { rank: Integer(r['bucket'], 10), count: Integer(r['cnt'], 10) } }
-  coverage = p.exec(
+  coverage = pg.exec(
     [
       'SELECT COUNT(*) AS total,',
       '  COUNT(*) FILTER (WHERE EXISTS (',
