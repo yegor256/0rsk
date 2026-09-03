@@ -69,7 +69,12 @@ class Rsk::AppTest < TestCase
       '/causes.json',
       '/risks.json',
       '/effects.json',
-      '/plans.json'
+      '/plans.json',
+      '/ranked.csv',
+      '/ranked.json',
+      '/causes.csv',
+      '/risks.csv',
+      '/effects.csv'
     ]
     pages.each do |p|
       get(p)
@@ -108,6 +113,37 @@ class Rsk::AppTest < TestCase
     assert_equal(302, last_response.status, last_response.body)
     get('/ranked')
     assert_equal(200, last_response.status, last_response.body)
+  end
+
+  def test_export_csv_and_json
+    login("export#{rand(99_999)}")
+    post(
+      '/triple/save',
+      [
+        'ctext=test+cause',
+        'rtext=test+risk',
+        'probability=5',
+        'emoji=A',
+        'etext=test+effect',
+        'impact=5',
+        'cid=',
+        'rid=',
+        'eid='
+      ].join('&')
+    )
+    get('/ranked.csv')
+    assert_equal(200, last_response.status, last_response.body)
+    assert_includes(last_response.headers['Content-Type'], 'text/csv')
+    assert_includes(last_response.headers['Content-Type'], 'charset=utf-8')
+    assert_equal('attachment; filename="ranked.csv"', last_response.headers['Content-Disposition'])
+    assert_includes(last_response.body, 'test cause')
+    assert_includes(last_response.body, 'test effect')
+    get('/ranked.json')
+    assert_equal(200, last_response.status, last_response.body)
+    data = JSON.parse(last_response.body)
+    assert_equal(1, data.size)
+    assert_equal('test cause', data[0]['cause'])
+    assert_equal('test effect', data[0]['effect'])
   end
 
   def test_logout
