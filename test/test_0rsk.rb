@@ -3,6 +3,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
+require 'json'
 require_relative 'test__helper'
 
 require_relative '../0rsk'
@@ -32,7 +33,7 @@ class Rsk::AppTest < TestCase
   end
 
   def test_renders_pages
-    pages = ['/version', '/robots.txt', '/', '/js/triple.js', '/js/responses.js', '/terms']
+    pages = ['/version', '/robots.txt', '/', '/js/triple.js', '/js/responses.js', '/terms', '/dashboard']
     pages.each do |p|
       get(p)
       assert_predicate(last_response, :ok?, last_response.body)
@@ -69,7 +70,8 @@ class Rsk::AppTest < TestCase
       '/causes.json',
       '/risks.json',
       '/effects.json',
-      '/plans.json'
+      '/plans.json',
+      '/dashboard.json'
     ]
     pages.each do |p|
       get(p)
@@ -108,6 +110,32 @@ class Rsk::AppTest < TestCase
     assert_equal(302, last_response.status, last_response.body)
     get('/ranked')
     assert_equal(200, last_response.status, last_response.body)
+  end
+
+  def test_dashboard_json
+    login("dash#{rand(99_999)}")
+    post(
+      '/triple/save',
+      [
+        'ctext=test+cause',
+        'rtext=test+risk',
+        'probability=5',
+        'emoji=A',
+        'etext=test+effect',
+        'impact=5',
+        'cid=',
+        'rid=',
+        'eid='
+      ].join('&')
+    )
+    assert_equal(302, last_response.status, last_response.body)
+    get('/dashboard.json')
+    assert_equal(200, last_response.status, last_response.body)
+    data = JSON.parse(last_response.body)
+    assert_equal(1, data['coverage']['total'])
+    assert_equal(0, data['coverage']['with_plans'])
+    refute_empty(data['heatmap'])
+    refute_empty(data['distribution'])
   end
 
   def test_logout

@@ -220,6 +220,69 @@ get '/terms' do
   haml :terms, layout: :layout, locals: merged(title: '/terms')
 end
 
+get '/dashboard' do
+  haml :dashboard, layout: :layout, locals: merged(title: '/dashboard')
+end
+
+get '/dashboard.json' do
+  content_type 'application/json'
+  pid = request.cookies['0rsk-project']
+  unless pid && projects.exists?(pid)
+    halt 200, JSON.generate(heatmap: [], distribution: [], coverage: { total: 0, with_plans: 0, without_plans: 0 })
+  end
+  pg = settings.pgsql
+  heatmap =
+    pg.exec(
+      [
+        'SELECT risk.probability, effect.impact, COUNT(t.id) AS cnt',
+        'FROM triple t',
+        'JOIN part AS cpart ON t.cause = cpart.id',
+        'JOIN risk ON t.risk = risk.id',
+        'JOIN effect ON t.effect = effect.id',
+        'WHERE cpart.project = $1',
+        'GROUP BY risk.probability, effect.impact',
+        'ORDER BY risk.probability, effect.impact'
+      ],
+      [pid]
+    ).map do |r|
+      {
+        probability: Integer(r['probability'], 10), impact: Integer(r['impact'], 10),
+        count: Integer(r['cnt'], 10)
+      }
+    end
+  distribution =
+    pg.exec(
+      [
+        'SELECT (risk.probability * effect.impact) / 10 * 10 AS bucket, COUNT(*) AS cnt',
+        'FROM triple t',
+        'JOIN part AS cpart ON t.cause = cpart.id',
+        'JOIN risk ON t.risk = risk.id',
+        'JOIN effect ON t.effect = effect.id',
+        'WHERE cpart.project = $1',
+        'GROUP BY bucket',
+        'ORDER BY bucket'
+      ],
+      [pid]
+    ).map { |r| { rank: Integer(r['bucket'], 10), count: Integer(r['cnt'], 10) } }
+  coverage = pg.exec(
+    [
+      'SELECT COUNT(*) AS total,',
+      '  COUNT(*) FILTER (WHERE EXISTS (',
+      '    SELECT 1 FROM plan WHERE plan.part IN (t.cause, t.risk, t.effect)',
+      '  )) AS with_plans',
+      'FROM triple t',
+      'JOIN part AS cpart ON t.cause = cpart.id',
+      'WHERE cpart.project = $1'
+    ],
+    [pid]
+  ).map do |r|
+    total = Integer(r['total'], 10)
+    wp = Integer(r['with_plans'], 10)
+    { total: total, with_plans: wp, without_plans: total - wp }
+  end[0]
+  JSON.generate(heatmap: heatmap, distribution: distribution, coverage: coverage)
+end
+
 module Rsk::App
   def identity
     redirect('/') unless @locals[:user]
