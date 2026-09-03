@@ -228,9 +228,7 @@ get '/dashboard.json' do
   content_type 'application/json'
   pid = request.cookies['0rsk-project']
   unless pid && projects.exists?(pid)
-    halt 200,
-      { 'Content-Type' => 'application/json' },
-      JSON.generate(heatmap: [], distribution: [], coverage: { total: 0, with_plans: 0, without_plans: 0 })
+    halt 200, JSON.generate(heatmap: [], distribution: [], coverage: { total: 0, with_plans: 0, without_plans: 0 })
   end
   p = settings.pgsql
   heatmap =
@@ -268,11 +266,12 @@ get '/dashboard.json' do
     ).map { |r| { rank: Integer(r['bucket'], 10), count: Integer(r['cnt'], 10) } }
   coverage = p.exec(
     [
-      'SELECT COUNT(t.id) AS total,',
-      '  COUNT(plan.id) FILTER (WHERE plan.id IS NOT NULL) AS with_plans',
+      'SELECT COUNT(*) AS total,',
+      '  COUNT(*) FILTER (WHERE EXISTS (',
+      '    SELECT 1 FROM plan WHERE plan.part IN (t.cause, t.risk, t.effect)',
+      '  )) AS with_plans',
       'FROM triple t',
       'JOIN part AS cpart ON t.cause = cpart.id',
-      'LEFT JOIN plan ON plan.part IN (t.cause, t.risk, t.effect)',
       'WHERE cpart.project = $1'
     ],
     [pid]
