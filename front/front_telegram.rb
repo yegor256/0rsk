@@ -5,8 +5,10 @@
 
 require 'telebot'
 require_relative '../objects/daemon'
+require_relative '../objects/markdown'
 require_relative '../objects/telechats'
 require_relative '../objects/telepings'
+require_relative '../objects/trimmed'
 require_relative '../objects/urror'
 
 get '/telegram' do
@@ -37,7 +39,7 @@ module Rsk::Telegram
       chat_id: chat,
       parse_mode: 'Markdown',
       disable_web_page_preview: true,
-      text: msg.length > 4000 ? "#{msg[0..4000]}..." : msg,
+      text: Rsk::Trimmed.new(msg, 4000).to_s,
       reply_markup: reply_markup
     )
   end
@@ -144,6 +146,7 @@ module Rsk::Telegram
         fresh.each { |t| telepings.add(t[:id], chat) }
       end
     rescue StandardError => e
+      Sentry.capture_exception(e)
       settings.log.error(e.message)
       next
     end
@@ -158,12 +161,13 @@ module Rsk::Telegram
         next if count.zero?
         msg = [
           "You have #{count} risk#{'s' unless count == 1} without response",
-          "plan#{'s' unless count == 1} in project '#{project[:title]}'.",
+          "plan#{'s' unless count == 1} in project '#{Rsk::Markdown.new(project[:title])}'.",
           '[View them](https://www.0rsk.com/ranked?q=%2Balone).'
         ].join(' ')
         telepost(msg, chat) if telechats.diff?(msg, chat)
       end
     rescue StandardError => e
+      Sentry.capture_exception(e)
       settings.log.error(e.message)
       next
     end
@@ -177,10 +181,10 @@ module Rsk::Telegram
           [
             "\n\n[T#{t[:id]}](https://www.0rsk.com/responses?id=#{t[:triple]})",
             "(#{t[:positive] ? '+' : '-'}#{t[:rank]})",
-            t[:text],
-            "in [#{t[:title]}](https://www.0rsk.com/projects/#{t[:pid]}):",
-            "#{t[:ctext]}; #{t[:rtext]}; #{t[:etext]}",
-            "(#{t[:schedule]})"
+            Rsk::Markdown.new(t[:text]).to_s,
+            "in [#{Rsk::Markdown.new(t[:title])}](https://www.0rsk.com/projects/#{t[:pid]}):",
+            "#{Rsk::Markdown.new(t[:ctext])}; #{Rsk::Markdown.new(t[:rtext])}; #{Rsk::Markdown.new(t[:etext])}",
+            "(#{Rsk::Markdown.new(t[:schedule])})"
           ].join(' ')
         end
       ]
@@ -190,15 +194,17 @@ module Rsk::Telegram
         list.map do |t|
           [
             "\n  `T#{t[:id]}` (#{t[:positive] ? '+' : '-'}#{t[:rank]})",
-            t[:text],
-            "#{t[:ctext]}; #{t[:rtext]}; #{t[:etext]}"
+            Rsk::Markdown.new(t[:text]).to_s,
+            "#{Rsk::Markdown.new(t[:ctext])}; #{Rsk::Markdown.new(t[:rtext])}; #{Rsk::Markdown.new(t[:etext])}"
           ].join(' ')
         end
       ]
     else
       [
         "There are too many tasks in the list (#{list.count}), here is the top of it:\n",
-        list.take(16).map! { |t| "\n`T#{t[:id]}` (#{t[:positive] ? '+' : '-'}#{t[:rank]}) #{t[:text]}" }
+        list.take(16).map! do |t|
+          "\n`T#{t[:id]}` (#{t[:positive] ? '+' : '-'}#{t[:rank]}) #{Rsk::Markdown.new(t[:text])}"
+        end
       ]
     end
   end
