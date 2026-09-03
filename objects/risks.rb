@@ -6,6 +6,7 @@ require_relative 'risk'
 # SPDX-License-Identifier: MIT
 
 require_relative 'rsk'
+require_relative 'urror'
 
 class Rsk::Risks
   def initialize(pgsql, project)
@@ -24,6 +25,8 @@ class Rsk::Risks
       t.exec('INSERT INTO risk (id) VALUES ($1)', [id])
       id
     end
+  rescue PG::UniqueViolation
+    raise(Rsk::Urror, "Risk \"#{text}\" already exists in this project")
   end
 
   def get(id)
