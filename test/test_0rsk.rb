@@ -47,6 +47,14 @@ class Rsk::AppTest < TestCase
     end
   end
 
+  def test_renders_markup_not_escaped_source
+    login('kate')
+    get('/ranked')
+    assert_equal(200, last_response.status, last_response.body)
+    refute_includes(last_response.body, '&lt;form', last_response.body)
+    assert_includes(last_response.body, '<form', last_response.body)
+  end
+
   def test_user_pages
     login('bill')
     pages = [
