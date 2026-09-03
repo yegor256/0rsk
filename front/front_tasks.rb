@@ -5,6 +5,7 @@ require_relative '../objects/pipeline'
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
+require_relative '../objects/postpone'
 require_relative '../objects/tasks'
 
 Rsk::Daemon.new(10).start do
@@ -39,11 +40,7 @@ end
 
 get '/tasks/later' do
   id = Integer(params[:id])
-  seconds = 1
-  seconds *= 7 * 24 * 60 * 60 if params[:period] == 'week'
-  seconds *= 30 * 24 * 60 * 60 if params[:period] == 'month'
-  seconds *= 3 * 30 * 24 * 60 * 60 if params[:period] == 'quarter'
-  tasks.postpone(id, seconds)
+  tasks.postpone(id, Rsk::Postpone.new(params[:period]).seconds)
   flash('/tasks', "Thanks, the task ##{id} was postponed")
 end
 

@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
+# SPDX-License-Identifier: MIT
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: 0rsk
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: pg_isready -U test -d 0rsk
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  app:
+    build: .
+    ports:
+      - 9292:9292
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://test:test@db:5432/0rsk
+    volumes:
+      - ./config.yml:/app/config.yml

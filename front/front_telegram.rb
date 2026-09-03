@@ -177,7 +177,7 @@ module Rsk::Telegram
           [
             "\n\n[T#{t[:id]}](https://www.0rsk.com/responses?id=#{t[:triple]})",
             "(#{t[:positive] ? '+' : '-'}#{t[:rank]})",
-            t[:text].inspect,
+            t[:text],
             "in [#{t[:title]}](https://www.0rsk.com/projects/#{t[:pid]}):",
             "#{t[:ctext]}; #{t[:rtext]}; #{t[:etext]}",
             "(#{t[:schedule]})"
@@ -190,7 +190,7 @@ module Rsk::Telegram
         list.map do |t|
           [
             "\n  `T#{t[:id]}` (#{t[:positive] ? '+' : '-'}#{t[:rank]})",
-            t[:text].inspect,
+            t[:text],
             "#{t[:ctext]}; #{t[:rtext]}; #{t[:etext]}"
           ].join(' ')
         end
@@ -198,7 +198,7 @@ module Rsk::Telegram
     else
       [
         "There are too many tasks in the list (#{list.count}), here is the top of it:\n",
-        list.take(16).map! { |t| "\n`T#{t[:id]}` (#{t[:positive] ? '+' : '-'}#{t[:rank]}) #{t[:text].inspect}" }
+        list.take(16).map! { |t| "\n`T#{t[:id]}` (#{t[:positive] ? '+' : '-'}#{t[:rank]}) #{t[:text]}" }
       ]
     end
   end

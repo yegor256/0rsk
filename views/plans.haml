@@ -43,7 +43,7 @@
           %td
             %code= "P#{r[:id]}"
           %td
-            %a{href: iri.cut('/responses').add(id: r[:triple])}<
+            %a{href: iri.cut('/responses'), title: 'View responses'.add(id: r[:triple])}<
               %code= "#{r[:prefix]}#{r[:part]}"
           %td
             &= r[:text]
@@ -54,4 +54,4 @@
           %td.right
             = thumb(r)
             = rank(r)
-  = Haml::Engine.new(File.read('views/_paging.haml')).render(self, locals.merge(count: plans.count))
+    = Tilt::HamlTemplate.new('views/_paging.haml', 1, format: :xhtml).render(self, locals.merge(count: plans.count))

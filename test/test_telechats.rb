@@ -8,7 +8,7 @@ require_relative 'test__helper'
 require 'securerandom'
 require_relative '../objects/telechats'
 
-class Rsk::TelechatsTest < Minitest::Test
+class Rsk::TelechatsTest < TestCase
   def test_checks
     telechats = Rsk::Telechats.new(test_pgsql)
     chat = SecureRandom.random_number(2_000_000_000) + 1

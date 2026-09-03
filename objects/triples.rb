@@ -138,7 +138,7 @@ class Rsk::Triples
         where.empty? ? '' : "AND (#{where.join(') AND (')})",
         'ORDER BY rank DESC, t.created DESC'
       ],
-      [@project, id.positive? ? id : "%#{words.join(' ')}%"]
+      [@project, id.positive? ? id : "%#{words.join(' ').gsub(/[%_]/, '\\\\\0')}%"]
     )
   end
 end

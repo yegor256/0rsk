@@ -9,11 +9,11 @@ require_relative '../objects/projects'
 require_relative '../objects/risks'
 require_relative '../objects/rsk'
 
-class Rsk::RiskTest < Minitest::Test
+class Rsk::RiskTest < TestCase
   def test_modifies_text
     before = 'text first'
     after = 'another text to set'
-    risks = Rsk::Risks.new(test_pgsql, Rsk::Projects.new(test_pgsql, 'jeff32').add('test'))
+    risks = Rsk::Risks.new(test_pgsql, test_project)
     risk = risks.get(risks.add(before))
     assert_equal(before, risk.text)
     risk.rename(after)
@@ -23,7 +23,7 @@ class Rsk::RiskTest < Minitest::Test
 
   def test_modifies_probability
     after = 9
-    risks = Rsk::Risks.new(test_pgsql, Rsk::Projects.new(test_pgsql, 'jeff94').add('test'))
+    risks = Rsk::Risks.new(test_pgsql, test_project)
     risk = risks.get(risks.add('some risk'))
     risk.weigh(after)
     risk.weigh(after)
