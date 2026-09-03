@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'json'
 require_relative 'pipeline'
 require_relative 'plans'
 require_relative 'query'
@@ -29,6 +30,19 @@ class Rsk::Tasks
       t.exec('DELETE FROM task WHERE id = $1', [id])
       Rsk::Plans.new(@pgsql, Integer(row['project'] || 0)).get(Integer(row['id']), Integer(row['part'])).complete
     end
+  end
+
+  def track(id, repo, issue)
+    row = @pgsql.exec('SELECT tracker_data FROM task WHERE id = $1', [id])[0]
+    raise(Rsk::Urror, "Task ##{id} not found") if row.nil?
+    data = row['tracker_data'].nil? ? [] : JSON.parse(row['tracker_data'])
+    entry = data.find { |e| e['repo'] == repo }
+    if entry
+      entry['issue'] = issue
+    else
+      data << { 'repo' => repo, 'issue' => issue }
+    end
+    @pgsql.exec('UPDATE task SET tracker_data = $1 WHERE id = $2', [JSON.generate(data), id])
   end
 
   def postpone(id, seconds)
@@ -63,7 +77,8 @@ class Rsk::Tasks
         rtext: r['rtext'],
         etext: r['etext'],
         ptext: r['ptext'],
-        schedule: r['schedule']
+        schedule: r['schedule'],
+        tracker_data: r['tracker_data'].nil? ? [] : JSON.parse(r['tracker_data'])
       }
     end
   end
@@ -75,6 +90,7 @@ class Rsk::Tasks
       @pgsql,
       [
         'SELECT * FROM (SELECT DISTINCT ON (task.id) task.id, task.plan,',
+        '  task.tracker_data AS tracker_data,',
         '  plan.schedule AS schedule, plan.part AS part,',
         '  emoji,',
         '  part.text AS text, t.text AS ptext,',

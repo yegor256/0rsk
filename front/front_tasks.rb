@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'json'
 require 'timeout'
 
 require_relative '../objects/daemon'
@@ -20,7 +19,7 @@ Rsk::Daemon.new(10).start do
       Rsk::Trackers.new(settings.pgsql, project[:id]).fetch(token: true).each do |trk|
         gh = Rsk::TaskTracker.new(trk[:repo], trk[:token])
         tasks(login: login).fetch(limit: 100).each do |task|
-          next if task[:tracker_data] && JSON.parse(task[:tracker_data])['repo'] == trk[:repo]
+          next if task[:tracker_data].any? { |t| t['repo'] == trk[:repo] }
           begin
             Timeout.timeout(15) do
               issue = gh.create(task)
