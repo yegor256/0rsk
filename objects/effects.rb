@@ -31,6 +31,12 @@ class Rsk::Effects
 
   def get(id)
     require_relative('effect')
+    if @pgsql.exec(
+      'SELECT id FROM part WHERE id = $1 AND project = $2 AND type = $3',
+      [id, @project, 'Effect']
+    ).empty?
+      raise(Rsk::Urror, "Effect ##{id} is not in project ##{@project}")
+    end
     Rsk::Effect.new(@pgsql, id)
   end
 

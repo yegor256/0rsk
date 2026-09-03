@@ -44,6 +44,9 @@ class Rsk::Causes
 
   def get(id)
     require_relative('cause')
+    if @pgsql.exec('SELECT id FROM part WHERE id = $1 AND project = $2 AND type = $3', [id, @project, 'Cause']).empty?
+      raise(Rsk::Urror, "Cause ##{id} is not in project ##{@project}")
+    end
     Rsk::Cause.new(@pgsql, id)
   end
 
