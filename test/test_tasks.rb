@@ -77,4 +77,28 @@ class Rsk::TasksTest < TestCase
     assert_equal(0, tasks.count)
     refute_equal(schedule, plan.schedule)
   end
+
+  def test_tracks_tasks_in_multiple_repos
+    login = "bobbyW#{rand(99_999)}"
+    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(99_999)}")
+    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
+    Rsk::Triples.new(test_pgsql, project).add(
+      Rsk::Causes.new(test_pgsql, project).add('we have data'),
+      Rsk::Risks.new(test_pgsql, project).add('we may lose it'), eid
+    )
+    plans = Rsk::Plans.new(test_pgsql, project)
+    plans.get(plans.add(eid, 'solve it!'), eid).reschedule((Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y'))
+    tasks = Rsk::Tasks.new(test_pgsql, login)
+    tasks.create
+    task = tasks.fetch.first
+    tasks.track(task[:id], 'yegor256/0rsk', 42)
+    tasks.track(task[:id], 'VasilevNStas/0rsk', 43)
+    data = tasks.fetch.first[:tracker_data]
+    assert_equal(2, data.count)
+    assert_equal(42, data.find { |t| t['repo'] == 'yegor256/0rsk' }['issue'])
+    tasks.track(task[:id], 'yegor256/0rsk', 44)
+    data = tasks.fetch.first[:tracker_data]
+    assert_equal(2, data.count)
+    assert_equal(44, data.find { |t| t['repo'] == 'yegor256/0rsk' }['issue'])
+  end
 end
