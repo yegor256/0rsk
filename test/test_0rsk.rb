@@ -47,6 +47,14 @@ class Rsk::AppTest < TestCase
     end
   end
 
+  def test_renders_markup_not_escaped_source
+    login('kate')
+    get('/ranked')
+    assert_equal(200, last_response.status, last_response.body)
+    refute_includes(last_response.body, '&lt;form', last_response.body)
+    assert_includes(last_response.body, '<form', last_response.body)
+  end
+
   def test_user_pages
     login('bill')
     pages = [
@@ -66,6 +74,18 @@ class Rsk::AppTest < TestCase
     pages.each do |p|
       get(p)
       assert_equal(200, last_response.status, "#{p} fails: #{last_response.body}")
+    end
+  end
+
+  def test_forbids_anonymous_json_pages
+    [
+      '/causes.json',
+      '/risks.json',
+      '/effects.json',
+      '/plans.json'
+    ].each do |p|
+      get(p)
+      assert_equal(403, last_response.status, "#{p} fails: #{last_response.body}")
     end
   end
 
@@ -102,7 +122,7 @@ class Rsk::AppTest < TestCase
 
   def test_deletes_ranked
     pid = login("deleter#{rand(99_999)}")
-    get(
+    post(
       "/ranked/delete?id=#{Rsk::Triples.new(fake_pgsql, pid).add(
         Rsk::Causes.new(fake_pgsql, pid).add('test cause'),
         Rsk::Risks.new(fake_pgsql, pid).add('test risk'),
@@ -116,8 +136,16 @@ class Rsk::AppTest < TestCase
     assert_includes(cookie.to_s, 'deleted')
   end
 
+  def test_refuses_to_delete_over_get
+    name = "getter#{rand(99_999)}"
+    pid = login(name)
+    get("/projects/delete?id=#{pid}")
+    assert_equal(404, last_response.status, last_response.body)
+    assert(Rsk::Projects.new(fake_pgsql, name).exists?(pid), 'the project must survive a GET')
+  end
+
   def test_deletes_project
-    get("/projects/delete?id=#{login("deleter#{rand(99_999)}")}")
+    post("/projects/delete?id=#{login("deleter#{rand(99_999)}")}")
     assert_equal(302, last_response.status, last_response.body)
     assert(last_response.location.end_with?('/projects'))
     cookie = last_response.headers['Set-Cookie']
@@ -125,12 +153,36 @@ class Rsk::AppTest < TestCase
     assert_includes(cookie.to_s, 'deleted')
   end
 
+  def test_telegram_listing_plain_text
+    listing = Object.new.extend(Rsk::Telegram).listing(
+      [
+        {
+          id: 42,
+          triple: 7,
+          positive: true,
+          rank: 3,
+          text: 'Fix "urgent" bug',
+          title: 'Project',
+          pid: 5,
+          ctext: 'Cause',
+          rtext: 'Risk',
+          etext: 'Effect',
+          schedule: 'today'
+        }
+      ]
+    ).flatten.join(' ')
+    assert_includes(listing, 'Fix "urgent" bug')
+    refute_includes(listing, '"Fix \\"urgent\\" bug"')
+  end
+
   private
 
-  def login(name)
+  def login(name = "u#{SecureRandom.hex(8)}")
     set_cookie("glogin=#{name}")
     pid = Rsk::Projects.new(fake_pgsql, name).add('test')
     set_cookie("0rsk-project=#{pid}")
     pid
   end
+
+  alias login_with_project login
 end

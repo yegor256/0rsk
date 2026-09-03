@@ -76,7 +76,7 @@ class Rsk::Plans
         ') sub',
         'ORDER BY rank DESC'
       ],
-      [@project, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip}%"]
+      [@project, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip.gsub(/[%_]/, '\\\\\0')}%"]
     )
   end
 end

@@ -6,6 +6,7 @@ require_relative 'query'
 # SPDX-License-Identifier: MIT
 
 require_relative 'rsk'
+require_relative 'urror'
 
 class Rsk::Effects
   def initialize(pgsql, project)
@@ -24,10 +25,18 @@ class Rsk::Effects
       t.exec('INSERT INTO effect (id) VALUES ($1)', [id])
       id
     end
+  rescue PG::UniqueViolation
+    raise(Rsk::Urror, "Effect \"#{text}\" already exists in this project")
   end
 
   def get(id)
     require_relative('effect')
+    if @pgsql.exec(
+      'SELECT id FROM part WHERE id = $1 AND project = $2 AND type = $3',
+      [id, @project, 'Effect']
+    ).empty?
+      raise(Rsk::Urror, "Effect ##{id} is not in project ##{@project}")
+    end
     Rsk::Effect.new(@pgsql, id)
   end
 
@@ -67,7 +76,7 @@ class Rsk::Effects
         'GROUP BY effect.id, part.id',
         'ORDER BY rank DESC'
       ],
-      [@project, "%#{query.to_s.downcase.strip}%"]
+      [@project, "%#{query.to_s.downcase.strip.gsub(/[%_]/, '\\\\\0')}%"]
     )
   end
 end

@@ -43,7 +43,7 @@
           %td
             %code= "P#{r[:id]}"
           %td
-            %a{href: iri.cut('/responses').add(id: r[:triple])}<
+            %a{href: iri.cut('/responses'), title: 'View responses'.add(id: r[:triple])}<
               %code= "#{r[:prefix]}#{r[:part]}"
           %td
             &= r[:text]
