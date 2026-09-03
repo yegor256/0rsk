@@ -230,7 +230,7 @@ get '/dashboard.json' do
   unless pid && projects.exists?(pid)
     halt 200, JSON.generate(heatmap: [], distribution: [], coverage: { total: 0, with_plans: 0, without_plans: 0 })
   end
-  settings.pgsql
+  pg = settings.pgsql
   heatmap =
     pg.exec(
       [
