@@ -45,4 +45,20 @@ class Rsk::TelechatsTest < TestCase
       telechats.add(chat, 'other')
     end
   end
+
+  def test_accepts_a_modern_telegram_chat
+    login = "judyBI#{SecureRandom.hex(8)}"
+    telechats = Rsk::Telechats.new(test_pgsql)
+    chat = 5_000_000_000 + SecureRandom.random_number(1_000_000_000)
+    telechats.add(chat, login)
+    assert_equal(chat, telechats.chat(login))
+  end
+
+  def test_accepts_a_supergroup_chat
+    login = "judySG#{SecureRandom.hex(8)}"
+    telechats = Rsk::Telechats.new(test_pgsql)
+    chat = -(1_001_000_000_000 + SecureRandom.random_number(1_000_000_000))
+    telechats.add(chat, login)
+    assert_equal(chat, telechats.chat(login))
+  end
 end
