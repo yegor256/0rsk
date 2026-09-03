@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: MIT
 
 require_relative 'rsk'
+require_relative 'urror'
 
 class Rsk::Effect
   attr_reader :id
@@ -26,6 +27,7 @@ class Rsk::Effect
   end
 
   def weigh(value)
+    raise(Rsk::Urror, "The impact must be between 1 and 9: #{value.inspect}") unless (1..9).cover?(value)
     @pgsql.exec('UPDATE effect SET impact = $2 WHERE id = $1', [@id, value])
   end
 
