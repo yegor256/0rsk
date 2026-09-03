@@ -94,7 +94,7 @@ task(seed_dummy: %i[pgsql liquibase]) do
   require_relative 'objects/rsk'
   require_relative 'objects/triples'
   pgsql = Pgtk::Pool.new(Pgtk::Wire::Yaml.new('target/pgsql-config.yml'), log: Loog::NULL).start
-  fixtures = YAML.safe_load(File.read('liquibase/fixtures.yml'))
+  fixtures = YAML.safe_load_file('liquibase/fixtures.yml')
   fixtures.each do |key, data|
     login = "demo_#{key}"
     pid = Rsk::Projects.new(pgsql, login).add(data['title'])

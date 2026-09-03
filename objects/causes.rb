@@ -6,6 +6,7 @@ require_relative 'query'
 # SPDX-License-Identifier: MIT
 
 require_relative 'rsk'
+require_relative 'urror'
 
 class Rsk::Causes
   def initialize(pgsql, project)
@@ -24,6 +25,8 @@ class Rsk::Causes
       t.exec('INSERT INTO cause (id) VALUES ($1)', [id])
       id
     end
+  rescue PG::UniqueViolation
+    raise(Rsk::Urror, "Cause \"#{text}\" already exists in this project")
   end
 
   def emojis
@@ -41,6 +44,9 @@ class Rsk::Causes
 
   def get(id)
     require_relative('cause')
+    if @pgsql.exec('SELECT id FROM part WHERE id = $1 AND project = $2 AND type = $3', [id, @project, 'Cause']).empty?
+      raise(Rsk::Urror, "Cause ##{id} is not in project ##{@project}")
+    end
     Rsk::Cause.new(@pgsql, id)
   end
 
@@ -78,7 +84,7 @@ class Rsk::Causes
         'GROUP BY cause.id, part.id',
         'ORDER BY rank DESC'
       ],
-      [@project, "%#{query.to_s.downcase.strip}%"]
+      [@project, "%#{query.to_s.downcase.strip.gsub(/[%_]/, '\\\\\0')}%"]
     )
   end
 end

@@ -7,7 +7,7 @@ AllCops:
     - 'assets/**/*'
     - 'vendor/**/*'
   DisplayCopNames: true
-  TargetRubyVersion: 2.6.0
+  TargetRubyVersion: 3.3
   NewCops: enable
   SuggestExtensions: false
 plugins:
@@ -40,6 +40,8 @@ Minitest/MultipleAssertions:
 Metrics/ParameterLists:
   Max: 10
 Layout/ParameterAlignment:
+  Enabled: false
+Layout/ArgumentAlignment:
   Enabled: false
 Metrics/PerceivedComplexity:
   Max: 25

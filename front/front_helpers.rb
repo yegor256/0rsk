@@ -9,7 +9,8 @@ helpers do
   end
 
   def thumb(i)
-    "<img class='#{i[:positive] ? 'up' : 'down'}'/>"
+    direction = i[:positive] ? 'up' : 'down'
+    "<img class='#{direction}' alt='#{direction}'/>"
   end
 
   def rank(i)
