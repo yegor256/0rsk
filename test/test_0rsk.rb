@@ -77,6 +77,14 @@ class Rsk::AppTest < TestCase
     end
   end
 
+  def test_survives_a_bad_limit
+    login("limitless#{rand(99_999)}")
+    ['/ranked?limit=-1', '/ranked?limit=99999999', '/causes?limit=0', '/tasks?limit=-3'].each do |p|
+      get(p)
+      assert_equal(200, last_response.status, "#{p} fails: #{last_response.body}")
+    end
+  end
+
   def test_forbids_anonymous_json_pages
     [
       '/causes.json',
