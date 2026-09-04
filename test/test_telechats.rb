@@ -40,9 +40,9 @@ class Rsk::TelechatsTest < TestCase
   def test_double_add
     telechats = Rsk::Telechats.new(test_pgsql)
     chat = SecureRandom.random_number(2_000_000_000) + 1
-    telechats.add(chat, "judyDA#{rand(99_999)}")
-    assert_raises(PG::UniqueViolation) do
-      telechats.add(chat, 'other')
+    telechats.add(chat, "judyDA#{SecureRandom.hex(8)}")
+    assert_raises(Rsk::Urror) do
+      telechats.add(chat, "other#{SecureRandom.hex(8)}")
     end
   end
 
@@ -58,6 +58,26 @@ class Rsk::TelechatsTest < TestCase
     login = "judySG#{SecureRandom.hex(8)}"
     telechats = Rsk::Telechats.new(test_pgsql)
     chat = -(1_001_000_000_000 + SecureRandom.random_number(1_000_000_000))
+    telechats.add(chat, login)
+    assert_equal(chat, telechats.chat(login))
+  end
+
+  def test_relinks_from_another_chat
+    login = "judyRL#{SecureRandom.hex(8)}"
+    telechats = Rsk::Telechats.new(test_pgsql)
+    first = SecureRandom.random_number(2_000_000_000) + 1
+    second = SecureRandom.random_number(2_000_000_000) + 1
+    telechats.add(first, login)
+    telechats.add(second, login)
+    assert_equal(second, telechats.chat(login))
+    refute(telechats.exists?(first))
+  end
+
+  def test_adds_the_same_chat_twice
+    login = "judyST#{SecureRandom.hex(8)}"
+    telechats = Rsk::Telechats.new(test_pgsql)
+    chat = SecureRandom.random_number(2_000_000_000) + 1
+    telechats.add(chat, login)
     telechats.add(chat, login)
     assert_equal(chat, telechats.chat(login))
   end

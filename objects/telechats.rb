@@ -11,7 +11,13 @@ class Rsk::Telechats
   end
 
   def add(id, login)
-    @pgsql.exec('INSERT INTO telechat (id, login) VALUES ($1, $2)', [id, login])
+    @pgsql.transaction do |t|
+      t.exec('DELETE FROM telechat WHERE login = $1 AND id <> $2', [login, id])
+      t.exec('INSERT INTO telechat (id, login) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING', [id, login])
+      if t.exec('SELECT login FROM telechat WHERE id = $1', [id])[0]['login'] != login
+        raise(Rsk::Urror, "Telegram chat ##{id} is already linked to another account")
+      end
+    end
   end
 
   def exists?(id)
