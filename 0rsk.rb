@@ -19,6 +19,7 @@ require 'sinatra'
 require 'telebot'
 require 'time'
 require 'yaml'
+require_relative 'objects/limits'
 require_relative 'objects/urror'
 require_relative 'version'
 
@@ -48,7 +49,7 @@ configure do
   set :config, config
   set :logging, true
   set :log, Loog::REGULAR
-  set :rate_limits, []
+  set :rate_limits, Rsk::Limits.new
   set :server_settings, timeout: 25
   set :glogin, GLogin::Auth.new(
     config['github']['client_id'],
