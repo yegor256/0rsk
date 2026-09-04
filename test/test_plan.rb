@@ -29,6 +29,14 @@ class Rsk::PlanTest < TestCase
     assert_raises(Rsk::Urror) { plan.reschedule('bad') }
   end
 
+  def test_rejects_a_date_that_is_not_in_the_calendar
+    plan = with_plan
+    %w[99-99-9999 31-02-2026 00-01-2026].each do |text|
+      assert_raises(Rsk::Urror, text) { plan.reschedule(text) }
+    end
+    assert_equal('weekly', plan.schedule)
+  end
+
   def test_completes_word_schedule
     plan = with_plan(login: "planW#{SecureRandom.hex(8)}", title: "pw#{SecureRandom.hex(8)}")
     plan.reschedule('daily')
