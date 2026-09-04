@@ -87,6 +87,9 @@ get '/triple' do
 end
 
 post '/triple/save' do
+  %i[ctext rtext etext cid rid eid probability impact].each do |name|
+    raise(Rsk::Urror, "The #{name} is missing in the form") if params[name].nil?
+  end
   ctext = params[:ctext].strip
   rtext = params[:rtext].strip
   etext = params[:etext].strip
@@ -97,8 +100,8 @@ post '/triple/save' do
   causes.get(cid).decorate(params[:emoji])
   risks.get(rid).rename(rtext)
   effects.get(eid).rename(etext)
-  risks.get(rid).weigh(Integer(params[:probability]))
-  effects.get(eid).weigh(Integer(params[:impact]))
+  risks.get(rid).weigh(number(params[:probability], 'probability'))
+  effects.get(eid).weigh(number(params[:impact], 'impact'))
   effects.get(eid).polarize(!params[:positive].nil?)
   tid = triples.add(cid, rid, eid)
   flash("/responses?id=#{tid}", "Thanks, the triple ##{tid} successfully saved!")

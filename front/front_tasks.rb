@@ -33,13 +33,13 @@ get '/tasks' do
 end
 
 get '/tasks/done' do
-  id = Integer(params[:id])
+  id = number(params[:id], 'id')
   tasks.done(id)
   flash('/tasks', "Thanks, task ##{id} was completed!")
 end
 
 get '/tasks/later' do
-  id = Integer(params[:id])
+  id = number(params[:id], 'id')
   tasks.postpone(id, Rsk::Postpone.new(params[:period]).seconds)
   flash('/tasks', "Thanks, the task ##{id} was postponed")
 end

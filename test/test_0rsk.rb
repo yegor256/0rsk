@@ -110,6 +110,17 @@ class Rsk::AppTest < TestCase
     assert_equal(200, last_response.status, last_response.body)
   end
 
+  def test_shows_no_backtrace_on_bad_input
+    login("clumsy#{rand(99_999)}")
+    ['probability=100&impact=5', 'probability=abc&impact=5', 'probability=5'].each do |tail|
+      salt = rand(99_999_999)
+      post('/triple/save', "ctext=c#{salt}&rtext=r#{salt}&etext=e#{salt}&emoji=A&cid=&rid=&eid=&#{tail}")
+      refute_includes(last_response.body, '<pre', "#{tail} shows a backtrace: #{last_response.body}")
+    end
+    get('/tasks/done?id=abc')
+    refute_includes(last_response.body, '<pre', last_response.body)
+  end
+
   def test_logout
     login('bob')
     get('/logout')

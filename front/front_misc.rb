@@ -68,6 +68,12 @@ module Rsk::Misc
     out
   end
 
+  def number(text, name)
+    Integer(text.to_s, 10)
+  rescue ArgumentError
+    raise(Rsk::Urror, "The #{name} must be a number: #{text.inspect}")
+  end
+
   def flash(uri, msg = '', color: 'darkgreen')
     response.set_cookie('flash_msg', msg)
     response.set_cookie('flash_color', color)
