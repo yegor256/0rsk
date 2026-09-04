@@ -72,8 +72,8 @@
     %br
     %span.item.small
       &= p[:schedule]
-    %form{action: iri.cut('/responses/detach').add(tid: triple[:id], id: p[:id], part: p[:part]), method: 'POST', style: 'display:inline', onsubmit: "return confirm('Are sure you want to detach plan ##{p[:id]}?')"}
-      %button.item.small{type: 'submit', title: 'Detach plan', style: 'background:none;border:none;padding:0;color:inherit;font:inherit;cursor:pointer'}
+    %form.inline-form.detach-form{action: iri.cut('/responses/detach').add(tid: triple[:id], id: p[:id], part: p[:part]), method: 'POST', data: {plan: p[:id]}}
+      %button.item.small.plain-button{type: 'submit', title: 'Detach plan'}
         Detach
 
 %p

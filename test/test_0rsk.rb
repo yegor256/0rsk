@@ -39,6 +39,15 @@ class Rsk::AppTest < TestCase
     end
   end
 
+  def test_sets_content_security_policy_header
+    get('/')
+    header = last_response.headers['Content-Security-Policy']
+    refute_nil(header, 'expected a Content-Security-Policy header on every response')
+    assert_includes(header, "style-src 'self'")
+    refute_includes(header, "style-src 'self' 'unsafe-inline'")
+    assert_includes(header, "script-src 'self'")
+  end
+
   def test_not_found
     ['/unknown_path', '/js/x/y/z/not-found.js', '/css/a/b/c/not-found.css'].each do |p|
       get(p)
