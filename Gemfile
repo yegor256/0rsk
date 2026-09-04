@@ -30,7 +30,7 @@ gem 'rubocop-performance', '>0', require: false
 gem 'rubocop-rake', '>0', require: false
 gem 'sentry-ruby'
 gem 'simplecov', '~>0.22'
-gem 'simplecov-cobertura', '~> 3.0'
+gem 'simplecov-cobertura', '~> 4.0'
 gem 'sinatra', '~>4.2'
 gem 'sprockets', '~>4.2'
 gem 'telebot', '~>0.1'
