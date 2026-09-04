@@ -29,6 +29,19 @@ class Rsk::PlansTest < TestCase
     plans.get(id, rid).complete
   end
 
+  def test_refuses_a_part_of_another_project
+    mine = test_project
+    theirs = test_project
+    alien = test_risk(project: theirs)
+    assert_includes(
+      assert_raises(Rsk::Urror) do
+        Rsk::Plans.new(test_pgsql, mine).add(alien, 'we make backups')
+      end.message,
+      "must belong to project ##{mine}"
+    )
+    assert_equal(0, Rsk::Plans.new(test_pgsql, theirs).count)
+  end
+
   def test_fetch_no_duplicates
     pid = test_project
     cid = test_cause(project: pid)
