@@ -16,22 +16,18 @@ class Rsk::Plan
     @part = part
   end
 
-  def detach
+  def detach(con: nil)
+    return detach_in(con) unless con.nil?
     @pgsql.transaction do |t|
-      project = pid(t)
-      if t.exec('SELECT * FROM part WHERE id = $1 AND project = $2', [@part, project]).empty?
-        raise(Rsk::Urror, "##{@id} is not in your project ##{project}")
-      end
-      t.exec('DELETE FROM plan WHERE id = $1 AND part = $2', [@id, @part])
-      t.exec('DELETE FROM part WHERE id = $1', [@id]) if t.exec('SELECT * FROM plan WHERE id = $1', [@id]).empty?
+      detach_in(t)
     end
   end
 
-  def complete(time: Time.now - (4 * 60 * 60))
-    if /^[a-z]+$/.match?(schedule)
-      @pgsql.exec('UPDATE plan SET completed = $3 WHERE id = $1 AND part = $2', [@id, @part, time])
+  def complete(time: Time.now - (4 * 60 * 60), con: nil)
+    if /^[a-z]+$/.match?(schedule(con:))
+      (con || @pgsql).exec('UPDATE plan SET completed = $3 WHERE id = $1 AND part = $2', [@id, @part, time])
     else
-      detach
+      detach(con:)
     end
   end
 
@@ -54,6 +50,16 @@ class Rsk::Plan
   end
 
   private
+
+  def detach_in(con)
+    project = pid(con)
+    if con.exec('SELECT * FROM part WHERE id = $1 AND project = $2', [@part, project]).empty?
+      raise(Rsk::Urror, "##{@id} is not in your project ##{project}")
+    end
+    con.exec('DELETE FROM plan WHERE id = $1 AND part = $2', [@id, @part])
+    return unless con.exec('SELECT * FROM plan WHERE id = $1', [@id]).empty?
+    con.exec('DELETE FROM part WHERE id = $1', [@id])
+  end
 
   def pid(con)
     row = con.exec('SELECT project FROM part WHERE id = $1 FOR UPDATE', [@id]).first
