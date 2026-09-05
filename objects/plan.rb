@@ -17,9 +17,9 @@ class Rsk::Plan
   end
 
   def detach(con: nil)
-    return detach_in(con) unless con.nil?
+    return wipe(con) unless con.nil?
     @pgsql.transaction do |t|
-      detach_in(t)
+      wipe(t)
     end
   end
 
@@ -51,7 +51,7 @@ class Rsk::Plan
 
   private
 
-  def detach_in(con)
+  def wipe(con)
     project = pid(con)
     if con.exec('SELECT * FROM part WHERE id = $1 AND project = $2', [@part, project]).empty?
       raise(Rsk::Urror, "##{@id} is not in your project ##{project}")
