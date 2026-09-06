@@ -24,7 +24,8 @@ class Rsk::Pipeline
         'JOIN effect ON triple.effect = effect.id',
         'LEFT JOIN task ON task.plan = plan.id',
         'WHERE project.login = $1 AND task.id IS NULL',
-        'GROUP BY plan.id, plan.completed, plan.schedule'
+        'GROUP BY plan.id, plan.completed, plan.schedule',
+        'ORDER BY rank DESC'
       ],
       [@login]
     ).filter_map do |p|
