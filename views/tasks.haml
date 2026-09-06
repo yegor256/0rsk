@@ -62,21 +62,25 @@
           &= t[:title]
         %span.item<
           &= t[:schedule]
-        %a.item{href: iri.cut('/tasks/done').add(id: t[:id]), title: 'Mark as done'} Done
+        %form.item{action: iri.cut('/tasks/done').add(id: t[:id]), method: 'POST', style: 'display:inline'}
+          %button{type: 'submit', title: 'Mark as done', style: 'background:none;border:none;padding:0;color:inherit;font:inherit;cursor:pointer'}
+            Done
         - unless /^[a-z]+$/.match?(t[:schedule])
           %span.item
             Later:
-            %a{href: iri.cut('/tasks/later'), title: 'Postpone'.add(id: t[:id], period: 'week')} week
-            = '|'
-            %a{href: iri.cut('/tasks/later'), title: 'Postpone'.add(id: t[:id], period: 'month')} month
-            = '|'
-            %a{href: iri.cut('/tasks/later'), title: 'Postpone'.add(id: t[:id], period: 'quarter')} quarter
+            - %w[week month quarter].each_with_index do |period, i|
+              = '|' unless i.zero?
+              %form{action: iri.cut('/tasks/later').add(id: t[:id], period: period), method: 'POST', style: 'display:inline'}
+                %button{type: 'submit', title: 'Postpone', style: 'background:none;border:none;padding:0;color:inherit;font:inherit;cursor:pointer'}
+                  = period
   = Tilt::HamlTemplate.new('views/_paging.haml', 1, format: :xhtml).render(self, locals.merge(count: tasks.count))
 
 %p
   We're checking all your plans regularly and create tasks
   accordingly, when time comes. You can
-  %a{href: iri.cut('/tasks/create'), title: 'Pull latest plans'} click here
+  %form{action: iri.cut('/tasks/create'), method: 'POST', style: 'display:inline'}
+    %button{type: 'submit', title: 'Pull latest plans', style: 'background:none;border:none;padding:0;color:inherit;font:inherit;cursor:pointer'}
+      click here
   to pull the latest plans in, right now.
   - if updated
     The last time plans were checked

@@ -94,7 +94,7 @@ get '/projects' do
   haml :projects, layout: :layout, locals: merged(title: '/projects', projects: projects.fetch)
 end
 
-get '/projects/select' do
+post '/projects/select' do
   pid = params[:id]
   response.set_cookie('0rsk-project', pid)
   flash('/ranked', "Project ##{pid} selected")
@@ -103,7 +103,8 @@ end
 post '/projects/create' do
   title = params[:title]
   pid = projects.add(title)
-  flash("/projects/select?id=#{pid}", "A new project ##{pid} selected")
+  response.set_cookie('0rsk-project', pid.to_s)
+  flash('/ranked', "A new project ##{pid} selected")
 end
 
 post '/projects/delete' do
