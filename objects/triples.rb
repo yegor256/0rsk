@@ -76,9 +76,8 @@ class Rsk::Triples
         impact: Integer(r['impact']),
         positive: r['positive'] == 't',
         rank: Integer(r['rank']),
-        plans: r['plans'] == '{NULL}' ? [] : JSON.parse("[#{r['plans'][1..-2]}]").map do |p|
-          id, text = p.split(':', 2)
-          { id: Integer(id), text: text }
+        plans: JSON.parse(r['plans']).filter_map do |p|
+          { id: Integer(p['id']), text: p['text'] } unless p['id'].nil?
         end
       }
     end
@@ -114,7 +113,7 @@ class Rsk::Triples
         '  risk.probability AS probability, effect.impact AS impact,',
         '  cpart.text AS ctext, rpart.text AS rtext, epart.text AS etext,',
         '  (probability * impact) AS rank,',
-        '  ARRAY_AGG(ppart.id || \':\' || ppart.text || \' (\' || plan.schedule || \')\')',
+        '  JSONB_AGG(JSONB_BUILD_OBJECT(\'id\', ppart.id, \'text\', ppart.text || \' (\' || plan.schedule || \')\'))',
         '    OVER (PARTITION BY t.id) AS plans',
         'FROM triple t',
         'JOIN cause ON cause.id = t.cause',

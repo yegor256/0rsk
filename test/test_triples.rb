@@ -29,6 +29,16 @@ class Rsk::TriplesTest < TestCase
     triples.fetch.each { |t| triples.delete(t[:id]) }
   end
 
+  def test_fetches_a_plan_whose_text_has_a_newline
+    project = test_project
+    eid = test_effect(project: project)
+    triples = Rsk::Triples.new(test_pgsql, project)
+    triples.add(test_cause(project: project), test_risk(project: project), eid)
+    Rsk::Plans.new(test_pgsql, project).add(eid, "pay the bill\nand check it")
+    assert_equal(1, triples.fetch[0][:plans].count)
+    assert_includes(triples.fetch[0][:plans][0][:text], "pay the bill\nand check it")
+  end
+
   def test_rejects_cross_project_parts
     project = test_project
     rid = test_risk(project: project)
