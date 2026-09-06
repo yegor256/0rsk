@@ -27,7 +27,7 @@ class Rsk::Tasks
     row = plan(id)
     @pgsql.transaction do |t|
       t.exec('DELETE FROM task WHERE id = $1', [id])
-      Rsk::Plans.new(@pgsql, Integer(row['project'])).get(Integer(row['id']), Integer(row['part'])).complete
+      Rsk::Plans.new(@pgsql, Integer(row['project'])).get(Integer(row['id']), Integer(row['part'])).complete(con: t)
     end
   end
 

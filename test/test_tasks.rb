@@ -79,6 +79,31 @@ class Rsk::TasksTest < TestCase
     refute_equal(schedule, plan.schedule)
   end
 
+  def test_completes_a_dated_plan_with_one_connection
+    pgsql = Pgtk::Pool.new(
+      Pgtk::Wire::Yaml.new(File.join(__dir__, '../target/pgsql-config.yml')),
+      max: 1,
+      timeout: 0.1,
+      log: Loog::NULL
+    )
+    pgsql.start!
+    login = "bobbyD#{SecureRandom.hex(8)}"
+    project = Rsk::Projects.new(pgsql, login).add("test#{SecureRandom.hex(8)}")
+    eid = Rsk::Effects.new(pgsql, project).add('business will stop')
+    Rsk::Triples.new(pgsql, project).add(
+      Rsk::Causes.new(pgsql, project).add('we have data'),
+      Rsk::Risks.new(pgsql, project).add('we may lose it'), eid
+    )
+    plans = Rsk::Plans.new(pgsql, project)
+    pid = plans.add(eid, 'solve it!')
+    plans.get(pid, eid).reschedule((Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y'))
+    tasks = Rsk::Tasks.new(pgsql, login)
+    tasks.create
+    tasks.done(tasks.fetch[0][:id])
+    assert_equal(0, tasks.count)
+    assert_empty(pgsql.exec('SELECT * FROM plan WHERE id = $1 AND part = $2', [pid, eid]))
+  end
+
   def test_resolves_the_owning_project
     login = "bobbyP#{SecureRandom.hex(8)}"
     project = Rsk::Projects.new(test_pgsql, login).add("test#{SecureRandom.hex(8)}")
