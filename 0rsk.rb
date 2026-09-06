@@ -5,6 +5,7 @@
 
 $stdout.sync = true
 
+require 'csv'
 require 'glogin'
 require 'glogin/codec'
 require 'haml'
