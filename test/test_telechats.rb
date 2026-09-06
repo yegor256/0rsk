@@ -46,6 +46,21 @@ class Rsk::TelechatsTest < TestCase
     end
   end
 
+  def test_binds_a_chat_by_a_one_time_token
+    login = "judyIN#{SecureRandom.hex(8)}"
+    telechats = Rsk::Telechats.new(test_pgsql)
+    chat = SecureRandom.random_number(2_000_000_000) + 1
+    token = telechats.invite(chat)
+    assert_equal(chat, telechats.accept(token, login))
+    assert_equal(login, telechats.login(chat))
+    assert_raises(Rsk::Urror) { telechats.accept(token, login) }
+  end
+
+  def test_refuses_a_token_it_never_gave
+    telechats = Rsk::Telechats.new(test_pgsql)
+    assert_raises(Rsk::Urror) { telechats.accept(SecureRandom.uuid, "judyNO#{SecureRandom.hex(8)}") }
+  end
+
   def test_accepts_a_modern_telegram_chat
     login = "judyBI#{SecureRandom.hex(8)}"
     telechats = Rsk::Telechats.new(test_pgsql)

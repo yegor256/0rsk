@@ -1,0 +1,8 @@
+- # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
+- # SPDX-License-Identifier: MIT
+%p
+  Confirm that you want to link this account with the Telegram chat
+  the bot sent you the link from.
+%form{action: iri.cut('/telegram'), method: 'POST'}
+  %input{type: 'hidden', name: 'token', value: token}
+  %input{type: 'submit', value: 'Link'}
