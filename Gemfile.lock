@@ -166,7 +166,7 @@ GEM
     openssl (4.0.2)
     os (1.1.4)
     ostruct (0.6.3)
-    parallel (2.1.0)
+    parallel (2.2.0)
     parser (3.3.12.0)
       ast (~> 2.4.1)
       racc
@@ -284,7 +284,7 @@ GEM
     rubocop-ast (1.50.0)
       parser (>= 3.3.7.2)
       prism (~> 1.7)
-    rubocop-elegant (0.6.0)
+    rubocop-elegant (0.8.0)
       lint_roller (~> 1.1)
       rubocop (~> 1.75)
     rubocop-minitest (0.40.0)
