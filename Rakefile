@@ -28,7 +28,7 @@ end
 
 require 'eslintrb/eslinttask'
 Eslintrb::EslintTask.new(:eslint) do |t|
-  t.pattern = 'js/**/*.js'
+  t.pattern = 'public/js/**/*.js'
   t.options = :defaults
 end
 
