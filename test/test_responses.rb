@@ -6,6 +6,7 @@
 require 'rack/test'
 require 'securerandom'
 require_relative 'test__helper'
+
 require_relative '../0rsk'
 require_relative '../objects/plans'
 require_relative '../objects/triples'
