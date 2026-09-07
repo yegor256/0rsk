@@ -5,6 +5,7 @@
 
 require 'rack/test'
 require_relative 'test__helper'
+
 require_relative '../0rsk'
 
 class Rsk::TermsTest < TestCase
