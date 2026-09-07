@@ -22,7 +22,6 @@ before '/*' do
       response.delete_cookie('glogin')
     end
   end
-  @locals[:tasks_count] = tasks.count if @locals[:user]
 end
 
 get '/github-callback' do
