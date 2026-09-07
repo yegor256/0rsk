@@ -13,9 +13,9 @@ class Rsk::Trimmed
 
   def to_s
     text = @text.to_s
-    return text if text.length <= @max
+    return text if units(text) <= @max
     suffix = @max < 3 ? '.' * @max : '...'
-    limit = @max - suffix.length
+    limit = @max - units(suffix)
     chars = text.each_char.to_a
     stack = []
     escaped = false
@@ -23,7 +23,11 @@ class Rsk::Trimmed
     line = 0
     openings = ['[', '(']
     closings = [[']', '['], [')', '(']]
-    chars.first(limit).each_with_index do |char, idx|
+    room = limit
+    chars.each_with_index do |char, idx|
+      width = char.ord > 0xFFFF ? 2 : 1
+      break if width > room
+      room -= width
       if escaped
         escaped = false
       elsif char == '\\'
@@ -38,5 +42,11 @@ class Rsk::Trimmed
       line = idx if char == "\n"
     end
     "#{chars.first(line.zero? ? safe : line).join}#{suffix}"
+  end
+
+  private
+
+  def units(text)
+    text.each_char.sum { |c| c.ord > 0xFFFF ? 2 : 1 }
   end
 end
