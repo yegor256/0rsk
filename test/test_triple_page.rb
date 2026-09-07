@@ -23,17 +23,21 @@ class Rsk::TriplePageTest < TestCase
     project = Rsk::Projects.new(test_pgsql, login).add("p#{SecureRandom.hex(8)}")
     risk = Rsk::Risks.new(test_pgsql, project).add("risk #{SecureRandom.hex(8)}")
     Rsk::Risks.new(test_pgsql, project).get(risk).weigh(8)
-    tid = Rsk::Triples.new(test_pgsql, project).add(
-      Rsk::Causes.new(test_pgsql, project).add("cause #{SecureRandom.hex(8)}"),
-      risk,
-      Rsk::Effects.new(test_pgsql, project).add("effect #{SecureRandom.hex(8)}")
-    )
     set_cookie("glogin=#{login}")
     set_cookie("0rsk-project=#{project}")
-    get("/triple?id=#{tid}")
+    get(
+      "/triple?id=#{Rsk::Triples.new(test_pgsql, project).add(
+        Rsk::Causes.new(test_pgsql, project).add("cause #{SecureRandom.hex(8)}"),
+        risk,
+        Rsk::Effects.new(test_pgsql, project).add("effect #{SecureRandom.hex(8)}")
+      )}"
+    )
     assert_equal(200, last_response.status, last_response.body)
-    picked = Nokogiri::HTML.parse(last_response.body)
-      .xpath("//select[@id='probability']/option[@selected]").map { |o| o['value'] }
-    assert_equal(['8'], picked, "exactly one option must be selected: #{last_response.body}")
+    html = Nokogiri::HTML.parse(last_response.body)
+    assert_equal(
+      ['8'],
+      html.xpath("//select[@id='probability']/option[@selected]").map { |o| o['value'] },
+      "exactly one option must be selected: #{last_response.body}"
+    )
   end
 end
