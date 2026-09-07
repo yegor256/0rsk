@@ -39,6 +39,26 @@ class Rsk::TriplesTest < TestCase
     assert_includes(triples.fetch[0][:plans][0][:text], "pay the bill\nand check it")
   end
 
+  def test_deletes_with_one_connection
+    pgsql = Pgtk::Pool.new(
+      Pgtk::Wire::Yaml.new(File.join(__dir__, '../target/pgsql-config.yml')),
+      max: 1,
+      timeout: 0.1,
+      log: Loog::NULL
+    )
+    pgsql.start!
+    project = Rsk::Projects.new(pgsql, "bobbyT#{SecureRandom.hex(8)}").add("test#{SecureRandom.hex(8)}")
+    triples = Rsk::Triples.new(pgsql, project)
+    triples.delete(
+      triples.add(
+        Rsk::Causes.new(pgsql, project).add('we have data'),
+        Rsk::Risks.new(pgsql, project).add('we may lose it'),
+        Rsk::Effects.new(pgsql, project).add('business will stop')
+      )
+    )
+    assert_equal(0, triples.count)
+  end
+
   def test_rejects_cross_project_parts
     project = test_project
     rid = test_risk(project: project)
