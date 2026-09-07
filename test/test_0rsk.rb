@@ -176,6 +176,13 @@ class Rsk::AppTest < TestCase
     end
   end
 
+  def test_login_cookie_is_protected
+    get('/?glogin=bob')
+    cookie = last_response.headers['Set-Cookie'].to_s
+    assert_includes(cookie.downcase, 'httponly', cookie)
+    assert_includes(cookie.downcase, 'samesite=lax', cookie)
+  end
+
   def test_deletes_ranked
     pid = login("deleter#{rand(99_999)}")
     post(
