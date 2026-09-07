@@ -23,7 +23,7 @@ class Rsk::LimitsTest < TestCase
     refute(limits.over?('1.1.1.1', now: now + 61))
   end
 
-  def test_does_not_let_a_rejected_request_extend_the_block
+  def test_forgets_a_refused_request
     limits = Rsk::Limits.new(max: 2, period: 60)
     now = Time.now.to_i
     2.times { limits.over?('1.1.1.1', now: now) }
