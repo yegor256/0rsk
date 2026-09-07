@@ -48,4 +48,4 @@
             = rank(r)
           %td.right
             = r[:effects]
-  = Tilt::HamlTemplate.new('views/_paging.haml', 1, format: :xhtml).render(self, locals.merge(count: risks.count))
+  != Tilt::HamlTemplate.new('views/_paging.haml', 1, format: :xhtml).render(self, locals.merge(count: risks.count))
