@@ -17,8 +17,7 @@ class Rsk::TrimmedTest < TestCase
   end
 
   def test_counts_an_emoji_the_way_telegram_counts_it
-    text = '🔥' * 4480
-    trimmed = Rsk::Trimmed.new(text, 4000).to_s
+    trimmed = Rsk::Trimmed.new('🔥' * 4480, 4000).to_s
     assert_operator(units(trimmed), :<=, 4096, "#{units(trimmed)} units is over the API limit")
   end
 
