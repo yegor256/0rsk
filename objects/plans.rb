@@ -27,6 +27,8 @@ class Rsk::Plans
       t.exec('INSERT INTO plan (id, part) VALUES ($1, $2)', [id, part])
       id
     end
+  rescue PG::UniqueViolation
+    raise(Rsk::Urror, "Plan \"#{text}\" already exists in this project")
   end
 
   def get(id, part, con: nil)
