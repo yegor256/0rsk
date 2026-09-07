@@ -15,7 +15,6 @@ class Rsk::Trimmed
     text = @text.to_s
     return text if units(text) <= @max
     suffix = @max < 3 ? '.' * @max : '...'
-    limit = @max - units(suffix)
     chars = text.each_char.to_a
     stack = []
     escaped = false
@@ -23,7 +22,7 @@ class Rsk::Trimmed
     line = 0
     openings = ['[', '(']
     closings = [[']', '['], [')', '(']]
-    room = limit
+    room = @max - units(suffix)
     chars.each_with_index do |char, idx|
       width = char.ord > 0xFFFF ? 2 : 1
       break if width > room
