@@ -154,7 +154,7 @@ class Rsk::AppTest < TestCase
       post('/triple/save', "ctext=c#{salt}&rtext=r#{salt}&etext=e#{salt}&emoji=A&cid=&rid=&eid=&#{tail}")
       refute_includes(last_response.body, '<pre', "#{tail} shows a backtrace: #{last_response.body}")
     end
-    get('/tasks/done?id=abc')
+    post('/tasks/done?id=abc')
     refute_includes(last_response.body, '<pre', last_response.body)
   end
 
@@ -166,6 +166,14 @@ class Rsk::AppTest < TestCase
     cookie = last_response.headers['Set-Cookie']
     refute_nil(cookie, last_response.body)
     assert_includes(cookie.to_s, 'glogin=', last_response.body)
+  end
+
+  def test_refuses_to_change_data_over_get
+    login
+    %w[/tasks/done?id=1 /tasks/later?id=1&period=week /tasks/create /projects/select?id=1].each do |uri|
+      get(uri)
+      assert_equal(404, last_response.status, uri)
+    end
   end
 
   def test_deletes_ranked

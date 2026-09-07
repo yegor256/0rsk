@@ -19,8 +19,9 @@
   - projects.each do |p|
     %p
       = "##{p[:id]}:"
-      %a{href: iri.cut('/projects/select').add(id: p[:id]), title: 'Click to pick this project'}<
-        &= p[:title]
+      %form{action: iri.cut('/projects/select').add(id: p[:id]), method: 'POST', style: 'display:inline'}
+        %button{type: 'submit', title: 'Click to pick this project', style: 'background:none;border:none;padding:0;color:inherit;font:inherit;cursor:pointer'}
+          &= p[:title]
       %br
       %span.small
         %form{action: iri.cut('/projects/delete').add(id: p[:id]), method: 'POST', style: 'display:inline', onsubmit: "return confirm('Are sure you want to delete it?')"}

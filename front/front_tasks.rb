@@ -32,19 +32,19 @@ get '/tasks' do
   )
 end
 
-get '/tasks/done' do
+post '/tasks/done' do
   id = number(params[:id], 'id')
   tasks.done(id)
   flash('/tasks', "Thanks, task ##{id} was completed!")
 end
 
-get '/tasks/later' do
+post '/tasks/later' do
   id = number(params[:id], 'id')
   tasks.postpone(id, Rsk::Postpone.new(params[:period]).seconds)
   flash('/tasks', "Thanks, the task ##{id} was postponed")
 end
 
-get '/tasks/create' do
+post '/tasks/create' do
   tasks.create
   flash('/tasks', 'All necessary tasks were created, thanks!')
 end
