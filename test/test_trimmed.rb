@@ -13,12 +13,11 @@ class Rsk::TrimmedTest < TestCase
   end
 
   def test_cuts_at_the_last_line_break
-    assert_equal("a\nb...", Rsk::Trimmed.new("a\nb\ncdefgh", 6).to_s)
+    assert_equal("a\nb...", Rsk::Trimmed.new("a\nb\ncdefgh", 9).to_s)
   end
 
   def test_counts_an_emoji_the_way_telegram_counts_it
-    text = '🔥' * 4480
-    trimmed = Rsk::Trimmed.new(text, 4000).to_s
+    trimmed = Rsk::Trimmed.new('🔥' * 4480, 4000).to_s
     assert_operator(units(trimmed), :<=, 4096, "#{units(trimmed)} units is over the API limit")
   end
 
