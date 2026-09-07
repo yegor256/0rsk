@@ -16,7 +16,7 @@ end
 get '/favicon.svg' do
   content_type 'image/svg+xml'
   response.headers['Cache-Control'] = 'no-cache'
-  count = tasks_count
+  count = agenda
   display = count > 99 ? '99+' : count.to_s
   color = count.zero? ? '#888' : '#C5283D'
   sz = count > 9 ? 10 : 14
@@ -56,12 +56,12 @@ module Rsk::Misc
     "#{request.ip} #{request.user_agent} #{Rsk::VERSION} #{Time.now.strftime('%Y/%m')}"
   end
 
-  def tasks_count
-    @tasks_count ||= @locals[:user] ? tasks.count : 0
+  def agenda
+    @agenda ||= @locals[:user] ? tasks.count : 0
   end
 
   def merged(hash)
-    out = @locals.merge(tasks_count: tasks_count).merge(hash)
+    out = @locals.merge(tasks_count: agenda).merge(hash)
     out[:local_assigns] = out
     if request.cookies['flash_msg']
       out[:flash_msg] = request.cookies['flash_msg']
