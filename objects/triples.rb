@@ -45,15 +45,9 @@ class Rsk::Triples
         raise(Rsk::Urror, "Triple ##{id} is not in your project ##{@project}")
       end
       t.exec('DELETE FROM triple WHERE id = $1', [id])
-      if t.exec('SELECT * FROM triple WHERE cause = $1', [triple[:cid]]).empty?
-        t.exec('DELETE FROM part WHERE id = $1', [triple[:cid]])
-      end
-      if t.exec('SELECT * FROM triple WHERE risk = $1', [triple[:rid]]).empty?
-        t.exec('DELETE FROM part WHERE id = $1', [triple[:rid]])
-      end
-      if t.exec('SELECT * FROM triple WHERE effect = $1', [triple[:eid]]).empty?
-        t.exec('DELETE FROM part WHERE id = $1', [triple[:eid]])
-      end
+      forget(t, triple[:cid]) if t.exec('SELECT * FROM triple WHERE cause = $1', [triple[:cid]]).empty?
+      forget(t, triple[:rid]) if t.exec('SELECT * FROM triple WHERE risk = $1', [triple[:rid]]).empty?
+      forget(t, triple[:eid]) if t.exec('SELECT * FROM triple WHERE effect = $1', [triple[:eid]]).empty?
     end
   end
 
@@ -84,6 +78,11 @@ class Rsk::Triples
   end
 
   private
+
+  def forget(con, part)
+    con.exec('DELETE FROM part WHERE id IN (SELECT id FROM plan WHERE part = $1)', [part])
+    con.exec('DELETE FROM part WHERE id = $1', [part])
+  end
 
   def query(id, query)
     where = []
