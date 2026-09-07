@@ -98,13 +98,7 @@ post '/triple/save' do
   cid = params[:cid].empty? ? causes.add(ctext) : params[:cid]
   rid = params[:rid].empty? ? risks.add(rtext) : params[:rid]
   eid = params[:eid].empty? ? effects.add(etext) : params[:eid]
-  # @todo #530:30min Save the triple in one transaction.
-  #  The texts are written one statement at a time, so a value that only the
-  #  object can reject still leaves them changed: a probability of 42 passes
-  #  "number" here and is refused later by Risk#weigh, after all three renames
-  #  have been committed. Wrapping the whole save in a single transaction would
-  #  make the form atomic, but every object below takes its own connection from
-  #  the pool, so this needs the connection to be threaded through first.
+  # @todo #530:30min Save the triple in one transaction, so a value the object rejects leaves nothing half written.
   causes.get(cid).decorate(params[:emoji])
   causes.get(cid).rename(ctext)
   risks.get(rid).rename(rtext)
