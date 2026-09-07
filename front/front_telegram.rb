@@ -12,8 +12,11 @@ require_relative '../objects/trimmed'
 require_relative '../objects/urror'
 
 get '/telegram' do
-  id = Integer(params[:id])
-  telechats.add(id, identity)
+  haml :telegram, layout: :layout, locals: merged(title: '/telegram', token: params[:token].to_s)
+end
+
+post '/telegram' do
+  id = telechats.accept(params[:token].to_s, identity)
   telepost("We identified you as [@#{identity}](https://github.com/#{identity}), thanks!")
   flash('/', "Your account linked with Telegram chat ##{id}, thanks!")
 end
@@ -218,7 +221,10 @@ if settings.config['telegram']
       if telechats.exists?(chat)
         dispatch(chat, message)
       else
-        telepost("[Click here](https://www.0rsk.com/telegram?id=#{chat}) to identify yourself.", chat)
+        telepost(
+          "[Click here](https://www.0rsk.com/telegram?token=#{telechats.invite(chat)}) to identify yourself.",
+          chat
+        )
       end
     end
   rescue Net::ReadTimeout => e

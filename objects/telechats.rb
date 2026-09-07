@@ -3,7 +3,9 @@
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
+require 'securerandom'
 require_relative 'rsk'
+require_relative 'urror'
 
 class Rsk::Telechats
   def initialize(pgsql)
@@ -12,6 +14,22 @@ class Rsk::Telechats
 
   def add(id, login)
     @pgsql.exec('INSERT INTO telechat (id, login) VALUES ($1, $2)', [id, login])
+  end
+
+  def invite(chat)
+    token = SecureRandom.uuid
+    @pgsql.exec('INSERT INTO teleinvite (token, chat) VALUES ($1, $2)', [token, chat])
+    token
+  end
+
+  def accept(token, login)
+    @pgsql.transaction do |t|
+      rows = t.exec('DELETE FROM teleinvite WHERE token = $1 RETURNING chat', [token])
+      raise(Rsk::Urror, 'This link is not valid any more, ask the bot for a new one') if rows.empty?
+      chat = Integer(rows[0]['chat'])
+      t.exec('INSERT INTO telechat (id, login) VALUES ($1, $2)', [chat, login])
+      chat
+    end
   end
 
   def exists?(id)
