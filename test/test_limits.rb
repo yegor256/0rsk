@@ -28,10 +28,7 @@ class Rsk::LimitsTest < TestCase
     now = Time.now.to_i
     2.times { limits.over?('1.1.1.1', now: now) }
     5.times { assert(limits.over?('1.1.1.1', now: now + 30), 'must be over the limit') }
-    refute(
-      limits.over?('1.1.1.1', now: now + 61),
-      'the requests that were refused must not keep the client blocked'
-    )
+    refute(limits.over?('1.1.1.1', now: now + 61), 'a refused request must not keep the client blocked')
   end
 
   def test_survives_concurrent_hits
