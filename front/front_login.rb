@@ -28,9 +28,15 @@ end
 get '/github-callback' do
   code = params[:code]
   error(400) if code.nil?
+  begin
+    user = settings.glogin.user(code)
+  rescue StandardError => e
+    settings.log.error(e.message)
+    flash('/', 'The login didn\'t work out, please try again', color: 'darkred')
+  end
   response.set_cookie(
     :glogin, GLogin::Cookie::Open.new(
-      settings.glogin.user(code),
+      user,
       settings.config['github']['encryption_secret'],
       context
     ).to_s
