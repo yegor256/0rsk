@@ -33,6 +33,9 @@ get '/github-callback' do
   rescue SocketError, SystemCallError, OpenSSL::SSL::SSLError, Net::OpenTimeout, Net::ReadTimeout => e
     settings.log.error("Can't log in via GitHub: #{e.message}")
     flash('/', 'GitHub could not be reached right now, please try again', color: 'darkred')
+  rescue StandardError => e
+    settings.log.error(e.message)
+    flash('/', 'The login didn\'t work out, please try again', color: 'darkred')
   end
   response.set_cookie(
     :glogin, GLogin::Cookie::Open.new(
