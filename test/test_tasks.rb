@@ -104,6 +104,21 @@ class Rsk::TasksTest < TestCase
     assert_empty(pgsql.exec('SELECT * FROM plan WHERE id = $1 AND part = $2', [pid, eid]))
   end
 
+  def test_creates_the_same_task_from_two_threads
+    login = "bobbyRC#{SecureRandom.hex(8)}"
+    project = Rsk::Projects.new(test_pgsql, login).add("test#{SecureRandom.hex(8)}")
+    eid = Rsk::Effects.new(test_pgsql, project).add('business will stop')
+    Rsk::Triples.new(test_pgsql, project).add(
+      Rsk::Causes.new(test_pgsql, project).add('we have data'),
+      Rsk::Risks.new(test_pgsql, project).add('we may lose it'),
+      eid
+    )
+    plans = Rsk::Plans.new(test_pgsql, project)
+    plans.get(plans.add(eid, 'solve it!'), eid).reschedule((Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y'))
+    Array.new(2) { Thread.new { Rsk::Tasks.new(test_pgsql, login).create } }.each(&:join)
+    assert_equal(1, Rsk::Tasks.new(test_pgsql, login).count)
+  end
+
   def test_resolves_the_owning_project
     login = "bobbyP#{SecureRandom.hex(8)}"
     project = Rsk::Projects.new(test_pgsql, login).add("test#{SecureRandom.hex(8)}")
