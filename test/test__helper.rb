@@ -16,7 +16,12 @@ if ARGV.include?('--coverage') || ENV['PICKS']
         SimpleCov::Formatter::CoberturaFormatter
       ]
     )
-    # @todo #508:30min Raise the minimum back to 40 once the suite covers enough of the code again.
+    # rubocop:disable Elegant/NoComments
+    # @todo #508:30min Raise the minimum back to 40. The suite measures 39.21% today, so the
+    #  number was lowered to keep the build green when the gate was switched on for the first
+    #  time. Once the pending pull requests land and the coverage climbs over 40 again, put the
+    #  original figure back and delete this note.
+    # rubocop:enable Elegant/NoComments
     SimpleCov.minimum_coverage(39)
     SimpleCov.minimum_coverage_by_file(10)
     SimpleCov.start do
