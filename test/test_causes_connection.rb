@@ -27,4 +27,19 @@ class Rsk::CausesConnectionTest < TestCase
     end
     assert_equal(1, backends.uniq.size, "a refused duplicate must not throw the connection away: #{backends}")
   end
+
+  def test_tells_the_losers_of_a_concurrent_add
+    causes = Rsk::Causes.new(test_pgsql, test_project)
+    text = "cause #{SecureRandom.hex(8)}"
+    seen = Array.new(4) do
+      Thread.new do
+        causes.add(text)
+        'added'
+      rescue Rsk::Urror
+        'refused'
+      end
+    end.map(&:value)
+    assert_equal(1, seen.count('added'), "exactly one may win: #{seen}")
+    assert_equal(3, seen.count('refused'), "the losers must be told, not crash: #{seen}")
+  end
 end
