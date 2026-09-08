@@ -185,7 +185,7 @@ module Rsk::Telegram
             "\n\n[T#{t[:id]}](https://www.0rsk.com/responses?id=#{t[:triple]})",
             "(#{t[:positive] ? '+' : '-'}#{t[:rank]})",
             Rsk::Markdown.new(t[:text]).to_s,
-            "in [#{Rsk::Markdown.new(t[:title])}](https://www.0rsk.com/projects/#{t[:pid]}):",
+            "in [#{Rsk::Markdown.new(t[:title])}](https://www.0rsk.com/project/#{t[:pid]}):",
             "#{Rsk::Markdown.new(t[:ctext])}; #{Rsk::Markdown.new(t[:rtext])}; #{Rsk::Markdown.new(t[:etext])}",
             "(#{Rsk::Markdown.new(t[:schedule])})"
           ].join(' ')
