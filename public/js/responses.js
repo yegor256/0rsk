@@ -13,9 +13,8 @@ function on_schedule(label, f) {
 
 function on_mnemo(id) {
   "use strict";
-  var $span = $("#" + id);
-  $span.on("click", function() {
-    $("#schedule").val($span.text());
+  $("#" + id).on("click", function() {
+    $("#schedule").val(id);
     return false;
   });
 }
