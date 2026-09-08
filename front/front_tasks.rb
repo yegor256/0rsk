@@ -8,11 +8,13 @@ require_relative '../objects/pipeline'
 require_relative '../objects/postpone'
 require_relative '../objects/tasks'
 
+Sinatra::Application.set(:updated, nil)
+
 Rsk::Daemon.new(10).start do
   users.fetch.each do |login|
     tasks(login: login).create
   end
-  @updated = Time.now
+  Sinatra::Application.set(:updated, Time.now)
 end
 
 get '/tasks' do
@@ -28,7 +30,7 @@ get '/tasks' do
     total: tasks.count(query: query),
     tasks: tasks.fetch(query: query, offset: offset, limit: limit),
     wired: telechats.wired?(identity),
-    updated: @updated
+    updated: settings.updated
   )
 end
 
