@@ -44,6 +44,17 @@ class Rsk::Telechats
     end
   end
 
+  def invited(token)
+    row = @pgsql.exec(
+      [
+        'SELECT chat FROM teleinvite WHERE token = $1',
+        "AND created > NOW() - INTERVAL '#{Rsk::Telechats::HOURS} hours'"
+      ],
+      [token]
+    ).first
+    row.nil? ? nil : Integer(row['chat'])
+  end
+
   def exists?(id)
     !@pgsql.exec('SELECT * FROM telechat WHERE id = $1', [id]).empty?
   end
