@@ -46,6 +46,8 @@ require_relative '../objects/risks'
 require_relative '../objects/triples'
 
 class TestCase < Minitest::Test
+  private
+
   def test_pgsql
     @@mtx ||= Mutex.new
     @@mtx.synchronize do
@@ -56,10 +58,7 @@ class TestCase < Minitest::Test
       @@test_pgsql.start!
     end
     @@test_pgsql
-    # rubocop:enable Style/ClassVars
   end
-
-  private
 
   def test_project(login: "u#{SecureRandom.hex(8)}", title: "t#{SecureRandom.hex(8)}")
     Rsk::Projects.new(test_pgsql, login).add(title)
