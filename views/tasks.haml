@@ -43,7 +43,7 @@
       %br
       = part('T', t[:id])
       ➜
-      %a{href: iri.cut('/responses'), title: 'View responses'.add(id: t[:triple])}<
+      %a{href: iri.cut('/responses').add(id: t[:triple]), title: 'View responses'}<
         %code= "P#{t[:plan]}"
       ➜
       = part(t[:prefix], t[:part])

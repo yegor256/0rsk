@@ -6,7 +6,7 @@
 
 %h2
   Responses to
-  %a{href: iri.cut('/triple'), title: 'New risk triple'.add(id: triple[:id])}
+  %a{href: iri.cut('/triple').add(id: triple[:id]), title: 'New risk triple'}
     = "##{triple[:id]}"
 
 %p
