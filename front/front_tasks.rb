@@ -18,9 +18,9 @@ if settings.role.daemons?
 end
 
 get '/tasks' do
-  offset = [Integer(params[:offset] || '0'), 0].max
-  limit = [Integer(params[:limit] || '10'), 1].max
-  query = params[:q] || ''
+  offset = [number(params[:offset] || 0, 'offset'), 0].max
+  limit = [number(params[:limit] || 10, 'limit'), 1].max
+  query = params[:q].to_s
   haml :tasks, layout: :layout, locals: merged(
     title: '/tasks',
     offset: offset,
