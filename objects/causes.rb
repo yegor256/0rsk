@@ -27,8 +27,10 @@ class Rsk::Causes
         t.exec('INSERT INTO cause (id) VALUES ($1)', [made])
         made
       end
-    raise(Rsk::Urror, "Cause \"#{text}\" already exists in this project") if id.nil?
+    taken(text) if id.nil?
     id
+  rescue PG::UniqueViolation
+    taken(text)
   end
 
   def emojis
@@ -69,6 +71,10 @@ class Rsk::Causes
   end
 
   private
+
+  def taken(text)
+    raise(Rsk::Urror, "Cause \"#{text}\" already exists in this project")
+  end
 
   def query(query)
     Rsk::Query.new(

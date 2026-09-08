@@ -27,8 +27,10 @@ class Rsk::Effects
         t.exec('INSERT INTO effect (id) VALUES ($1)', [made])
         made
       end
-    raise(Rsk::Urror, "Effect \"#{text}\" already exists in this project") if id.nil?
+    taken(text) if id.nil?
     id
+  rescue PG::UniqueViolation
+    taken(text)
   end
 
   def get(id)
@@ -60,6 +62,10 @@ class Rsk::Effects
   end
 
   private
+
+  def taken(text)
+    raise(Rsk::Urror, "Effect \"#{text}\" already exists in this project")
+  end
 
   def query(query)
     Rsk::Query.new(

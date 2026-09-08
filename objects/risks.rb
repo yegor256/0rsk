@@ -27,8 +27,10 @@ class Rsk::Risks
         t.exec('INSERT INTO risk (id) VALUES ($1)', [made])
         made
       end
-    raise(Rsk::Urror, "Risk \"#{text}\" already exists in this project") if id.nil?
+    taken(text) if id.nil?
     id
+  rescue PG::UniqueViolation
+    taken(text)
   end
 
   def get(id)
@@ -56,6 +58,10 @@ class Rsk::Risks
   end
 
   private
+
+  def taken(text)
+    raise(Rsk::Urror, "Risk \"#{text}\" already exists in this project")
+  end
 
   def query(query)
     Rsk::Query.new(
