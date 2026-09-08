@@ -1,0 +1,6 @@
+.bundle/
+.git/
+coverage/
+target/
+vendor/
+config.yml
