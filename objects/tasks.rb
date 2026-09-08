@@ -109,7 +109,7 @@ class Rsk::Tasks
         'ORDER BY task.id ASC) x',
         'ORDER BY rank DESC'
       ],
-      [@login, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip.gsub(/[%_]/, '\\\\\0')}%"]
+      [@login, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip.gsub(/[\\%_]/, '\\\\\0')}%"]
     )
   end
 
