@@ -13,15 +13,15 @@ ENV['RACK_ENV'] = 'test'
 task default: %i[clean test eslint rubocop xcop]
 
 require 'rake/testtask'
-desc 'Delete the coverage report of the previous run'
-task :wipe_coverage do
+desc 'Delete the previous report and ask the tests to measure the coverage'
+task :with_coverage do
   Rake::Cleaner.cleanup_files(['coverage'])
+  ENV['PICKS'] = 'yes'
 end
 
-Rake::TestTask.new(test: %i[pgsql liquibase wipe_coverage]) do |test|
+Rake::TestTask.new(test: %i[pgsql liquibase with_coverage]) do |test|
   test.libs << 'lib' << 'test'
   test.pattern = 'test/**/test_*.rb'
-  test.options = '--coverage'
   test.verbose = true
   test.warning = true
 end
