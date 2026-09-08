@@ -82,7 +82,7 @@ class Rsk::Plans
         (query.is_a?(Integer) ? '  triple.id = $2' : '  LOWER(part.text) LIKE $2'),
         '  ORDER BY plan.id, rank DESC',
         ') sub',
-        'ORDER BY rank DESC'
+        'ORDER BY rank DESC NULLS LAST'
       ],
       [@project, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip.gsub(/[%_]/, '\\\\\0')}%"]
     )
