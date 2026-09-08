@@ -42,6 +42,24 @@ class Rsk::PipelineTest < TestCase
     )
   end
 
+  def test_calculates_calendar_deadlines
+    pipeline = Rsk::Pipeline.new(test_pgsql, "cal#{SecureRandom.hex(8)}")
+    completed = Time.parse('2024-01-31 10:00:00 UTC')
+    {
+      'daily' => '2024-02-01 10:00:00 UTC',
+      'weekly' => '2024-02-07 10:00:00 UTC',
+      'monthly' => '2024-02-29 10:00:00 UTC',
+      'quarterly' => '2024-04-30 10:00:00 UTC',
+      'annually' => '2025-01-31 10:00:00 UTC'
+    }.each do |schedule, expected|
+      assert_equal(
+        Time.parse(expected),
+        pipeline.__send__(:deadline, completed, schedule),
+        "Wrong deadline for '#{schedule}'"
+      )
+    end
+  end
+
   private
 
   def planned(project, plans, weight)
