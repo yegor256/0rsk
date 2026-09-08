@@ -61,10 +61,10 @@ module Rsk::Misc
     out[:local_assigns] = out
     if request.cookies['flash_msg']
       out[:flash_msg] = request.cookies['flash_msg']
-      response.delete_cookie('flash_msg')
+      response.delete_cookie('flash_msg', path: '/')
     end
     out[:flash_color] = request.cookies['flash_color'] || 'darkgreen'
-    response.delete_cookie('flash_color')
+    response.delete_cookie('flash_color', path: '/')
     out
   end
 
@@ -75,8 +75,8 @@ module Rsk::Misc
   end
 
   def flash(uri, msg = '', color: 'darkgreen')
-    response.set_cookie('flash_msg', msg)
-    response.set_cookie('flash_color', color)
+    response.set_cookie('flash_msg', value: msg, path: '/')
+    response.set_cookie('flash_color', value: color, path: '/')
     redirect(uri)
   end
 end
