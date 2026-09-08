@@ -77,7 +77,7 @@ end
 
 get '/triple' do
   vars = { title: '/triple', project: pid, emojis: causes.emojis }
-  id = Integer(params[:id] || 0)
+  id = number(params[:id] || 0, 'id')
   if id.positive?
     triple = triples.fetch(id: id, limit: 1)[0]
     raise(Rsk::Urror, "Triple ##{id} not found") if triple.nil?
