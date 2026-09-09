@@ -68,6 +68,10 @@ module Rsk::Misc
     out
   end
 
+  def cookie(name, value)
+    response.set_cookie(name, value: value.to_s, secure: ENV['RACK_ENV'] != 'test', path: '/')
+  end
+
   def number(text, name)
     Integer(text.to_s, 10)
   rescue ArgumentError
@@ -75,8 +79,8 @@ module Rsk::Misc
   end
 
   def flash(uri, msg = '', color: 'darkgreen')
-    response.set_cookie('flash_msg', msg)
-    response.set_cookie('flash_color', color)
+    cookie('flash_msg', msg)
+    cookie('flash_color', color)
     redirect(uri)
   end
 end

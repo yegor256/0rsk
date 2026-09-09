@@ -9,7 +9,7 @@ before '/*' do
   end
   @locals = { http_start: Time.now, ver: Rsk::VERSION, login_link: settings.glogin.login_uri, request_ip: request.ip }
   if params[:glogin] && ENV['RACK_ENV'] != 'production'
-    response.set_cookie('glogin', params[:glogin])
+    cookie('glogin', params[:glogin])
   end
   if request.cookies['glogin']
     begin
@@ -34,12 +34,13 @@ get '/github-callback' do
     settings.log.error("Can't log in via GitHub: #{e.message}")
     flash('/', 'GitHub could not be reached right now, please try again', color: 'darkred')
   end
-  response.set_cookie(
-    :glogin, GLogin::Cookie::Open.new(
+  cookie(
+    :glogin,
+    GLogin::Cookie::Open.new(
       user,
       settings.config['github']['encryption_secret'],
       context
-    ).to_s
+    )
   )
   flash('/', 'You have been logged in')
 end
