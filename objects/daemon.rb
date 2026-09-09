@@ -12,12 +12,12 @@ class Rsk::Daemon
   end
 
   def start
-    sleep(1)
     Thread.start do
       loop do
         begin
           yield
-        rescue StandardError => e
+        rescue Exception => e # rubocop:disable Lint/RescueException
+          raise if e.is_a?(SystemExit) || e.is_a?(Interrupt) || e.is_a?(SignalException)
           Sentry.capture_exception(e)
         end
         sleep(@minutes * 60)
