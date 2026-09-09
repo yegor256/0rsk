@@ -97,14 +97,14 @@ end
 
 post '/projects/select' do
   pid = params[:id]
-  response.set_cookie('0rsk-project', pid)
+  cookie('0rsk-project', pid)
   flash('/ranked', "Project ##{pid} selected")
 end
 
 post '/projects/create' do
   title = params[:title]
   pid = projects.add(title)
-  response.set_cookie('0rsk-project', pid.to_s)
+  cookie('0rsk-project', pid)
   flash('/ranked', "A new project ##{pid} selected")
 end
 
