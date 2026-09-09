@@ -33,9 +33,16 @@ configure do
   set :haml, format: :xhtml, escape_html: false
   config = { 'github' => { 'client_id' => '?', 'client_secret' => '?', 'encryption_secret' => '' }, 'sentry' => '' }
   cfg = File.join(File.dirname(__FILE__), 'config.yml')
-  if File.exist?(cfg)
-    loaded = YAML.safe_load(File.open(cfg))
-    config.merge!(loaded) if loaded.is_a?(Hash)
+  if File.file?(cfg)
+    loaded = YAML.safe_load_file(cfg)
+    if loaded.is_a?(Hash)
+      config.merge!(loaded) do |_key, ours, theirs|
+        ours.is_a?(Hash) && theirs.is_a?(Hash) ? ours.merge(theirs) : theirs
+      end
+    end
+  end
+  if ENV['RACK_ENV'] != 'test' && config['github']['encryption_secret'].to_s.empty?
+    raise(Rsk::Urror, 'The github.encryption_secret is empty, so a login cookie would be taken as plain text')
   end
   if config['sentry'] && !config['sentry'].empty?
     Sentry.init do |c|
