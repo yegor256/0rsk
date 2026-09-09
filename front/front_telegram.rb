@@ -98,6 +98,19 @@ module Rsk::Telegram
     end
   end
 
+  def incoming(message)
+    return if message.nil?
+    chat = message.chat.id
+    if telechats.exists?(chat)
+      dispatch(chat, message)
+    else
+      telepost(
+        "[Click here](https://www.0rsk.com/telegram?token=#{telechats.invite(chat)}) to identify yourself.",
+        chat
+      )
+    end
+  end
+
   def dispatch(chat, message)
     login = telechats.login(chat)
     response =
@@ -217,15 +230,7 @@ Object.include(Rsk::Telegram)
 if settings.config['telegram']
   Rsk::Daemon.new.start do
     Telebot::Bot.new(settings.config['telegram']['token']).run do |_, message|
-      chat = message.chat.id
-      if telechats.exists?(chat)
-        dispatch(chat, message)
-      else
-        telepost(
-          "[Click here](https://www.0rsk.com/telegram?token=#{telechats.invite(chat)}) to identify yourself.",
-          chat
-        )
-      end
+      incoming(message)
     end
   rescue Net::ReadTimeout => e
     settings.log.error(e.message)
