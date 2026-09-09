@@ -106,7 +106,7 @@ class Rsk::Tasks
           'OR LOWER(rpart.text) LIKE $2',
           'OR LOWER(epart.text) LIKE $2)'
         ].join(' '),
-        'ORDER BY task.id ASC) x',
+        'ORDER BY task.id ASC, rank DESC) x',
         'ORDER BY rank DESC'
       ],
       [@login, query.is_a?(Integer) ? query : "%#{query.to_s.downcase.strip.gsub(/[\\%_]/, '\\\\\0')}%"]
