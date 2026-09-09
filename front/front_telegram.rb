@@ -37,7 +37,6 @@ module Rsk::Telegram
 
   def telepost(msg, chat = telechats.chat(identity), reply_markup: nil)
     return unless settings.config['telegram']
-    telechats.posted(msg, chat)
     telebot.send_message(
       chat_id: chat,
       parse_mode: 'Markdown',
@@ -45,6 +44,7 @@ module Rsk::Telegram
       text: Rsk::Trimmed.new(msg, 4000).to_s,
       reply_markup: reply_markup
     )
+    telechats.posted(msg, chat)
   end
 
   def reply(msg, login)
