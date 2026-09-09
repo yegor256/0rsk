@@ -74,7 +74,7 @@ class Rsk::Causes
       [
         'SELECT cause.*, part.text,',
         '  SUM(risk.probability * effect.impact) / COUNT(risk.id) AS rank,',
-        '  COUNT(risk.id) AS risks',
+        '  COUNT(DISTINCT risk.id) AS risks',
         'FROM cause',
         'JOIN part ON part.id = cause.id',
         'LEFT JOIN triple ON triple.cause = cause.id',
