@@ -12,6 +12,9 @@ require_relative '../objects/trimmed'
 require_relative '../objects/urror'
 
 get '/telegram' do
+  unless @locals[:user]
+    flash('/', 'Log in first, then open the link the bot sent you again', color: 'darkred')
+  end
   haml :telegram, layout: :layout, locals: merged(title: '/telegram', token: params[:token].to_s)
 end
 
