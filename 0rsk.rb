@@ -21,6 +21,7 @@ require 'telebot'
 require 'time'
 require 'yaml'
 require_relative 'objects/limits'
+require_relative 'objects/role'
 require_relative 'objects/urror'
 require_relative 'version'
 
@@ -31,6 +32,7 @@ end
 
 configure do
   set :haml, format: :xhtml, escape_html: false
+  set :role, Rsk::Role.new
   config = { 'github' => { 'client_id' => '?', 'client_secret' => '?', 'encryption_secret' => '' }, 'sentry' => '' }
   cfg = File.join(File.dirname(__FILE__), 'config.yml')
   if File.exist?(cfg)
