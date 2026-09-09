@@ -97,14 +97,14 @@ end
 
 post '/projects/select' do
   pid = params[:id]
-  response.set_cookie('0rsk-project', pid)
+  response.set_cookie('0rsk-project', value: pid, path: '/')
   flash('/ranked', "Project ##{pid} selected")
 end
 
 post '/projects/create' do
   title = params[:title]
   pid = projects.add(title)
-  response.set_cookie('0rsk-project', pid.to_s)
+  response.set_cookie('0rsk-project', value: pid.to_s, path: '/')
   flash('/ranked', "A new project ##{pid} selected")
 end
 
@@ -295,7 +295,7 @@ module Rsk::App
     id = request.cookies['0rsk-project']
     flash('/projects', 'Pick up a project to work with, or create a new one') unless id
     unless projects.exists?(id)
-      response.delete_cookie('0rsk-project')
+      response.delete_cookie('0rsk-project', path: '/')
       flash('/projects', 'Pick up a new project')
     end
     id
