@@ -176,6 +176,16 @@ class Rsk::AppTest < TestCase
     end
   end
 
+  def test_ignores_the_glogin_param_outside_the_tests
+    app.set(:environment, :development)
+    begin
+      get('/?glogin=bob', {}, 'HTTP_HOST' => 'localhost')
+      refute_includes(last_response.headers['Set-Cookie'].to_s, 'glogin=bob')
+    ensure
+      app.set(:environment, :test)
+    end
+  end
+
   def test_deletes_ranked
     pid = login("deleter#{rand(99_999)}")
     post(
