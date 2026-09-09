@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
-require 'benchmark'
+require 'timeout'
 require_relative '../objects/daemon'
 require_relative 'test__helper'
 
@@ -25,6 +25,8 @@ class Rsk::DaemonSurvivesTest < Minitest::Test
   end
 
   def test_starts_without_delaying_the_caller
-    assert_operator(Benchmark.realtime { Rsk::Daemon.new(0.001).start { nil }.kill }, :<, 0.5)
+    Timeout.timeout(0.5) do
+      assert_instance_of(Thread, Rsk::Daemon.new(0.001).start { nil }.tap(&:kill))
+    end
   end
 end
