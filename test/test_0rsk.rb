@@ -176,6 +176,13 @@ class Rsk::AppTest < TestCase
     end
   end
 
+  def test_escapes_html_in_a_flash_message
+    set_cookie('flash_msg=<b>bold</b>')
+    get('/')
+    refute_includes(last_response.body, '<b>bold</b>', last_response.body)
+    assert_includes(last_response.body, '&lt;b&gt;bold&lt;/b&gt;', last_response.body)
+  end
+
   def test_deletes_ranked
     pid = login("deleter#{rand(99_999)}")
     post(
