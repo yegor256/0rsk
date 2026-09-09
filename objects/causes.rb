@@ -82,7 +82,7 @@ class Rsk::Causes
         'LEFT JOIN effect ON triple.effect = effect.id',
         'WHERE project = $1 AND (LOWER(text) LIKE $2 OR emoji LIKE $2)',
         'GROUP BY cause.id, part.id',
-        'ORDER BY rank DESC'
+        'ORDER BY rank DESC NULLS LAST'
       ],
       [@project, "%#{query.to_s.downcase.strip.gsub(/[\\%_]/, '\\\\\0')}%"]
     )

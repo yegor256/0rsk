@@ -69,7 +69,7 @@ class Rsk::Risks
         'LEFT JOIN effect ON triple.effect = effect.id',
         'WHERE project = $1 AND LOWER(text) LIKE $2',
         'GROUP BY risk.id, part.id',
-        'ORDER BY rank DESC'
+        'ORDER BY rank DESC NULLS LAST'
       ],
       [@project, "%#{query.to_s.downcase.strip.gsub(/[\\%_]/, '\\\\\0')}%"]
     )
