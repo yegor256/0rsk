@@ -15,18 +15,22 @@ class Rsk::Risks
   end
 
   def add(text)
-    @pgsql.transaction do |t|
-      id = Integer(
-        t.exec(
-          'INSERT INTO part (project, text, type) VALUES ($1, $2, $3) RETURNING id',
-          [@project, text, 'Risk']
-        )[0]['id']
-      )
-      t.exec('INSERT INTO risk (id) VALUES ($1)', [id])
-      id
-    end
+    id =
+      @pgsql.transaction do |t|
+        next if t.exec('SELECT id FROM part WHERE project = $1 AND text = $2', [@project, text]).any?
+        made = Integer(
+          t.exec(
+            'INSERT INTO part (project, text, type) VALUES ($1, $2, $3) RETURNING id',
+            [@project, text, 'Risk']
+          )[0]['id']
+        )
+        t.exec('INSERT INTO risk (id) VALUES ($1)', [made])
+        made
+      end
+    taken(text) if id.nil?
+    id
   rescue PG::UniqueViolation
-    raise(Rsk::Urror, "Risk \"#{text}\" already exists in this project")
+    taken(text)
   end
 
   def get(id)
@@ -54,6 +58,10 @@ class Rsk::Risks
   end
 
   private
+
+  def taken(text)
+    raise(Rsk::Urror, "Risk \"#{text}\" already exists in this project")
+  end
 
   def query(query)
     Rsk::Query.new(
