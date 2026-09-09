@@ -21,6 +21,7 @@ require 'telebot'
 require 'time'
 require 'yaml'
 require_relative 'objects/limits'
+require_relative 'objects/paging'
 require_relative 'objects/urror'
 require_relative 'version'
 
@@ -71,8 +72,9 @@ get '/' do
 end
 
 get '/ranked' do
-  offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '10')
+  paging = Rsk::Paging.new(params, limit: 10)
+  offset = paging.offset
+  limit = paging.limit
   query = params[:q] || ''
   haml :ranked, layout: :layout, locals: merged(
     title: '/ranked',
@@ -163,8 +165,9 @@ post '/responses/detach' do
 end
 
 get '/causes' do
-  offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '25')
+  paging = Rsk::Paging.new(params, limit: 25)
+  offset = paging.offset
+  limit = paging.limit
   query = params[:q] || ''
   haml :causes, layout: :layout, locals: merged(
     title: '/causes',
@@ -178,8 +181,9 @@ get '/causes' do
 end
 
 get '/risks' do
-  offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '25')
+  paging = Rsk::Paging.new(params, limit: 25)
+  offset = paging.offset
+  limit = paging.limit
   query = params[:q] || ''
   haml :risks, layout: :layout, locals: merged(
     title: '/risks',
@@ -192,8 +196,9 @@ get '/risks' do
 end
 
 get '/effects' do
-  offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '25')
+  paging = Rsk::Paging.new(params, limit: 25)
+  offset = paging.offset
+  limit = paging.limit
   query = params[:q] || ''
   haml :effects, layout: :layout, locals: merged(
     title: '/effects',
@@ -206,8 +211,9 @@ get '/effects' do
 end
 
 get '/plans' do
-  offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '25')
+  paging = Rsk::Paging.new(params, limit: 25)
+  offset = paging.offset
+  limit = paging.limit
   query = params[:q] || ''
   haml :plans, layout: :layout, locals: merged(
     title: '/plans',

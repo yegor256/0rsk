@@ -5,6 +5,7 @@ require_relative '../objects/pipeline'
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
+require_relative '../objects/paging'
 require_relative '../objects/postpone'
 require_relative '../objects/tasks'
 
@@ -16,8 +17,9 @@ Rsk::Daemon.new(10).start do
 end
 
 get '/tasks' do
-  offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '10')
+  paging = Rsk::Paging.new(params, limit: 10)
+  offset = paging.offset
+  limit = paging.limit
   query = params[:q] || ''
   haml :tasks, layout: :layout, locals: merged(
     title: '/tasks',
