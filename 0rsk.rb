@@ -347,7 +347,7 @@ module Rsk::App
 
   def cell(text)
     value = text.to_s
-    value.start_with?('=', '+', '-', '@') ? "'#{value}" : value
+    value.lstrip.start_with?('=', '+', '-', '@') ? "'#{value}" : value
   end
 
   def to_csv(filename, header, rows)
