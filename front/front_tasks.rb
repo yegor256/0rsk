@@ -16,9 +16,9 @@ Rsk::Daemon.new(10).start do
 end
 
 get '/tasks' do
-  offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '10')
-  query = params[:q] || ''
+  offset = [number(params[:offset] || 0, 'offset'), 0].max
+  limit = number(params[:limit] || 10, 'limit')
+  query = params[:q].to_s
   haml :tasks, layout: :layout, locals: merged(
     title: '/tasks',
     offset: offset,

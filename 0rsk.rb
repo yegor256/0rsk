@@ -71,9 +71,9 @@ get '/' do
 end
 
 get '/ranked' do
-  offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '10')
-  query = params[:q] || ''
+  offset = [number(params[:offset] || 0, 'offset'), 0].max
+  limit = number(params[:limit] || 10, 'limit')
+  query = params[:q].to_s
   haml :ranked, layout: :layout, locals: merged(
     title: '/ranked',
     query: query,
@@ -129,14 +129,14 @@ end
 
 post '/project/{id}/tracker/delete' do
   pid = params[:id]
-  tid = Integer(params[:tid], 10)
+  tid = number(params[:tid], 'tid')
   raise Rsk::Urror, "Project ##{pid} not found" unless projects.exists?(pid)
   trackers(pid: pid).delete(tid)
   flash("/project/#{pid}", 'Tracker removed')
 end
 
 get '/responses' do
-  id = Integer(params[:id])
+  id = number(params[:id], 'id')
   triple = triples.fetch(id: id, limit: 1)[0]
   raise(Rsk::Urror, "Triple ##{id} not found") if triple.nil?
   haml :responses, layout: :layout, locals: merged(
@@ -147,25 +147,25 @@ get '/responses' do
 end
 
 post '/responses/add' do
-  id = Integer(params[:id])
-  part = Integer(params[:strategy])
+  id = number(params[:id], 'id')
+  part = number(params[:strategy], 'strategy')
   pid = plans.add(part, params[:plan])
   plans.get(pid, part).reschedule(params[:schedule].strip)
   flash("/responses?id=#{id}", "Thanks, plan ##{pid}/#{part} added to the triple ##{id}")
 end
 
 post '/responses/detach' do
-  tid = Integer(params[:tid])
-  id = Integer(params[:id])
-  part = Integer(params[:part])
+  tid = number(params[:tid], 'tid')
+  id = number(params[:id], 'id')
+  part = number(params[:part], 'part')
   plans.get(id, part).detach
   flash("/responses?id=#{tid}", "Thanks, plan ##{id} detached from the triple ##{tid}")
 end
 
 get '/causes' do
-  offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '25')
-  query = params[:q] || ''
+  offset = [number(params[:offset] || 0, 'offset'), 0].max
+  limit = number(params[:limit] || 25, 'limit')
+  query = params[:q].to_s
   haml :causes, layout: :layout, locals: merged(
     title: '/causes',
     query: query,
@@ -178,9 +178,9 @@ get '/causes' do
 end
 
 get '/risks' do
-  offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '25')
-  query = params[:q] || ''
+  offset = [number(params[:offset] || 0, 'offset'), 0].max
+  limit = number(params[:limit] || 25, 'limit')
+  query = params[:q].to_s
   haml :risks, layout: :layout, locals: merged(
     title: '/risks',
     query: query,
@@ -192,9 +192,9 @@ get '/risks' do
 end
 
 get '/effects' do
-  offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '25')
-  query = params[:q] || ''
+  offset = [number(params[:offset] || 0, 'offset'), 0].max
+  limit = number(params[:limit] || 25, 'limit')
+  query = params[:q].to_s
   haml :effects, layout: :layout, locals: merged(
     title: '/effects',
     query: query,
@@ -206,9 +206,9 @@ get '/effects' do
 end
 
 get '/plans' do
-  offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '25')
-  query = params[:q] || ''
+  offset = [number(params[:offset] || 0, 'offset'), 0].max
+  limit = number(params[:limit] || 25, 'limit')
+  query = params[:q].to_s
   haml :plans, layout: :layout, locals: merged(
     title: '/plans',
     query: query,
