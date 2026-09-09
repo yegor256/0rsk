@@ -69,7 +69,7 @@ module Rsk::Misc
   end
 
   def cookie(name, value)
-    response.set_cookie(name, value: value.to_s, secure: ENV['RACK_ENV'] != 'test', path: '/')
+    response.set_cookie(name, value: value.to_s, secure: request.secure?, path: '/')
   end
 
   def number(text, name)
