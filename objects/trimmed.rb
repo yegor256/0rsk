@@ -13,9 +13,22 @@ class Rsk::Trimmed
 
   def to_s
     text = @text.to_s
-    return text if text.length <= @max
-    head = text[0...@max]
+    return text if units(text) <= @max
+    head = +''
+    room = @max
+    text.each_char do |c|
+      width = c.ord > 0xFFFF ? 2 : 1
+      break if width > room
+      head << c
+      room -= width
+    end
     stop = head.rindex("\n")
     "#{stop.nil? ? head : head[0...stop]}..."
+  end
+
+  private
+
+  def units(text)
+    text.each_char.sum { |c| c.ord > 0xFFFF ? 2 : 1 }
   end
 end
