@@ -21,7 +21,7 @@ class Rsk::TelepingsTest < TestCase
   def test_fetches
     login = "judyT#{rand(99_999)}"
     test_tasks(login)
-    telepings = Rsk::Telepings.new(test_pgsql)
+    telepings = Rsk::Telepings.new(fake_pgsql)
     refute_empty(telepings.fresh(login))
     assert(telepings.required?(login))
   end
@@ -30,8 +30,8 @@ class Rsk::TelepingsTest < TestCase
     login = "judyTA#{rand(99_999)}"
     tasks = test_tasks(login)
     chat = SecureRandom.random_number(2_000_000_000) + 1
-    Rsk::Telechats.new(test_pgsql).add(chat, login)
-    telepings = Rsk::Telepings.new(test_pgsql)
+    Rsk::Telechats.new(fake_pgsql).add(chat, login)
+    telepings = Rsk::Telepings.new(fake_pgsql)
     refute_empty(telepings.fresh(login))
     assert(telepings.required?(login))
     tasks.fetch.each do |t|
@@ -43,67 +43,67 @@ class Rsk::TelepingsTest < TestCase
   end
 
   def test_required
-    assert(Rsk::Telepings.new(test_pgsql).required?("judyR#{SecureRandom.hex(8)}"))
+    assert(Rsk::Telepings.new(fake_pgsql).required?("judyR#{SecureRandom.hex(8)}"))
   end
 
   def test_required_after_add
     login = "judyRA#{SecureRandom.hex(8)}"
-    project = Rsk::Projects.new(test_pgsql, login).add("test#{SecureRandom.hex(8)}")
-    Rsk::Telechats.new(test_pgsql).add(SecureRandom.random_number(2_000_000_000) + 1, login)
-    eid = Rsk::Effects.new(test_pgsql, project).add('effect')
-    Rsk::Triples.new(test_pgsql, project).add(
-      Rsk::Causes.new(test_pgsql, project).add('cause'),
-      Rsk::Risks.new(test_pgsql, project).add('risk'), eid
+    project = Rsk::Projects.new(fake_pgsql, login).add("test#{SecureRandom.hex(8)}")
+    Rsk::Telechats.new(fake_pgsql).add(SecureRandom.random_number(2_000_000_000) + 1, login)
+    eid = Rsk::Effects.new(fake_pgsql, project).add('effect')
+    Rsk::Triples.new(fake_pgsql, project).add(
+      Rsk::Causes.new(fake_pgsql, project).add('cause'),
+      Rsk::Risks.new(fake_pgsql, project).add('risk'), eid
     )
-    plans = Rsk::Plans.new(test_pgsql, project)
+    plans = Rsk::Plans.new(fake_pgsql, project)
     plans.get(plans.add(eid, 'plan'), eid).reschedule((Time.now - (60 * 60)).strftime('%d-%m-%Y'))
-    Rsk::Tasks.new(test_pgsql, login).create
-    assert(Rsk::Telepings.new(test_pgsql).required?(login))
+    Rsk::Tasks.new(fake_pgsql, login).create
+    assert(Rsk::Telepings.new(fake_pgsql).required?(login))
   end
 
   def test_fresh
     login = "judyF#{SecureRandom.hex(8)}"
-    project = Rsk::Projects.new(test_pgsql, login).add("test#{SecureRandom.hex(8)}")
-    Rsk::Telechats.new(test_pgsql).add(SecureRandom.random_number(2_000_000_000) + 1, login)
-    eid = Rsk::Effects.new(test_pgsql, project).add('effect')
-    Rsk::Triples.new(test_pgsql, project).add(
-      Rsk::Causes.new(test_pgsql, project).add('cause'),
-      Rsk::Risks.new(test_pgsql, project).add('risk'), eid
+    project = Rsk::Projects.new(fake_pgsql, login).add("test#{SecureRandom.hex(8)}")
+    Rsk::Telechats.new(fake_pgsql).add(SecureRandom.random_number(2_000_000_000) + 1, login)
+    eid = Rsk::Effects.new(fake_pgsql, project).add('effect')
+    Rsk::Triples.new(fake_pgsql, project).add(
+      Rsk::Causes.new(fake_pgsql, project).add('cause'),
+      Rsk::Risks.new(fake_pgsql, project).add('risk'), eid
     )
-    plans = Rsk::Plans.new(test_pgsql, project)
+    plans = Rsk::Plans.new(fake_pgsql, project)
     plans.get(plans.add(eid, 'plan'), eid).reschedule((Time.now - (60 * 60)).strftime('%d-%m-%Y'))
-    Rsk::Tasks.new(test_pgsql, login).create
-    refute_empty(Rsk::Telepings.new(test_pgsql).fresh(login))
+    Rsk::Tasks.new(fake_pgsql, login).create
+    refute_empty(Rsk::Telepings.new(fake_pgsql).fresh(login))
   end
 
   def test_fresh_after_ping
     login = "judyFA#{SecureRandom.hex(8)}"
-    project = Rsk::Projects.new(test_pgsql, login).add("test#{SecureRandom.hex(8)}")
+    project = Rsk::Projects.new(fake_pgsql, login).add("test#{SecureRandom.hex(8)}")
     chat = SecureRandom.random_number(2_000_000_000) + 1
-    Rsk::Telechats.new(test_pgsql).add(chat, login)
-    eid = Rsk::Effects.new(test_pgsql, project).add('effect')
-    Rsk::Triples.new(test_pgsql, project).add(
-      Rsk::Causes.new(test_pgsql, project).add('cause'),
-      Rsk::Risks.new(test_pgsql, project).add('risk'), eid
+    Rsk::Telechats.new(fake_pgsql).add(chat, login)
+    eid = Rsk::Effects.new(fake_pgsql, project).add('effect')
+    Rsk::Triples.new(fake_pgsql, project).add(
+      Rsk::Causes.new(fake_pgsql, project).add('cause'),
+      Rsk::Risks.new(fake_pgsql, project).add('risk'), eid
     )
-    plans = Rsk::Plans.new(test_pgsql, project)
+    plans = Rsk::Plans.new(fake_pgsql, project)
     plans.get(plans.add(eid, 'plan'), eid).reschedule((Time.now - (60 * 60)).strftime('%d-%m-%Y'))
-    Rsk::Tasks.new(test_pgsql, login).create
-    telepings = Rsk::Telepings.new(test_pgsql)
+    Rsk::Tasks.new(fake_pgsql, login).create
+    telepings = Rsk::Telepings.new(fake_pgsql)
     telepings.add(telepings.fresh(login)[0], chat)
     assert_empty(telepings.fresh(login))
   end
 
   def test_fresh_tasks_skips_orphan_ids
     login = "judyTO#{rand(99_999)}"
-    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(9999)}")
-    cid = Rsk::Causes.new(test_pgsql, project).add('orphan cause')
-    plans = Rsk::Plans.new(test_pgsql, project)
+    project = Rsk::Projects.new(fake_pgsql, login).add("test#{rand(9999)}")
+    cid = Rsk::Causes.new(fake_pgsql, project).add('orphan cause')
+    plans = Rsk::Plans.new(fake_pgsql, project)
     pid = plans.add(cid, 'orphan plan')
     plans.get(pid, cid).reschedule((Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y'))
-    tid = Integer(test_pgsql.exec('INSERT INTO task (plan) VALUES ($1) RETURNING id', [pid])[0]['id'])
-    tasks = Rsk::Tasks.new(test_pgsql, login)
-    telepings = Rsk::Telepings.new(test_pgsql)
+    tid = Integer(fake_pgsql.exec('INSERT INTO task (plan) VALUES ($1) RETURNING id', [pid])[0]['id'])
+    tasks = Rsk::Tasks.new(fake_pgsql, login)
+    telepings = Rsk::Telepings.new(fake_pgsql)
     assert_includes(telepings.fresh(login), tid)
     assert_empty(tasks.fetch(query: tid))
     fresh = telepings.pending(login, tasks)
@@ -114,16 +114,16 @@ class Rsk::TelepingsTest < TestCase
   private
 
   def test_tasks(login)
-    project = Rsk::Projects.new(test_pgsql, login).add("test#{rand(9999)}")
-    rid = Rsk::Risks.new(test_pgsql, project).add('we may lose it')
-    Rsk::Triples.new(test_pgsql, project).add(
-      Rsk::Causes.new(test_pgsql, project).add('we have data'), rid,
-      Rsk::Effects.new(test_pgsql, project).add('business will stop')
+    project = Rsk::Projects.new(fake_pgsql, login).add("test#{rand(9999)}")
+    rid = Rsk::Risks.new(fake_pgsql, project).add('we may lose it')
+    Rsk::Triples.new(fake_pgsql, project).add(
+      Rsk::Causes.new(fake_pgsql, project).add('we have data'), rid,
+      Rsk::Effects.new(fake_pgsql, project).add('business will stop')
     )
-    plans = Rsk::Plans.new(test_pgsql, project)
+    plans = Rsk::Plans.new(fake_pgsql, project)
     pid = plans.add(rid, 'solve it!')
     plans.get(pid, rid).reschedule((Time.now - (5 * 24 * 60 * 60)).strftime('%d-%m-%Y'))
-    tasks = Rsk::Tasks.new(test_pgsql, login)
+    tasks = Rsk::Tasks.new(fake_pgsql, login)
     tasks.create
     assert(tasks.fetch.any? { |t| t[:plan] == pid })
     tasks

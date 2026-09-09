@@ -10,7 +10,7 @@ require_relative '../objects/telechats'
 
 class Rsk::TelechatsTest < TestCase
   def test_checks
-    telechats = Rsk::Telechats.new(test_pgsql)
+    telechats = Rsk::Telechats.new(fake_pgsql)
     chat = SecureRandom.random_number(2_000_000_000) + 1
     telechats.add(chat, "judy#{rand(99_999)}")
     msg = 'hey, you!'
@@ -21,7 +21,7 @@ class Rsk::TelechatsTest < TestCase
 
   def test_adds_and_fetches
     login = "judyAF#{rand(99_999)}"
-    telechats = Rsk::Telechats.new(test_pgsql)
+    telechats = Rsk::Telechats.new(fake_pgsql)
     chat = SecureRandom.random_number(2_000_000_000) + 1
     telechats.add(chat, login)
     assert(telechats.exists?(chat))
@@ -31,14 +31,14 @@ class Rsk::TelechatsTest < TestCase
 
   def test_wired
     login = "judyW#{rand(99_999)}"
-    telechats = Rsk::Telechats.new(test_pgsql)
+    telechats = Rsk::Telechats.new(fake_pgsql)
     refute(telechats.wired?(login))
     telechats.add(SecureRandom.random_number(2_000_000_000) + 1, login)
     assert(telechats.wired?(login))
   end
 
   def test_double_add
-    telechats = Rsk::Telechats.new(test_pgsql)
+    telechats = Rsk::Telechats.new(fake_pgsql)
     chat = SecureRandom.random_number(2_000_000_000) + 1
     telechats.add(chat, "judyDA#{rand(99_999)}")
     assert_raises(PG::UniqueViolation) do
