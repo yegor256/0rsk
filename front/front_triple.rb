@@ -93,15 +93,23 @@ post '/triple/save' do
   ctext = params[:ctext].strip
   rtext = params[:rtext].strip
   etext = params[:etext].strip
+  probability = number(params[:probability], 'probability')
+  impact = number(params[:impact], 'impact')
   cid = params[:cid].empty? ? causes.add(ctext) : params[:cid]
   rid = params[:rid].empty? ? risks.add(rtext) : params[:rid]
   eid = params[:eid].empty? ? effects.add(etext) : params[:eid]
-  causes.get(cid).rename(ctext)
+  # rubocop:disable Elegant/NoComments
+  # @todo #530:30min Save the whole triple in one transaction. A value that only
+  #  the object itself can reject, such as a probability of 42 that Risk#weigh
+  #  refuses, still leaves the three texts renamed behind it, because each object
+  #  takes its own connection from the pool and every write is its own statement.
+  # rubocop:enable Elegant/NoComments
   causes.get(cid).decorate(params[:emoji])
+  causes.get(cid).rename(ctext)
   risks.get(rid).rename(rtext)
   effects.get(eid).rename(etext)
-  risks.get(rid).weigh(number(params[:probability], 'probability'))
-  effects.get(eid).weigh(number(params[:impact], 'impact'))
+  risks.get(rid).weigh(probability)
+  effects.get(eid).weigh(impact)
   effects.get(eid).polarize(!params[:positive].nil?)
   tid = triples.add(cid, rid, eid)
   flash("/responses?id=#{tid}", "Thanks, the triple ##{tid} successfully saved!")
