@@ -35,7 +35,7 @@ class Rsk::Trimmed
       end
       next unless stack.empty? && !escaped
       safe = idx + 1
-      line = safe if char == "\n"
+      line = idx if char == "\n"
     end
     "#{chars.first(line.zero? ? safe : line).join}#{suffix}"
   end
