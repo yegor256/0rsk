@@ -14,8 +14,29 @@ class Rsk::Trimmed
   def to_s
     text = @text.to_s
     return text if text.length <= @max
-    head = text[0...@max]
-    stop = head.rindex("\n")
-    "#{stop.nil? ? head : head[0...stop]}..."
+    suffix = @max < 3 ? '.' * @max : '...'
+    limit = @max - suffix.length
+    chars = text.each_char.to_a
+    stack = []
+    escaped = false
+    safe = 0
+    line = 0
+    openings = ['[', '(']
+    closings = [[']', '['], [')', '(']]
+    chars.first(limit).each_with_index do |char, idx|
+      if escaped
+        escaped = false
+      elsif char == '\\'
+        escaped = true
+      elsif openings.include?(char)
+        stack << char
+      elsif closings.include?([char, stack.last])
+        stack.pop
+      end
+      next unless stack.empty? && !escaped
+      safe = idx + 1
+      line = safe if char == "\n"
+    end
+    "#{chars.first(line.zero? ? safe : line).join}#{suffix}"
   end
 end
