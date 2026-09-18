@@ -17,11 +17,12 @@ class Rsk::Triples
     @pgsql.transaction do |t|
       if Integer(
         t.exec(
-          'SELECT COUNT(*) FROM part WHERE id IN ($1, $2, $3) AND project = $4',
+          "SELECT COUNT(*) FROM part WHERE project = $4 AND ((id = $1 AND type = 'Cause') OR " \
+          "(id = $2 AND type = 'Risk') OR (id = $3 AND type = 'Effect'))",
           [cid, rid, eid, @project]
         )[0]['count']
       ) < 3
-        raise(Rsk::Urror, "Parts ##{cid}, ##{rid}, ##{eid} must all belong to project ##{@project}")
+        raise(Rsk::Urror, "Parts ##{cid}, ##{rid}, ##{eid} must be a cause, risk, and effect in project ##{@project}")
       end
       Integer(
         t.exec(
