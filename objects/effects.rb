@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'effect'
+require_relative 'part_text'
 require_relative 'query'
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
@@ -15,6 +16,7 @@ class Rsk::Effects
   end
 
   def add(text)
+    Rsk::PartText.validate(text)
     id =
       @pgsql.transaction do |t|
         next if t.exec('SELECT id FROM part WHERE project = $1 AND text = $2', [@project, text]).any?

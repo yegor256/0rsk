@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'part_text'
 require_relative 'plan'
 require_relative 'query'
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
@@ -15,6 +16,7 @@ class Rsk::Plans
 
   def add(part, text)
     raise(Rsk::Urror, 'Plan text cannot be empty') if text.strip.empty?
+    Rsk::PartText.validate(text)
     @pgsql.transaction do |t|
       if t.exec('SELECT id FROM part WHERE id = $1 AND project = $2', [part, @project]).empty?
         raise(Rsk::Urror, "Part ##{part} must belong to project ##{@project}")

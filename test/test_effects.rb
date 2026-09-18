@@ -17,4 +17,10 @@ class Rsk::EffectsTest < TestCase
     assert_equal(1, effects.count)
     assert(effects.fetch.any? { |c| c[:text] == text })
   end
+
+  def test_refuses_text_longer_than_database_limit
+    assert_raises(Rsk::Urror) do
+      Rsk::Effects.new(test_pgsql, test_project).add('x' * 161)
+    end
+  end
 end
