@@ -29,6 +29,13 @@ class Rsk::PlansTest < TestCase
     plans.get(id, rid).complete
   end
 
+  def test_refuses_text_longer_than_database_limit
+    project = test_project
+    assert_raises(Rsk::Urror) do
+      Rsk::Plans.new(test_pgsql, project).add(test_risk(project: project), 'x' * 161)
+    end
+  end
+
   def test_refuses_a_part_of_another_project
     mine = test_project
     theirs = test_project
