@@ -27,7 +27,7 @@ class Rsk::Risk
   end
 
   def weigh(value)
-    unless (1..9).cover?(value)
+    unless value.is_a?(Integer) && (1..9).cover?(value)
       raise(Rsk::Urror, "The probability must be between 1 and 9: #{value.inspect}")
     end
     @pgsql.exec('UPDATE risk SET probability = $2 WHERE id = $1', [@id, value])

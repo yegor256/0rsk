@@ -29,4 +29,9 @@ class Rsk::RiskTest < TestCase
     risk.weigh(after)
     assert_equal(after, risk.probability)
   end
+
+  def test_refuses_fractional_probability
+    risks = Rsk::Risks.new(test_pgsql, test_project)
+    assert_raises(Rsk::Urror) { risks.get(risks.add('some risk')).weigh(1.5) }
+  end
 end
