@@ -23,4 +23,9 @@ class Rsk::EffectTest < TestCase
     effect = effects.get(effects.add('another effect'))
     assert_raises(Rsk::Urror) { effect.polarize(nil) }
   end
+
+  def test_refuses_fractional_impact
+    effects = Rsk::Effects.new(test_pgsql, test_project)
+    assert_raises(Rsk::Urror) { effects.get(effects.add('an effect')).weigh(1.5) }
+  end
 end
