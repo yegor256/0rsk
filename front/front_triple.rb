@@ -93,6 +93,9 @@ post '/triple/save' do
   ctext = params[:ctext].strip
   rtext = params[:rtext].strip
   etext = params[:etext].strip
+  { cause: ctext, risk: rtext, effect: etext }.each do |type, text|
+    raise(Rsk::Urror, "The #{type} name can't be empty") if text.empty?
+  end
   cid = params[:cid].empty? ? causes.add(ctext) : params[:cid]
   rid = params[:rid].empty? ? risks.add(rtext) : params[:rid]
   eid = params[:eid].empty? ? effects.add(etext) : params[:eid]
