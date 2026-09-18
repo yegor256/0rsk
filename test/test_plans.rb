@@ -56,6 +56,15 @@ class Rsk::PlansTest < TestCase
     assert_equal(1, Rsk::Plans.new(test_pgsql, theirs).count)
   end
 
+  def test_refuses_a_part_not_linked_to_plan
+    project = test_project
+    plans = Rsk::Plans.new(test_pgsql, project)
+    plan = plans.add(test_risk(project: project), 'we make backups')
+    assert_raises(Rsk::Urror) do
+      plans.get(plan, test_effect(project: project))
+    end
+  end
+
   def test_fetch_no_duplicates
     pid = test_project
     cid = test_cause(project: pid)
