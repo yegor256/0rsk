@@ -60,7 +60,7 @@ class Rsk::Causes
         id: Integer(r['id']),
         text: r['text'],
         emoji: r['emoji'],
-        rank: Integer(r['rank'] || 0),
+        rank: Float(r['rank'] || 0),
         risks: Integer(r['risks'])
       }
     end
@@ -73,7 +73,7 @@ class Rsk::Causes
       @pgsql,
       [
         'SELECT cause.*, part.text,',
-        '  SUM(risk.probability * effect.impact) / COUNT(risk.id) AS rank,',
+        '  SUM(risk.probability * effect.impact)::NUMERIC / COUNT(risk.id) AS rank,',
         '  COUNT(risk.id) AS risks',
         'FROM cause',
         'JOIN part ON part.id = cause.id',
@@ -82,7 +82,7 @@ class Rsk::Causes
         'LEFT JOIN effect ON triple.effect = effect.id',
         'WHERE project = $1 AND (LOWER(text) LIKE $2 OR emoji LIKE $2)',
         'GROUP BY cause.id, part.id',
-        'ORDER BY rank DESC'
+        'ORDER BY rank DESC, part.id ASC'
       ],
       [@project, "%#{query.to_s.downcase.strip.gsub(/[\\%_]/, '\\\\\0')}%"]
     )
