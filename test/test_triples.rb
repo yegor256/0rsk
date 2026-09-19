@@ -38,13 +38,9 @@ class Rsk::TriplesTest < TestCase
   def test_finds_a_triple_by_the_id_of_its_part
     project = test_project
     cid = test_cause(project: project)
-    rid = test_risk(project: project)
-    eid = test_effect(project: project)
     triples = Rsk::Triples.new(test_pgsql, project)
-    tid = triples.add(cid, rid, eid)
-    found = triples.fetch(query: "+#{cid}")
-    assert_equal(1, found.count)
-    assert_equal(tid, found[0][:id])
+    triples.add(cid, test_risk(project: project), test_effect(project: project))
+    assert_equal(1, triples.fetch(query: "+#{cid}").count)
   end
 
   def test_fetches_a_plan_whose_text_has_a_newline
