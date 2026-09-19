@@ -12,6 +12,7 @@ require_relative '../objects/projects'
 require_relative '../objects/risks'
 require_relative '../objects/rsk'
 require_relative '../objects/triples'
+require_relative '../objects/urror'
 
 class Rsk::TriplesTest < TestCase
   def test_adds_and_fetches
@@ -27,6 +28,19 @@ class Rsk::TriplesTest < TestCase
     assert(triples.fetch.any? { |t| t[:id] == tid })
     assert_equal(0, triples.fetch(id: tid)[0][:plans].count)
     triples.fetch.each { |t| triples.delete(t[:id]) }
+  end
+
+  def test_rejects_a_number_bigger_than_int
+    triples = Rsk::Triples.new(test_pgsql, test_project)
+    assert_raises(Rsk::Urror) { triples.fetch(query: '+99999999999999999999') }
+  end
+
+  def test_finds_a_triple_by_the_id_of_its_part
+    project = test_project
+    cid = test_cause(project: project)
+    triples = Rsk::Triples.new(test_pgsql, project)
+    triples.add(cid, test_risk(project: project), test_effect(project: project))
+    assert_equal(1, triples.fetch(query: "+#{cid}").count)
   end
 
   def test_fetches_a_plan_whose_text_has_a_newline
