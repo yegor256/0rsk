@@ -34,7 +34,7 @@ class Rsk::CausesTest < TestCase
     triples = Rsk::Triples.new(test_pgsql, project)
     high = causes.add('the higher one')
     low = causes.add('the lower one')
-    [[high, 10, 9], [high, 10, 10], [low, 10, 9], [low, 10, 9]].each do |cid, probability, impact|
+    [[high, 9, 8], [high, 9, 9], [low, 9, 8], [low, 9, 8]].each do |cid, probability, impact|
       rid = risks.add("risk #{SecureRandom.hex(8)}")
       risks.get(rid).weigh(probability)
       eid = effects.add("effect #{SecureRandom.hex(8)}")
