@@ -8,6 +8,8 @@ require_relative 'rsk'
 require_relative 'urror'
 
 class Rsk::Triples
+  MAX_ID = 2_147_483_647
+
   def initialize(pgsql, project)
     @pgsql = pgsql
     @project = project
@@ -88,6 +90,7 @@ class Rsk::Triples
   def query(id, query)
     where = []
     words = []
+    numbers = []
     unless id.positive?
       query.strip.downcase.split.each do |w|
         if w.start_with?('+')
@@ -95,7 +98,10 @@ class Rsk::Triples
             where << 'plan.id IS NULL'
           elsif /^\+[0-9]+$/.match?(w)
             p = Integer(w[1..])
-            where << "t.cause = #{p} OR t.risk = #{p} OR t.effect = #{p}"
+            raise(Rsk::Urror, "The number in #{w.inspect} is too big") if p > MAX_ID
+            numbers << p
+            pos = numbers.size + 2
+            where << "t.cause = $#{pos} OR t.risk = $#{pos} OR t.effect = $#{pos}"
           else
             raise(Rsk::Urror, "Can't understand query operator #{w.inspect}")
           end
@@ -137,7 +143,7 @@ class Rsk::Triples
         where.empty? ? '' : "AND (#{where.join(') AND (')})",
         'ORDER BY rank DESC, t.created DESC'
       ],
-      [@project, id.positive? ? id : "%#{words.join(' ').gsub(/[\\%_]/, '\\\\\0')}%"]
+      [@project, id.positive? ? id : "%#{words.join(' ').gsub(/[\\%_]/, '\\\\\0')}%"] + numbers
     )
   end
 end
