@@ -51,7 +51,7 @@ class Rsk::Effects
         text: r['text'],
         impact: Integer(r['impact']),
         positive: r['positive'] == 't',
-        rank: Integer(r['rank'] || 0),
+        rank: Float(r['rank'] || 0),
         risks: Integer(r['risks'])
       }
     end
@@ -65,7 +65,7 @@ class Rsk::Effects
       [
         'SELECT effect.*, part.text AS text,',
         '  SUM(risk.probability) AS probability,',
-        '  effect.impact * SUM(risk.probability) / COUNT(risk.id) AS rank,',
+        '  effect.impact * SUM(risk.probability)::NUMERIC / COUNT(risk.id) AS rank,',
         '  COUNT(risk.id) AS risks',
         'FROM effect',
         'JOIN part ON part.id = effect.id',
@@ -74,7 +74,7 @@ class Rsk::Effects
         'WHERE project = $1',
         'AND LOWER(text) LIKE $2',
         'GROUP BY effect.id, part.id',
-        'ORDER BY rank DESC'
+        'ORDER BY rank DESC, part.id ASC'
       ],
       [@project, "%#{query.to_s.downcase.strip.gsub(/[\\%_]/, '\\\\\0')}%"]
     )

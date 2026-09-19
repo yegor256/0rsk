@@ -14,6 +14,6 @@ helpers do
   end
 
   def rank(i)
-    "<span class=''>#{Integer(i[:rank])}</span>"
+    "<span class=''>#{i[:rank].round}</span>"
   end
 end
