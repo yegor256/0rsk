@@ -8,6 +8,12 @@ require_relative 'test__helper'
 require_relative '../objects/limits'
 
 class Rsk::LimitsTest < TestCase
+  def test_refuses_invalid_configuration
+    assert_raises(Rsk::Urror) { Rsk::Limits.new(max: 0) }
+    assert_raises(Rsk::Urror) { Rsk::Limits.new(max: -1) }
+    assert_raises(Rsk::Urror) { Rsk::Limits.new(period: -1) }
+  end
+
   def test_counts_per_client
     limits = Rsk::Limits.new(max: 3)
     3.times { refute(limits.over?('1.1.1.1')) }
