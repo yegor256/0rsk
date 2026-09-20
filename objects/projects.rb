@@ -27,7 +27,7 @@ class Rsk::Projects
   end
 
   def fetch
-    @pgsql.exec('SELECT * FROM project WHERE login = $1', [@login]).map do |r|
+    @pgsql.exec('SELECT * FROM project WHERE login = $1 ORDER BY id', [@login]).map do |r|
       {
         id: Integer(r['id']),
         title: r['title'],

@@ -11,11 +11,12 @@ require_relative 'test__helper'
 class Rsk::ProjectsTest < TestCase
   def test_adds_and_fetches
     projects = Rsk::Projects.new(test_pgsql, 'jeff11')
-    pid = projects.add('test')
-    assert_predicate(pid, :positive?)
-    assert(projects.exists?(pid))
-    projects.delete(pid)
-    refute(projects.exists?(pid))
+    first = projects.add('test')
+    assert_predicate(first, :positive?)
+    assert_equal([first, projects.add('test-2')], projects.fetch.map { |project| project[:id] })
+    assert(projects.exists?(first))
+    projects.delete(first)
+    refute(projects.exists?(first))
   end
 
   def test_refuses_id_that_is_not_a_number
