@@ -12,8 +12,8 @@ class Rsk::Daemon
   end
 
   def start
-    sleep(1)
     Thread.start do
+      sleep(1)
       loop do
         begin
           yield
