@@ -28,6 +28,21 @@ class Rsk::CauseTest < TestCase
     assert_equal('📚', cause.emoji)
   end
 
+  def test_accepts_multi_codepoint_emoji
+    causes = Rsk::Causes.new(test_pgsql, test_project)
+    cause = causes.get(causes.add('test flag'))
+    ['👍🏽', '🏳️‍🌈', '❤️', '🇺🇸'].each do |e|
+      cause.decorate(e)
+      assert_equal(e, cause.emoji)
+    end
+  end
+
+  def test_rejects_two_emoji
+    causes = Rsk::Causes.new(test_pgsql, test_project)
+    cause = causes.get(causes.add('test pair'))
+    assert_raises(Rsk::Urror) { cause.decorate('📚📦') }
+  end
+
   def test_rejects_nil_emoji
     causes = Rsk::Causes.new(test_pgsql, test_project)
     cause = causes.get(causes.add('test nil'))
