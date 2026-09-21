@@ -95,6 +95,14 @@ class Rsk::AppTest < TestCase
     end
   end
 
+  def test_reads_leading_zero_id_as_decimal
+    tid = test_triple(project: login)
+    ["/responses?id=0#{tid}", "/triple?id=00#{tid}"].each do |p|
+      get(p)
+      assert_equal(200, last_response.status, "#{p} fails: #{last_response.body}")
+    end
+  end
+
   def test_add
     login("jeff09#{rand(99_999)}")
     post(

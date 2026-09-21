@@ -136,7 +136,7 @@ post '/project/{id}/tracker/delete' do
 end
 
 get '/responses' do
-  id = Integer(params[:id])
+  id = Integer(params[:id], 10)
   triple = triples.fetch(id: id, limit: 1)[0]
   raise(Rsk::Urror, "Triple ##{id} not found") if triple.nil?
   haml :responses, layout: :layout, locals: merged(
@@ -147,17 +147,17 @@ get '/responses' do
 end
 
 post '/responses/add' do
-  id = Integer(params[:id])
-  part = Integer(params[:strategy])
+  id = Integer(params[:id], 10)
+  part = Integer(params[:strategy], 10)
   pid = plans.add(part, params[:plan])
   plans.get(pid, part).reschedule(params[:schedule].strip)
   flash("/responses?id=#{id}", "Thanks, plan ##{pid}/#{part} added to the triple ##{id}")
 end
 
 post '/responses/detach' do
-  tid = Integer(params[:tid])
-  id = Integer(params[:id])
-  part = Integer(params[:part])
+  tid = Integer(params[:tid], 10)
+  id = Integer(params[:id], 10)
+  part = Integer(params[:part], 10)
   plans.get(id, part).detach
   flash("/responses?id=#{tid}", "Thanks, plan ##{id} detached from the triple ##{tid}")
 end
