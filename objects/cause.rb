@@ -27,6 +27,7 @@ class Rsk::Cause
 
   def decorate(char)
     raise(Rsk::Urror, 'The emoji can\'t be nil') if char.nil?
+    raise(Rsk::Urror, 'The emoji can\'t be empty') if char.empty?
     raise(Rsk::Urror, 'The emoji must be one-symbol only') if char.each_grapheme_cluster.count > 1
     @pgsql.exec('UPDATE cause SET emoji = $2 WHERE id = $1', [@id, char])
   end
