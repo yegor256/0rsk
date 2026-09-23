@@ -15,7 +15,7 @@ class Rsk::Pipeline
     @pgsql.exec(
       [
         'SELECT plan.id, plan.completed, plan.schedule,',
-        'SUM(risk.probability * effect.impact) / COUNT(triple.id) AS rank',
+        'SUM(risk.probability * effect.impact)::numeric / COUNT(triple.id) AS rank',
         'FROM plan',
         'JOIN part ON part.id = plan.part',
         'JOIN project ON part.project = project.id',
