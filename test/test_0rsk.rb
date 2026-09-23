@@ -103,6 +103,14 @@ class Rsk::AppTest < TestCase
     end
   end
 
+  def test_renders_paginated_pages_with_negative_limit
+    login
+    ['/ranked', '/tasks', '/causes', '/risks', '/effects', '/plans'].each do |p|
+      get("#{p}?limit=-1")
+      assert_equal(200, last_response.status, "#{p} fails: #{last_response.body}")
+    end
+  end
+
   def test_add
     login("jeff09#{rand(99_999)}")
     post(

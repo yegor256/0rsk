@@ -17,7 +17,7 @@ end
 
 get '/tasks' do
   offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '10')
+  limit = [Integer(params[:limit] || '10'), 1].max
   query = params[:q] || ''
   haml :tasks, layout: :layout, locals: merged(
     title: '/tasks',
