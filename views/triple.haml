@@ -42,7 +42,7 @@
   %a#ctext_detach.small.item{href: '#', style: defined?(triple) ? '' : 'display: none;', title: 'Click to detach it from the existing cause'} Detach
   %br
   %a{href: 'https://unicode.org/emoji/charts/full-emoji-list.html', title: 'Emoji reference'} Emoji:
-  %input#emoji{type: 'text', name: 'emoji', size: 2, maxlength: 2, autocomplete: 'off', tabindex: 2, placeholder: '💰', value: defined?(triple) ? triple[:emoji] : '💰', required: true}
+  %input#emoji{type: 'text', name: 'emoji', size: 2, autocomplete: 'off', tabindex: 2, placeholder: '💰', value: defined?(triple) ? triple[:emoji] : '💰', required: true}
   - unless emojis.empty?
     - emojis.each do |e|
       %a{onclick: '$("#emoji").val($(this).text());return false;', href: '#', title: 'Insert emoji'}= e
