@@ -43,6 +43,13 @@ class Rsk::CauseTest < TestCase
     assert_raises(Rsk::Urror) { cause.decorate('📚📦') }
   end
 
+  def test_rejects_empty_emoji
+    causes = Rsk::Causes.new(test_pgsql, test_project)
+    cause = causes.get(causes.add('test empty'))
+    assert_raises(Rsk::Urror) { cause.decorate('') }
+    assert_equal('💾', cause.emoji)
+  end
+
   def test_rejects_nil_emoji
     causes = Rsk::Causes.new(test_pgsql, test_project)
     cause = causes.get(causes.add('test nil'))
