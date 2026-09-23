@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'cause'
+require_relative 'part_text'
 require_relative 'query'
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
@@ -15,6 +16,7 @@ class Rsk::Causes
   end
 
   def add(text)
+    Rsk::PartText.validate(text)
     @pgsql.transaction do |t|
       id = Integer(
         t.exec(

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'part_text'
 require_relative 'query'
 require_relative 'risk'
 # SPDX-FileCopyrightText: Copyright (c) 2019-2026 Yegor Bugayenko
@@ -15,6 +16,7 @@ class Rsk::Risks
   end
 
   def add(text)
+    Rsk::PartText.validate(text)
     @pgsql.transaction do |t|
       id = Integer(
         t.exec(

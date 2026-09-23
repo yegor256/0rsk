@@ -20,4 +20,10 @@ class Rsk::RisksTest < TestCase
     assert(risks.fetch.any? { |r| r[:id] == rid })
     assert(risks.fetch.any? { |r| r[:text] == text })
   end
+
+  def test_refuses_text_longer_than_database_limit
+    assert_raises(Rsk::Urror) do
+      Rsk::Risks.new(test_pgsql, test_project).add('x' * 161)
+    end
+  end
 end
