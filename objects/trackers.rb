@@ -11,11 +11,11 @@ class Rsk::Trackers
     @project = project
   end
 
-  def add(repo, token)
+  def add(type, repo, token)
     Integer(
       @pgsql.exec(
-        'INSERT INTO tracker (project, repo, token) VALUES ($1, $2, $3) RETURNING id',
-        [@project, repo, token]
+        'INSERT INTO tracker (project, type, repo, token) VALUES ($1, $2, $3, $4) RETURNING id',
+        [@project, type, repo, token]
       )[0]['id'], 10
     )
   end
