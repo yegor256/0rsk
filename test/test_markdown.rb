@@ -29,6 +29,19 @@ class Rsk::MarkdownTest < TestCase
   end
 
   def test_cuts_a_single_line
-    assert_equal('abcde...', Rsk::Trimmed.new('abcdefghij', 5).to_s)
+    assert_equal('ab...', Rsk::Trimmed.new('abcdefghij', 5).to_s)
+  end
+
+  def test_escape_boundary
+    value = Rsk::Trimmed.new('aaaaaa\\_tail', 10).to_s
+    refute(value.end_with?('\\'))
+    assert_operator(value.length, :<=, 10)
+  end
+
+  def test_does_not_leave_an_open_markdown_link
+    value = Rsk::Trimmed.new('xxxx [link](https://example.com)', 20).to_s
+    assert_equal(value.count('['), value.count(']'))
+    assert_equal(value.count('('), value.count(')'))
+    assert_operator(value.length, :<=, 20)
   end
 end
