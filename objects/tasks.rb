@@ -24,8 +24,8 @@ class Rsk::Tasks
   end
 
   def done(id)
-    row = plan(id)
     @pgsql.transaction do |t|
+      row = plan(id, t)
       t.exec('DELETE FROM task WHERE id = $1', [id])
       Rsk::Plans.new(@pgsql, Integer(row['project']))
         .get(Integer(row['id']), Integer(row['part']), con: t)
@@ -34,8 +34,8 @@ class Rsk::Tasks
   end
 
   def postpone(id, seconds)
-    row = plan(id)
     @pgsql.transaction do |t|
+      row = plan(id, t)
       t.exec('DELETE FROM task WHERE id = $1', [id])
       plan = Rsk::Plans.new(@pgsql, Integer(row['project'])).get(Integer(row['id']), Integer(row['part']), con: t)
       raise(Rsk::Urror, "Can't postpone plan ##{row['id']}") if /^[a-z]+$/.match?(plan.schedule(con: t))
@@ -113,8 +113,10 @@ class Rsk::Tasks
     )
   end
 
-  def plan(id)
-    project = @pgsql.exec(
+  def plan(id, con = @pgsql)
+    raise(Rsk::Urror, "Task ##{id} is not there any more") if
+      con.exec('SELECT id FROM task WHERE id = $1 FOR UPDATE', [id]).empty?
+    project = con.exec(
       [
         'SELECT project.* FROM project',
         'JOIN part ON part.project = project.id',
@@ -126,7 +128,7 @@ class Rsk::Tasks
     )[0]
     raise(Rsk::Urror, "Task ##{id} not found in projects of #{@login}") if project.nil?
     raise(Rsk::Urror, "Task ##{id} doesn't belong to #{@login}") if project['login'] != @login
-    row = @pgsql.exec('SELECT plan.* FROM plan JOIN task ON task.plan = plan.id WHERE task.id = $1', [id])[0]
+    row = con.exec('SELECT plan.* FROM plan JOIN task ON task.plan = plan.id WHERE task.id = $1', [id])[0]
     raise(Rsk::Urror, "Plan for task ##{id} not found") if row.nil?
     row.merge('project' => project['id'])
   end
