@@ -4,9 +4,16 @@
 # SPDX-License-Identifier: MIT
 
 require_relative 'rsk'
+require_relative 'urror'
 
 class Rsk::Limits
   def initialize(max: 10, period: 60)
+    unless max.is_a?(Integer) && max.positive?
+      raise(Rsk::Urror, "The maximum number of requests must be positive: #{max.inspect}")
+    end
+    unless period.is_a?(Integer) && period >= 0
+      raise(Rsk::Urror, "The period must not be negative: #{period.inspect}")
+    end
     @max = max
     @period = period
     @seen = {}
