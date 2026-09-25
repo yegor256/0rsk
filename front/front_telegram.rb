@@ -214,7 +214,7 @@ module Rsk::Telegram
 end
 Object.include(Rsk::Telegram)
 
-if settings.config['telegram']
+if settings.config['telegram'] && settings.role.daemons?
   Rsk::Daemon.new.start do
     Telebot::Bot.new(settings.config['telegram']['token']).run do |_, message|
       chat = message.chat.id
@@ -232,13 +232,13 @@ if settings.config['telegram']
   end
 end
 
-if settings.config['telegram']
+if settings.config['telegram'] && settings.role.daemons?
   Rsk::Daemon.new(10).start do
     broadcast
   end
 end
 
-if settings.config['telegram']
+if settings.config['telegram'] && settings.role.daemons?
   Rsk::Daemon.new(1440).start do
     alone
   end
