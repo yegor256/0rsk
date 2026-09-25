@@ -33,7 +33,7 @@ configure do
   set :haml, format: :xhtml, escape_html: false
   config = { 'github' => { 'client_id' => '?', 'client_secret' => '?', 'encryption_secret' => '' }, 'sentry' => '' }
   cfg = File.join(File.dirname(__FILE__), 'config.yml')
-  if File.exist?(cfg)
+  if File.file?(cfg)
     loaded = YAML.safe_load(File.open(cfg))
     config.merge!(loaded) if loaded.is_a?(Hash)
   end
