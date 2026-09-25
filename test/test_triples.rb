@@ -62,6 +62,16 @@ class Rsk::TriplesTest < TestCase
     assert_raises(Rsk::Urror) { triples.add(other, rid, eid) }
   end
 
+  def test_rejects_parts_in_wrong_positions
+    project = test_project
+    cause = test_cause(project: project)
+    risk = test_risk(project: project)
+    effect = test_effect(project: project)
+    triples = Rsk::Triples.new(test_pgsql, project)
+    assert_raises(Rsk::Urror) { triples.add(risk, cause, effect) }
+    assert_equal(0, triples.count)
+  end
+
   def test_fetches_with_plans
     project = test_project
     cid = Rsk::Causes.new(test_pgsql, project).add('we have data')
