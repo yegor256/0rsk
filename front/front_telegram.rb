@@ -67,7 +67,7 @@ module Rsk::Telegram
               index: i,
               text: "/done #{t[:id]}"
             }
-          end.group_by { |x| (x[:index] / 4).round }.values,
+          end.group_by { |x| x[:index] / 4 }.values,
           one_time_keyboard: true,
           resize_keyboard: true
         }
