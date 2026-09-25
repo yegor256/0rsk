@@ -18,7 +18,7 @@ before '/*' do
         settings.config['github']['encryption_secret'],
         context
       ).to_user
-    rescue GLogin::Codec::DecodingError
+    rescue GLogin::Codec::DecodingError, ArgumentError
       response.delete_cookie('glogin')
     end
   end
