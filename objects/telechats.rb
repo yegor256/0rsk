@@ -8,6 +8,8 @@ require_relative 'rsk'
 require_relative 'urror'
 
 class Rsk::Telechats
+  HOURS = 24
+
   def initialize(pgsql)
     @pgsql = pgsql
   end
@@ -18,18 +20,39 @@ class Rsk::Telechats
 
   def invite(chat)
     token = SecureRandom.uuid
-    @pgsql.exec('INSERT INTO teleinvite (token, chat) VALUES ($1, $2)', [token, chat])
+    @pgsql.transaction do |t|
+      t.exec("DELETE FROM teleinvite WHERE created < NOW() - INTERVAL '#{Rsk::Telechats::HOURS} hours'")
+      t.exec('INSERT INTO teleinvite (token, chat) VALUES ($1, $2)', [token, chat])
+    end
     token
   end
 
   def accept(token, login)
     @pgsql.transaction do |t|
-      rows = t.exec('DELETE FROM teleinvite WHERE token = $1 RETURNING chat', [token])
+      rows = t.exec(
+        [
+          'DELETE FROM teleinvite WHERE token = $1',
+          "AND created > NOW() - INTERVAL '#{Rsk::Telechats::HOURS} hours'",
+          'RETURNING chat'
+        ],
+        [token]
+      )
       raise(Rsk::Urror, 'This link is not valid any more, ask the bot for a new one') if rows.empty?
       chat = Integer(rows[0]['chat'])
       t.exec('INSERT INTO telechat (id, login) VALUES ($1, $2)', [chat, login])
       chat
     end
+  end
+
+  def invited(token)
+    row = @pgsql.exec(
+      [
+        'SELECT chat FROM teleinvite WHERE token = $1',
+        "AND created > NOW() - INTERVAL '#{Rsk::Telechats::HOURS} hours'"
+      ],
+      [token]
+    ).first
+    row.nil? ? nil : Integer(row['chat'])
   end
 
   def exists?(id)

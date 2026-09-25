@@ -12,7 +12,8 @@ require_relative '../objects/trimmed'
 require_relative '../objects/urror'
 
 get '/telegram' do
-  haml :telegram, layout: :layout, locals: merged(title: '/telegram', token: params[:token].to_s)
+  token = params[:token].to_s
+  haml(:telegram, layout: :layout, locals: merged(title: '/telegram', token:, chat: telechats.invited(token)))
 end
 
 post '/telegram' do
