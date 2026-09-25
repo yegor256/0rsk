@@ -32,6 +32,20 @@ class Rsk::AppTest < TestCase
     Sinatra::Application
   end
 
+  def test_survives_github_being_unreachable
+    fake = Object.new
+    fake.define_singleton_method(:user) { |_| raise(SocketError, 'getaddrinfo: temporary failure') }
+    fake.define_singleton_method(:login_uri) { 'https://example.com/login' }
+    before = Sinatra::Application.settings.glogin
+    Sinatra::Application.set(:glogin, fake)
+    begin
+      get('/github-callback?code=abc')
+      assert_equal(302, last_response.status, last_response.body)
+    ensure
+      Sinatra::Application.set(:glogin, before)
+    end
+  end
+
   def test_renders_pages
     pages = ['/version', '/robots.txt', '/', '/js/triple.js', '/js/responses.js', '/terms']
     pages.each do |p|

@@ -28,9 +28,15 @@ end
 get '/github-callback' do
   code = params[:code]
   error(400) if code.nil?
+  begin
+    user = settings.glogin.user(code)
+  rescue SocketError, SystemCallError, OpenSSL::SSL::SSLError, Net::OpenTimeout, Net::ReadTimeout => e
+    settings.log.error("Can't log in via GitHub: #{e.message}")
+    flash('/', 'GitHub could not be reached right now, please try again', color: 'darkred')
+  end
   response.set_cookie(
     :glogin, GLogin::Cookie::Open.new(
-      settings.glogin.user(code),
+      user,
       settings.config['github']['encryption_secret'],
       context
     ).to_s
