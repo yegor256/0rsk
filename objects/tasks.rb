@@ -11,15 +11,18 @@ require_relative 'rsk'
 class Rsk::Tasks
   THRESHOLD = 8
 
+  INSERT = 'INSERT INTO task (plan) VALUES ($1) ON CONFLICT (plan) DO NOTHING RETURNING id'
+
   def initialize(pgsql, login)
     @pgsql = pgsql
     @login = login
   end
 
   def create
+    room = THRESHOLD - count
     Rsk::Pipeline.new(@pgsql, @login).fetch.each do |p|
-      next if count >= THRESHOLD
-      @pgsql.exec('INSERT INTO task (plan) VALUES ($1) ON CONFLICT (plan) DO NOTHING', [p])
+      break if room <= 0
+      room -= @pgsql.exec(INSERT, [p]).size
     end
   end
 
