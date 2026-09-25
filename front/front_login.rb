@@ -9,7 +9,7 @@ before '/*' do
   end
   @locals = { http_start: Time.now, ver: Rsk::VERSION, login_link: settings.glogin.login_uri, request_ip: request.ip }
   if params[:glogin] && ENV['RACK_ENV'] != 'production'
-    response.set_cookie('glogin', params[:glogin])
+    response.set_cookie('glogin', value: params[:glogin], path: '/')
   end
   if request.cookies['glogin']
     begin
@@ -19,7 +19,7 @@ before '/*' do
         context
       ).to_user
     rescue GLogin::Codec::DecodingError, ArgumentError
-      response.delete_cookie('glogin')
+      response.delete_cookie('glogin', path: '/')
     end
   end
   @locals[:tasks_count] = tasks.count if @locals[:user]
@@ -35,21 +35,23 @@ get '/github-callback' do
     flash('/', 'GitHub could not be reached right now, please try again', color: 'darkred')
   end
   response.set_cookie(
-    :glogin, GLogin::Cookie::Open.new(
+    :glogin,
+    value: GLogin::Cookie::Open.new(
       user,
       settings.config['github']['encryption_secret'],
       context
-    ).to_s
+    ).to_s,
+    path: '/'
   )
   flash('/', 'You have been logged in')
 end
 
 get '/logout' do
-  response.delete_cookie('glogin')
+  response.delete_cookie('glogin', path: '/')
   flash('/', 'You have been logged out')
 end
 
 post '/logout' do
-  response.delete_cookie('glogin')
+  response.delete_cookie('glogin', path: '/')
   flash('/', 'You have been logged out')
 end
