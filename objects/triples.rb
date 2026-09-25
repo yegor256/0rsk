@@ -42,7 +42,7 @@ class Rsk::Triples
 
   def delete(id)
     @pgsql.transaction do |t|
-      triple = fetch(id: Integer(id))[0]
+      triple = fetch(id: Integer(id), con: t)[0]
       raise(Rsk::Urror, "Triple ##{id} not found in your project ##{@project}") if triple.nil?
       if t.exec('SELECT * FROM part WHERE id = $1 AND project = $2', [triple[:cid], @project]).empty?
         raise(Rsk::Urror, "Triple ##{id} is not in your project ##{@project}")
@@ -64,8 +64,8 @@ class Rsk::Triples
     query(0, query).count
   end
 
-  def fetch(id: 0, query: '', limit: 10, offset: 0)
-    query(id, query).fetch(offset, limit).map do |r|
+  def fetch(id: 0, query: '', limit: 10, offset: 0, con: nil)
+    query(id, query, con).fetch(offset, limit).map do |r|
       {
         id: Integer(r['id']),
         cid: Integer(r['cid']),
@@ -88,7 +88,7 @@ class Rsk::Triples
 
   private
 
-  def query(id, query)
+  def query(id, query, con = nil)
     where = []
     words = []
     numbers = []
@@ -112,7 +112,7 @@ class Rsk::Triples
       end
     end
     Rsk::Query.new(
-      @pgsql,
+      con || @pgsql,
       [
         'SELECT DISTINCT t.id, t.created, cause.id AS cid, risk.id AS rid, effect.id AS eid,',
         '  effect.positive,',
