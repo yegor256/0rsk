@@ -111,7 +111,7 @@
             %li{title: 'PostgreSQL version'}
               = "pg:#{settings.pgsql.version}"
             %li{title: 'Your IP address visible to the server'}
-              %a{href: 'https://iplocation.com/?ip=', title: 'Your IP address' + request_ip}
+              %a{href: "https://iplocation.com/?ip=#{request_ip}", title: "Look up #{request_ip}"}
                 = request_ip
             %li{title: 'This request processing time'}
               = "#{((Time.now - http_start) * 1000).round}ms"
