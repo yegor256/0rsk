@@ -53,7 +53,7 @@ class Rsk::Plans
         positive: r['positive'] == 't',
         part: Integer(r['pid']),
         rank: Integer(r['rank'] || 0),
-        completed: Time.parse(r['completed']),
+        completed: r['completed'] && Time.parse(r['completed']),
         schedule: r['schedule']
       }
     end
