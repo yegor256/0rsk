@@ -36,10 +36,10 @@ class Rsk::Plan
   end
 
   def reschedule(text, con: nil)
-    unless /^(daily|weekly|biweekly|monthly|quarterly|annually|\d{2}-\d{2}-\d{4})$/.match?(text)
+    unless /\A(daily|weekly|biweekly|monthly|quarterly|annually|\d{2}-\d{2}-\d{4})\z/.match?(text)
       raise(Rsk::Urror, "Schedule can either be a word or a date DD-MM-YYYY: #{text.inspect}")
     end
-    if /^\d{2}-\d{2}-\d{4}$/.match?(text)
+    if /\A\d{2}-\d{2}-\d{4}\z/.match?(text)
       begin
         Date.strptime(text, '%d-%m-%Y')
       rescue Date::Error

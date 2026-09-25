@@ -27,6 +27,7 @@ class Rsk::PlanTest < TestCase
   def test_rejects_invalid_schedule
     plan = with_plan
     assert_raises(Rsk::Urror) { plan.reschedule('bad') }
+    assert_raises(Rsk::Urror) { plan.reschedule("daily\n") }
   end
 
   def test_rejects_a_date_that_is_not_in_the_calendar
