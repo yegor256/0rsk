@@ -33,7 +33,9 @@ class Rsk::Plans
   def get(id, part, con: nil)
     require_relative('plan')
     if (con || @pgsql).exec(
-      'SELECT id FROM part WHERE id = $1 AND project = $2 AND type = $3', [id, @project, 'Plan']
+      'SELECT plan.id FROM plan JOIN part ON part.id = plan.id ' \
+      'WHERE plan.id = $1 AND plan.part = $2 AND part.project = $3',
+      [id, part, @project]
     ).empty?
       raise(Rsk::Urror, "Plan ##{id} is not in project ##{@project}")
     end
