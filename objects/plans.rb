@@ -19,6 +19,9 @@ class Rsk::Plans
       if t.exec('SELECT id FROM part WHERE id = $1 AND project = $2', [part, @project]).empty?
         raise(Rsk::Urror, "Part ##{part} must belong to project ##{@project}")
       end
+      if t.exec("SELECT id FROM part WHERE id = $1 AND type IN ('Cause', 'Risk', 'Effect')", [part]).empty?
+        raise(Rsk::Urror, "Part ##{part} must be a cause, risk, or effect in project ##{@project}")
+      end
       id = Integer(
         t.exec(
           'INSERT INTO part (project, text, type) VALUES ($1, $2, $3) RETURNING id',

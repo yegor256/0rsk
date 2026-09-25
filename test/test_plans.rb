@@ -48,6 +48,16 @@ class Rsk::PlansTest < TestCase
     assert_equal(0, Rsk::Plans.new(test_pgsql, theirs).count)
   end
 
+  def test_refuses_a_plan_as_a_part
+    project = test_project
+    plans = Rsk::Plans.new(test_pgsql, project)
+    first = plans.add(test_risk(project: project), 'first plan')
+    assert_raises(Rsk::Urror) do
+      plans.add(first, 'nested plan')
+    end
+    assert_equal(1, plans.count)
+  end
+
   def test_refuses_a_plan_of_another_project
     mine = test_project
     theirs = test_project
