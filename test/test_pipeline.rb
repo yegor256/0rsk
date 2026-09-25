@@ -16,6 +16,15 @@ require_relative '../objects/tasks'
 require_relative '../objects/triples'
 
 class Rsk::PipelineTest < TestCase
+  def test_uses_calendar_year_for_annual_deadline
+    assert_equal(
+      Time.new(2025, 2, 28, 12, 0, 0, '+00:00'),
+      Rsk::Pipeline.new(test_pgsql, 'unused').__send__(
+        :deadline, Time.new(2024, 2, 29, 12, 0, 0, '+00:00'), 'annually'
+      )
+    )
+  end
+
   def test_adds_and_fetches
     login = "bobby#{rand(99_999)}"
     project = Rsk::Projects.new(test_pgsql, login).add("testuu#{rand(99_999)}")
