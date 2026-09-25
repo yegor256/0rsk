@@ -29,6 +29,12 @@ class Rsk::PlansTest < TestCase
     plans.get(id, rid).complete
   end
 
+  def test_refuses_blank_text
+    project = test_project
+    plans = Rsk::Plans.new(test_pgsql, project)
+    assert_raises(Rsk::Urror) { plans.add(test_risk(project: project), '   ') }
+  end
+
   def test_refuses_a_part_of_another_project
     mine = test_project
     theirs = test_project
