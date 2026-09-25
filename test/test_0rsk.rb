@@ -150,7 +150,7 @@ class Rsk::AppTest < TestCase
     login("blank#{rand(99_999)}")
     post('/triple/save?ctext=&rtext=test+risk&etext=test+effect&emoji=A&cid=&rid=&eid=&probability=5&impact=5')
     assert_equal(302, last_response.status, last_response.body)
-    assert_includes(last_response.headers['Set-Cookie'], 'flash_msg=The+cause+name+can%27t+be+empty')
+    assert_includes(last_response.headers['Set-Cookie'].to_s, 'flash_msg=The+cause+name+can%27t+be+empty')
   end
 
   def test_export_csv_and_json
