@@ -72,7 +72,7 @@ end
 
 get '/ranked' do
   offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '10')
+  limit = [Integer(params[:limit] || '10'), 1].max
   query = params[:q] || ''
   haml :ranked, layout: :layout, locals: merged(
     title: '/ranked',
@@ -164,7 +164,7 @@ end
 
 get '/causes' do
   offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '25')
+  limit = [Integer(params[:limit] || '25'), 1].max
   query = params[:q] || ''
   haml :causes, layout: :layout, locals: merged(
     title: '/causes',
@@ -179,7 +179,7 @@ end
 
 get '/risks' do
   offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '25')
+  limit = [Integer(params[:limit] || '25'), 1].max
   query = params[:q] || ''
   haml :risks, layout: :layout, locals: merged(
     title: '/risks',
@@ -193,7 +193,7 @@ end
 
 get '/effects' do
   offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '25')
+  limit = [Integer(params[:limit] || '25'), 1].max
   query = params[:q] || ''
   haml :effects, layout: :layout, locals: merged(
     title: '/effects',
@@ -207,7 +207,7 @@ end
 
 get '/plans' do
   offset = [Integer(params[:offset] || '0'), 0].max
-  limit = Integer(params[:limit] || '25')
+  limit = [Integer(params[:limit] || '25'), 1].max
   query = params[:q] || ''
   haml :plans, layout: :layout, locals: merged(
     title: '/plans',
