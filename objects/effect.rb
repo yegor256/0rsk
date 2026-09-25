@@ -36,6 +36,9 @@ class Rsk::Effect
   end
 
   def polarize(v)
+    unless [true, false].include?(v)
+      raise(Rsk::Urror, "The polarity must be true or false: #{v.inspect}")
+    end
     @pgsql.exec('UPDATE effect SET positive = $2 WHERE id = $1', [@id, v])
   end
 end

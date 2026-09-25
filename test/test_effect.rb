@@ -17,4 +17,10 @@ class Rsk::EffectTest < TestCase
     effect.polarize(true)
     assert_predicate(effect, :positive?)
   end
+
+  def test_refuses_nil_polarity
+    effects = Rsk::Effects.new(test_pgsql, test_project)
+    effect = effects.get(effects.add('another effect'))
+    assert_raises(Rsk::Urror) { effect.polarize(nil) }
+  end
 end
