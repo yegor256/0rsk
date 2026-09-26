@@ -13,6 +13,9 @@ require_relative '../objects/urror'
 
 get '/telegram' do
   token = params[:token].to_s
+  unless @locals[:user]
+    flash('/', 'Log in first, then open the link the bot sent you again', color: 'darkred')
+  end
   haml(:telegram, layout: :layout, locals: merged(title: '/telegram', token:, chat: telechats.invited(token)))
 end
 
