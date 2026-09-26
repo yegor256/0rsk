@@ -22,6 +22,7 @@ require 'time'
 require 'yaml'
 require_relative 'objects/limits'
 require_relative 'objects/role'
+require_relative 'objects/schedule'
 require_relative 'objects/urror'
 require_relative 'version'
 
@@ -151,8 +152,9 @@ end
 post '/responses/add' do
   id = Integer(params[:id], 10)
   part = Integer(params[:strategy], 10)
+  schedule = Rsk::Schedule.new(params[:schedule]).to_s
   pid = plans.add(part, params[:plan])
-  plans.get(pid, part).reschedule(params[:schedule].strip)
+  plans.get(pid, part).reschedule(schedule)
   flash("/responses?id=#{id}", "Thanks, plan ##{pid}/#{part} added to the triple ##{id}")
 end
 
