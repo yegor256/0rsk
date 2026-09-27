@@ -7,6 +7,8 @@ require_relative 'rsk'
 require_relative 'urror'
 
 class Rsk::Limits
+  SWEEP = 1024
+
   def initialize(max: 10, period: 60)
     unless max.is_a?(Integer) && max.positive?
       raise(Rsk::Urror, "The maximum number of requests must be positive: #{max.inspect}")
@@ -22,11 +24,19 @@ class Rsk::Limits
 
   def over?(client, now: Time.now.to_i)
     @mutex.synchronize do
-      @seen.each_value { |hits| hits.reject! { |t| t < now - @period } }
-      @seen.reject! { |_, hits| hits.empty? }
+      sweep(now) if @seen.size > Rsk::Limits::SWEEP
       hits = (@seen[client] ||= [])
-      hits << now
-      hits.size > @max
+      hits.reject! { |t| t < now - @period }
+      over = hits.size >= @max
+      hits << now unless over
+      over
     end
+  end
+
+  private
+
+  def sweep(now)
+    @seen.each_value { |hits| hits.reject! { |t| t < now - @period } }
+    @seen.reject! { |_, hits| hits.empty? }
   end
 end
