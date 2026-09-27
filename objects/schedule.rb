@@ -15,11 +15,11 @@ class Rsk::Schedule
   end
 
   def to_s
-    text = @text.to_s.strip
-    unless Rsk::Schedule::WORDS.include?(text) || /^\d{2}-\d{2}-\d{4}$/.match?(text)
+    text = @text.to_s
+    unless Rsk::Schedule::WORDS.include?(text) || /\A\d{2}-\d{2}-\d{4}\z/.match?(text)
       raise(Rsk::Urror, "Schedule can either be a word or a date DD-MM-YYYY: #{text.inspect}")
     end
-    if /^\d{2}-\d{2}-\d{4}$/.match?(text)
+    if /\A\d{2}-\d{2}-\d{4}\z/.match?(text)
       begin
         Date.strptime(text, '%d-%m-%Y')
       rescue Date::Error

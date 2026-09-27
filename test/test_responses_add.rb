@@ -8,6 +8,7 @@ require 'securerandom'
 require_relative 'test__helper'
 
 require_relative '../0rsk'
+require_relative '../objects/limits'
 require_relative '../objects/plans'
 require_relative '../objects/triples'
 
@@ -16,6 +17,10 @@ class Rsk::ResponsesAddTest < TestCase
 
   def app
     Sinatra::Application
+  end
+
+  def setup
+    Sinatra::Application.set(:rate_limits, Rsk::Limits.new)
   end
 
   def test_adds_no_plan_when_the_schedule_is_refused
