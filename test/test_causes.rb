@@ -46,6 +46,12 @@ class Rsk::CausesTest < TestCase
     assert_operator(found[0][:rank], :>, found[1][:rank])
   end
 
+  def test_refuses_text_longer_than_database_limit
+    assert_raises(Rsk::Urror) do
+      Rsk::Causes.new(test_pgsql, test_project).add('x' * 161)
+    end
+  end
+
   def test_fetch_emojis
     causes = Rsk::Causes.new(test_pgsql, test_project)
     causes.get(causes.add('some cause')).decorate('💰')
