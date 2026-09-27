@@ -8,6 +8,7 @@ require 'securerandom'
 require_relative 'test__helper'
 
 require_relative '../0rsk'
+require_relative '../objects/limits'
 require_relative '../objects/triples'
 
 class Rsk::TripleAtomicTest < TestCase
@@ -18,6 +19,7 @@ class Rsk::TripleAtomicTest < TestCase
   end
 
   def test_keeps_the_texts_when_a_number_is_refused
+    Sinatra::Application.set(:rate_limits, Rsk::Limits.new)
     login = "u#{SecureRandom.hex(8)}"
     project = Rsk::Projects.new(test_pgsql, login).add("p#{SecureRandom.hex(8)}")
     text = "cause #{SecureRandom.hex(8)}"
