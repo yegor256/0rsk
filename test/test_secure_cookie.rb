@@ -8,6 +8,7 @@ require 'securerandom'
 require_relative 'test__helper'
 
 require_relative '../0rsk'
+require_relative '../objects/limits'
 
 class Rsk::SecureCookieTest < TestCase
   include Rack::Test::Methods
@@ -17,6 +18,7 @@ class Rsk::SecureCookieTest < TestCase
   end
 
   def test_marks_the_project_cookie_secure_over_https
+    Sinatra::Application.set(:rate_limits, Rsk::Limits.new)
     login = "u#{SecureRandom.hex(8)}"
     set_cookie("glogin=#{login}")
     post(
