@@ -88,7 +88,7 @@ end
 
 post '/triple/save' do
   %i[ctext rtext etext cid rid eid probability impact].each do |name|
-    raise(Rsk::Urror, "The #{name} is missing in the form") if params[name].nil?
+    raise(Rsk::Urror, "The #{name} is missing in the form") unless params[name].is_a?(String)
   end
   ctext = params[:ctext].strip
   rtext = params[:rtext].strip
