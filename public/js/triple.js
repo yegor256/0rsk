@@ -25,7 +25,7 @@ function auto(kind, uri) {
       });
     },
     select: function(event, ui) {
-      $.each(ui.item.fields, function(field, v) {
+      var apply = function(field, v) {
         var $field = $("#" + field);
         if (typeof v === "boolean") {
           $field.prop("checked", v);
@@ -34,6 +34,16 @@ function auto(kind, uri) {
         }
         $field.trigger("change");
         $("#" + kind + "_detach").show().removeClass("red");
+      };
+      $.each(ui.item.fields, function(field, v) {
+        if (typeof v === "boolean") {
+          apply(field, v);
+        }
+      });
+      $.each(ui.item.fields, function(field, v) {
+        if (typeof v !== "boolean") {
+          apply(field, v);
+        }
       });
     },
     close: function() {
