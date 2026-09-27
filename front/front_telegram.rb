@@ -6,9 +6,11 @@
 require 'telebot'
 require_relative '../objects/daemon'
 require_relative '../objects/markdown'
+require_relative '../objects/projects'
 require_relative '../objects/telechats'
 require_relative '../objects/telepings'
 require_relative '../objects/trimmed'
+require_relative '../objects/triples'
 require_relative '../objects/urror'
 
 get '/telegram' do
