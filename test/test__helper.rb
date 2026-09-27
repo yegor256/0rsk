@@ -40,12 +40,17 @@ require 'securerandom'
 require 'yaml'
 require_relative '../objects/causes'
 require_relative '../objects/effects'
+require_relative '../objects/limits'
 require_relative '../objects/plans'
 require_relative '../objects/projects'
 require_relative '../objects/risks'
 require_relative '../objects/triples'
 
 class TestCase < Minitest::Test
+  def setup
+    Sinatra::Application.set(:rate_limits, Rsk::Limits.new) if defined?(Sinatra::Application)
+  end
+
   private
 
   def test_pgsql
