@@ -8,7 +8,7 @@ before '/*' do
     halt 429, { 'Content-Type' => 'text/plain' }, 'Too many requests'
   end
   @locals = { http_start: Time.now, ver: Rsk::VERSION, login_link: settings.glogin.login_uri, request_ip: request.ip }
-  if params[:glogin] && ENV['RACK_ENV'] != 'production'
+  if params[:glogin] && settings.environment == :test
     response.set_cookie('glogin', params[:glogin])
   end
   if request.cookies['glogin']
