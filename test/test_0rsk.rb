@@ -9,6 +9,7 @@ require_relative 'test__helper'
 require_relative '../0rsk'
 require_relative '../objects/causes'
 require_relative '../objects/effects'
+require_relative '../objects/limits'
 require_relative '../objects/projects'
 require_relative '../objects/risks'
 require_relative '../objects/rsk'
@@ -30,6 +31,10 @@ class Rsk::AppTest < TestCase
 
   def app
     Sinatra::Application
+  end
+
+  def setup
+    Sinatra::Application.set(:rate_limits, Rsk::Limits.new)
   end
 
   def test_survives_github_being_unreachable
