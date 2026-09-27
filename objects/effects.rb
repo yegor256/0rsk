@@ -82,7 +82,7 @@ class Rsk::Effects
         'WHERE project = $1',
         'AND LOWER(text) LIKE $2',
         'GROUP BY effect.id, part.id',
-        'ORDER BY rank DESC, part.id ASC'
+        'ORDER BY rank DESC NULLS LAST, part.id ASC'
       ],
       [@project, "%#{query.to_s.downcase.strip.gsub(/[\\%_]/, '\\\\\0')}%"]
     )
