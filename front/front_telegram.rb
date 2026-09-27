@@ -50,7 +50,7 @@ module Rsk::Telegram
 
   def reply(msg, login)
     case msg
-    when %r{^/done$}
+    when %r{\A/done(?:@\w+)?\s*\z}i
       left = tasks(login: login).fetch(limit: 100)
       if left.empty?
         ['There are no tasks in your agenda, nothing to complete.']
@@ -73,8 +73,8 @@ module Rsk::Telegram
           resize_keyboard: true
         }
       end
-    when %r{^/done [0-9]+$}
-      id = Integer(msg.split[1])
+    when %r{\A/done(?:@\w+)?\s+(?<id>[0-9]+)\s*\z}i
+      id = Integer(Regexp.last_match[:id])
       tasks(login: login).done(id)
       left = tasks(login: login).fetch
       [
@@ -83,7 +83,7 @@ module Rsk::Telegram
           'Your agenda is empty, good job!' :
           "There are still #{left.count} tasks in your agenda. Say /tasks to see them all."
       ]
-    when %r{^/tasks$}
+    when %r{\A/tasks(?:@\w+)?\s*\z}i
       list = tasks(login: login).fetch(limit: 100)
       if list.empty?
         ['There are no tasks in your agenda, good job!']
