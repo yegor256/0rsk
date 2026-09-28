@@ -13,6 +13,7 @@ class Rsk::Daemon
 
   def start
     Thread.start do
+      sleep(1)
       loop do
         begin
           yield
