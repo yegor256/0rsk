@@ -6,6 +6,7 @@
 source 'https://rubygems.org'
 
 gem 'csv', '~>3.3'
+gem 'benchmark', require: false
 gem 'eslintrb', '~>2.1'
 gem 'faraday-multipart', '~>1.2'
 gem 'glogin', '~>0.14'

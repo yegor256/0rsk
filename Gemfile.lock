@@ -39,6 +39,7 @@ GEM
     backtrace (0.4.1)
     base58 (0.2.3)
     base64 (0.3.0)
+    benchmark (0.5.0)
     bigdecimal (4.1.2)
     builder (3.3.0)
     cgi (0.5.2)
@@ -369,6 +370,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  benchmark
   csv (~> 3.3)
   eslintrb (~> 2.1)
   faraday-multipart (~> 1.2)
