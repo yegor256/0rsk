@@ -33,14 +33,7 @@ get '/github-callback' do
     settings.log.error("Can't log in via GitHub: #{e.message}")
     flash('/', 'GitHub could not be reached right now, please try again', color: 'darkred')
   end
-  cookie(
-    :glogin,
-    GLogin::Cookie::Open.new(
-      user,
-      settings.config['github']['encryption_secret'],
-      context
-    )
-  )
+  cookie(:glogin, GLogin::Cookie::Open.new(user, settings.config['github']['encryption_secret'], context))
   flash('/', 'You have been logged in')
 end
 
