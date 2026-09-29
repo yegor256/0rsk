@@ -35,11 +35,7 @@ get '/github-callback' do
   end
   response.set_cookie(
     :glogin,
-    value: GLogin::Cookie::Open.new(
-      user,
-      settings.config['github']['encryption_secret'],
-      context
-    ).to_s,
+    value: GLogin::Cookie::Open.new(user, settings.config['github']['encryption_secret'], context).to_s,
     path: '/'
   )
   flash('/', 'You have been logged in')
