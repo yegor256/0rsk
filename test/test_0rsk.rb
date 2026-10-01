@@ -9,6 +9,7 @@ require_relative 'test__helper'
 require_relative '../0rsk'
 require_relative '../objects/causes'
 require_relative '../objects/effects'
+require_relative '../objects/limits'
 require_relative '../objects/projects'
 require_relative '../objects/risks'
 require_relative '../objects/rsk'
@@ -30,6 +31,10 @@ class Rsk::AppTest < TestCase
 
   def app
     Sinatra::Application
+  end
+
+  def setup
+    Sinatra::Application.set(:rate_limits, Rsk::Limits.new)
   end
 
   def test_survives_github_being_unreachable
@@ -150,7 +155,7 @@ class Rsk::AppTest < TestCase
     login("blank#{rand(99_999)}")
     post('/triple/save?ctext=&rtext=test+risk&etext=test+effect&emoji=A&cid=&rid=&eid=&probability=5&impact=5')
     assert_equal(302, last_response.status, last_response.body)
-    assert_includes(last_response.headers['Set-Cookie'], 'flash_msg=The+cause+name+can%27t+be+empty')
+    assert_includes(last_response.headers['Set-Cookie'].to_s, 'flash_msg=The+cause+name+can%27t+be+empty')
   end
 
   def test_export_csv_and_json
